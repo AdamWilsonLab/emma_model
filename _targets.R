@@ -2,6 +2,7 @@ library(targets)
 library(tarchetypes)
 library(tidyverse)
 library(arrow)
+library(piggyback)
 
 # source all files in R folder
 lapply(list.files("R",pattern="[.]R",full.names = T), source)
