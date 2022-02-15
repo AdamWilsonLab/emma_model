@@ -27,11 +27,11 @@ list(
   ),
   tar_target(
     data,
-    tidy_static_data()
+    tidy_static_data(envdata)
   ),
   tar_target(
     dyndata,
-    tidy_dynamic_data(cells=data$cellID)
+    tidy_dynamic_data(envdata,cells=data$cellID)
   ),
   tar_target(
     merge_data,

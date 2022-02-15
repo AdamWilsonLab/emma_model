@@ -1,5 +1,5 @@
 ## Download the most recent release from the emma_envdata
-tidy_dynamic_data <- function(cells){
+tidy_dynamic_data <- function(envdata,cells){
 
 
 # Data pre-processing

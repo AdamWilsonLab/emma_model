@@ -1,5 +1,5 @@
 ## Download the most recent release from the emma_envdata
-tidy_static_data <- function(){
+tidy_static_data <- function(envdata){
 
   # projection
 
