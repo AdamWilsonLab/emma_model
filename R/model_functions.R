@@ -25,7 +25,9 @@ group_data_function <- function(data){
 # compile model
 compile_model<- function(stan_file='firemodel_predict.stan',dir="_targets/objects"){
 #  output_file=file.path(dir,sub("[.]stan","",stan_file))
-  cmdstanr::cmdstan_model(stan_file=stan_file,
+  if(!file.exists(dir)) dir.create(dir,recursive = T)
+
+    cmdstanr::cmdstan_model(stan_file=stan_file,
                 compile = TRUE,
                 dir=dir)
  # return(output_file) #return the filename so targets can track it
