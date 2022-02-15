@@ -93,7 +93,8 @@ jobs:
       - name: Run targets pipeline
         run: targets::tar_make()
         shell: Rscript {0}
-
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       - name: Identify files that the targets pipeline produced
         run: git ls-files -mo --exclude=renv > .targets-files
 
