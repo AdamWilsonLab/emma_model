@@ -8,7 +8,7 @@ editor_options:
   chunk_output_type: console
 output:
   github_document:
-    html_preview: false
+    html_preview: true
 ---
 
 ```{r, echo=F}
