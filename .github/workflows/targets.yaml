@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-18.04
     container: adamwilsonlab/emma:latest
     env:
-      GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
+      GITHUB_PAT: ${{ secrets.GH_PAT }}
       RENV_PATHS_ROOT: ~/.local/share/renv
     steps:
       - uses: actions/checkout@v2
@@ -93,8 +93,6 @@ jobs:
       - name: Run targets pipeline
         run: targets::tar_make()
         shell: Rscript {0}
-        env:
-          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       - name: Identify files that the targets pipeline produced
         run: git ls-files -mo --exclude=renv > .targets-files
 
