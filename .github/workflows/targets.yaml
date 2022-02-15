@@ -33,7 +33,8 @@ name: targets
 
 jobs:
   targets:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
+    container: adamwilsonlab/emma:latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       RENV_PATHS_ROOT: ~/.local/share/renv
@@ -48,6 +49,14 @@ jobs:
           sudo apt-get install libcurl4-openssl-dev
           sudo apt-get install libssl-dev
           sudo apt-get install libzmq3-dev
+      - name: Checkout LFS objects
+        run: git lfs checkout
+        continue-on-error: true
+
+      - name: Install R Package Dependencies
+        run: |-
+          Rscript -e "questionr::qscan(list.files(pattern='*.R',recursive=T), load = TRUE, detail = FALSE)" # this scans all scripts and installs any needed packages
+          Rscript -e "remotes::install_github('ROpenSci/bibtex')"
 
       - name: Cache packages
         uses: actions/cache@v1

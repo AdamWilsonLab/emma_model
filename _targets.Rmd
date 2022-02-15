@@ -93,7 +93,18 @@ tar_read(hist)
 The `targets` dependency graph helps your readers understand the steps of your pipeline at a high level.
 
 ```{r}
-tar_visnetwork()
+# some random EDA
+if(F){
+tar_load(data)
+data %>%
+  gather("variable","value",-x,-y) %>%
+  filter(variable=="MODCF_interannualSD.tif") %>%
+  ggplot(aes(x=x,y=y,fill=value))+
+#  facet_wrap(~variable)+
+  geom_raster()+
+  geom_sf(data=region,inherit.aes = F,fill=NA,col="red")
+}
+
 ```
 
 At this point, you can go back and run `{targets}` chunks in interactive mode without interfering with the code or data of the non-interactive pipeline.
