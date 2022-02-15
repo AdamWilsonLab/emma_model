@@ -22,8 +22,8 @@ tar_option_set(packages = c("piggyback","cmdstanr", "posterior", "bayesplot", "t
 ## Download the most recent data release
 list(
   tar_target(
-    envdata,
-    piggyback::pb_download(repo = "AdamWilsonLab/emma_envdata", dest = "data/envdata")
+    envdata,sync_envdata(),
+    format="file"
   ),
   tar_target(
     data,
