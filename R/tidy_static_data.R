@@ -14,8 +14,9 @@ data <- open_dataset(sources = "data/envdata/stable_data.gz.parquet")
 
 
 data %>%
-  filter(remnant_distance.tif>=2) %>%
+  filter(remnant_distance.tif>=5) %>%
   collect() %>%
+  slice_sample(prop=0.1) %>%
   as_tibble() %>%
   return()
 
