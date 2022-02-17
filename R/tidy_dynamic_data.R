@@ -1,21 +1,21 @@
 ## Download the most recent release from the emma_envdata
-tidy_dynamic_data <- function(envdata,cells){
+tidy_dynamic_data <- function(data){
 
 
 # Data pre-processing
 
 dynfiles <- open_dataset(sources = list.files("data/envdata","dynamic",full=T))
 
-#dynfiles$files
+cells_to_keep<- select(data,cellID)
 
-#as_date(11706)
-
-data <- dynfiles  %>%
-  filter(cellID%in%cells) %>%
+dyndata <- dynfiles  %>%
+  semi_join(cells_to_keep,by="cellID") %>% #keep only pixels in data
+#  filter(cellID%in%cells) %>%
   collect() %>%
-  as_tibble() %>%
   spread(variable,value) %>%
   mutate(date=as_date(date),
-         ndvi=ndvi/100)
-return(data)
+         ndvi=ndvi/100) %>%
+  as_tibble()
+
+return(dyndata)
 }

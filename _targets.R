@@ -31,7 +31,7 @@ list(
   ),
   tar_target(
     dyndata,
-    tidy_dynamic_data(envdata,cells=data$cellID)
+    tidy_dynamic_data(data)
   ),
   tar_target(
     merge_data,
