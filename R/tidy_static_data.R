@@ -16,7 +16,7 @@ data <- open_dataset(sources = "data/envdata/stable_data.gz.parquet")
 data %>%
   filter(remnant_distance.tif>=5) %>%
   collect() %>%
-  slice_sample(prop=0.1) %>%
+  slice_sample(prop=0.25) %>% # use only some percentage of full dataset!
   as_tibble() %>%
   return()
 

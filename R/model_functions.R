@@ -1,7 +1,7 @@
 #tidy up
 merge_data_function <- function(data,dyndata){
   dyndata %>%
-    filter(ndvi>0) %>% #remove impossible NDVI values
+    #filter(ndvi>0) %>% #remove impossible NDVI values
     mutate(age=time_since_fire/365.23) %>% #convert age from days to years
     left_join(data,by="cellID") %>%
     select(cellID,date,age,ndvi,

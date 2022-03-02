@@ -11,7 +11,7 @@ output:
     html_preview: true
 ---
 
-```{r, echo=F}
+```{r, echo=F, messages=F}
 library(targets)
 library(tidyverse)
 library(doParallel)
@@ -39,12 +39,13 @@ We have `age` in years, a plot identifier `pid`. the observed ndvi `nd` and two 
 
 Lets load up our Stan model which codes the model described above. This is not a particularly clever or efficient way of coding the model, but it is nice and readable and works fine on this example dataset  
 
+## Fitting Overview
 
-How long did that take?
+### Geographic region
 
-```{r vb_time, echo=T, eval=T, message=FALSE}
-model_fit$time()$total
-```
+
+## 
+The model took `r model_fit$time()$total/60` minutes to fit.  
 
 
 ```{r p1, echo=T, eval=T, message=FALSE}
@@ -63,13 +64,13 @@ ggplot(posteriors,aes(x=value))+
 
 ```{r plot, echo=T, eval=T, message=FALSE}
 posterior_summary %>% 
-#  filter(pid %in% as.numeric(sample(levels(as.factor(posterior_summary$pid)),20))) %>% # just show a few
+  filter(pid %in% as.numeric(sample(levels(as.factor(posterior_summary$pid)),20))) %>% # just show a few
   ggplot(aes(x=age)) +
-  geom_line(aes(y=mean),colour="blue") +
+ geom_line(aes(y=mean),colour="blue") +
   geom_line(aes(y=ndvi),colour="black",lwd=0.5,alpha=0.3) +
-#  geom_ribbon(aes(ymin=q5,ymax=q95),alpha=0.5)+
-#  facet_wrap(~pid) +
-  xlim(c(0,20))+
+  geom_ribbon(aes(ymin=q5,ymax=q95),alpha=0.5)+
+  facet_wrap(~pid) +
+#  xlim(c(0,25))+ ylim(c(0,10))+
   labs(x="time since fire (years)",y="NDVI") +
   theme_bw()
 ```
