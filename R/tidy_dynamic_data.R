@@ -10,8 +10,8 @@ cells_to_keep<- dplyr::select(data,cellID)
 
 dyndata <- dynfiles  %>%
   semi_join(cells_to_keep,by="cellID") %>% #keep only pixels in data
-  filter(date<"2001-01-01") %>%
   collect() %>%
+  filter(date<"2001-01-01") %>%
   spread(variable,value) %>%
   mutate(date=as_date(date),
          ndvi=(ndvi/100)-1) %>%
