@@ -6,21 +6,24 @@ tidy_dynamic_data <- function(data){
 
 dynfiles <- open_dataset(sources = list.files("data/envdata","dynamic",full=T))
 
+cells_to_keep<- dplyr::select(data,cellID)
+
+dyndata <- dynfiles  %>%
+  semi_join(cells_to_keep,by="cellID") %>% #keep only pixels in data
+  filter(date<"2001-01-01") %>%
+  collect() %>%
+  spread(variable,value) %>%
+  mutate(date=as_date(date),
+         ndvi=(ndvi/100)-1) %>%
+  as_tibble()
+
 # dynfiles %>%
 #   filter(cellID<5000,variable=="ndvi") %>%
 #   mutate(ndvi2=(value/100)-1) %>%
 #   collect() %>%
 #   as_tibble()
 
-cells_to_keep<- dplyr::select(data,cellID)
 
-dyndata <- dynfiles  %>%
-  semi_join(cells_to_keep,by="cellID") %>% #keep only pixels in data
-  collect() %>%
-  spread(variable,value) %>%
-  mutate(date=as_date(date),
-         ndvi=(ndvi/100)-1) %>%
-  as_tibble()
 
 return(dyndata)
 }
