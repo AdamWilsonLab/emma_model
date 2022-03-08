@@ -24,7 +24,7 @@ tar_option_set(packages = c("piggyback","cmdstanr", "posterior", "bayesplot", "t
 ## Download the most recent data release
 list(
   tar_target(
-    envdata,sync_envdata(delete_all_first=T),
+    envdata,sync_envdata(delete_all_first=F),
     format="file"
   ),
   tar_target(data,
