@@ -22,15 +22,6 @@ group_data_function <- function(data){
     summarise(env1 = mean(env1),env2 = mean(env2))
 }
 
-# compile model
-compile_model<- function(stan_file='firemodel_predict.stan',dir="_targets/objects"){
-#  output_file=file.path(dir,sub("[.]stan","",stan_file))
-  if(!file.exists(dir)) dir.create(dir,recursive = T)
-    cmdstanr::cmdstan_model(stan_file=stan_file,
-                compile = TRUE,
-                dir=dir)
- # return(output_file) #return the filename so targets can track it
-}
 
 #prep data for stan
 stan_data_function <- function(data,group_data){
@@ -44,32 +35,14 @@ stan_data_function <- function(data,group_data){
 }
 
 
-# fit model
-fit_model<- function(model,data){
-  model_results=
-    model$variational(
-      data = data,
-      adapt_engaged=FALSE,
-      eta=0.1,
-      tol_rel_obj = 0.001,
-      seed = 123)
-  # the next few lines ensure all the data is actually read into RAM (and not stored in temp files)
-  # from https://github.com/stan-dev/cmdstanr/blob/622fa94e31e677878f7d3ed8d79a186edb7e0d6b/R/fit.R#L99-L103
-  model_results$draws()
-  try(model_results$sampler_diagnostics(), silent = TRUE)
-  try(model_results$init(), silent = TRUE)
-  try(model_results$profiles(), silent = TRUE)
-  #  model_results$save_object(file)
-  return(model_results)
-}
-
 
 # Summarize posteriors
-summarize_posteriors <- function(model_output,data){
+parameter_summary <- function(model_output,data){
   #posterior predictive
-  tdata<- model_output$summary("nd_new","mean","quantile2") %>%
-        mutate(pid=gsub("[]]","",gsub(".*[[]","",variable))) %>%  #extract pid from parameter names
-    bind_cols(select(data,cellID,date,age,ndvi))  # be careful - this just binds and not a full join - don't change row order!!!!!
+  tdata<- model_output %>%
+        mutate(pid=gsub("[]]","",gsub(".*[[]","",variable)),
+               parameter=gsub("[[].*","",variable)) %>%  #extract pid from parameter names
+    filter(!variable%in%c("mu","nd_new"))
 
   #wrangle
   #  stan_ndvi <- rbind(stan_vb) %>%
@@ -84,8 +57,7 @@ summarize_posteriors <- function(model_output,data){
 spatial_outputs <- function(posteriors) {
   message("This function doesn't work - need to get actual dates from the original data!!!!!")
   stan_spatial <- stan_vb %>%
-    mutate(pid=gsub("[]]","",gsub(".*[[]","",variable))) %>%
-    bind_cols(select(data,x,y,age,nd))
+    mutate(pid=gsub("[]]","",gsub(".*[[]","",variable)))
 
   foreach(t=unique(raw_data$DA),.combine=stack) %do% {
     stan_spatial %>%

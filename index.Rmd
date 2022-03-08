@@ -11,7 +11,7 @@ output:
     html_preview: true
 ---
 
-```{r, echo=F, messages=F}
+```{r, echo=F, messages=F, results="hide"}
 library(targets)
 library(tidyverse)
 library(doParallel)

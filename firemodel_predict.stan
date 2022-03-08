@@ -38,16 +38,18 @@ transformed parameters {
   }
 
   for (i in 1:N){
+//    bid=pid[i] # pixel id for this observation
+//    mu[i] = exp(alpha[bid])+exp(gamma[bid])-exp(gamma[bid])*exp(-(age[i]/exp(lambda[bid])));
     mu[i] = exp(alpha[pid[i]])+exp(gamma[pid[i]])-exp(gamma[pid[i]])*exp(-(age[i]/exp(lambda[pid[i]])));
   }
 }
 
 model {
 
-  tau ~  inv_gamma(0.01, 0.01);
-  gamma_tau ~ inv_gamma(0.01, 0.01);
-  lambda_tau ~ inv_gamma(0.01, 0.01);
-  alpha_tau ~ inv_gamma(0.01, 0.01);
+  tau ~  student_t(4,0,1); #inv_gamma(0.01, 0.01);
+  gamma_tau ~ student_t(4,0,1); #inv_gamma(0.01, 0.01);
+  lambda_tau ~ student_t(4,0,1); #inv_gamma(0.01, 0.01);
+  alpha_tau ~ student_t(4,0,1); #inv_gamma(0.01, 0.01);
 
   alpha_mu ~ normal(0.15,3);
   gamma_b1 ~ normal(0,3);
