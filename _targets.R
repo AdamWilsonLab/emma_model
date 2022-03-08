@@ -24,7 +24,7 @@ tar_option_set(packages = c("piggyback","cmdstanr", "posterior", "bayesplot", "t
 ## Download the most recent data release
 list(
   tar_target(
-    envdata,sync_envdata(),
+    envdata,sync_envdata(delete_all_first=T),
     format="file"
   ),
   tar_target(data,
@@ -74,7 +74,7 @@ list(
 #    stderr = R.utils::nullfile(),
     adapt_engaged=F,
     eta=0.1,
-    iter = 10000, #should be 1000 or more - 100 is just to run quickly
+    iter = 1000, #should be 1000 or more - 100 is just to run quickly
     garbage_collection=T,
     init=1,
     tol_rel_obj = 0.001
