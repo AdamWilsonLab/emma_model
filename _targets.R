@@ -16,7 +16,7 @@ tar_option_set(packages = c("piggyback","cmdstanr", "posterior", "bayesplot", "t
                deployment="main")
 
           Sys.setenv(HOME="/home/rstudio")
-          #cmdstanr::set_cmdstan_path("/home/rstudio/.cmdstanr/cmdstan-2.28.1")
+          cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
           cmdstanr::check_cmdstan_toolchain()
           #cmdstanr::install_cmdstan()
 
@@ -74,9 +74,9 @@ list(
 #    stderr = R.utils::nullfile(),
     adapt_engaged=F,
     eta=0.1,
-    iter = 100,
+    iter = 10000, #should be 1000 or more - 100 is just to run quickly
     garbage_collection=T,
-    init=2,
+    init=1,
     tol_rel_obj = 0.001
   )
 
