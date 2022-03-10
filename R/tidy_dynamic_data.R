@@ -19,7 +19,8 @@ dyndata <- dynfiles  %>%
   collect() %>%
   spread(variable,value) %>%
   mutate(date=as_date(date),
-         ndvi=(ndvi/100)-1) %>%
+         ndvi=(ndvi/100)-1,
+         age=time_since_fire/365.23) %>% #convert age from days to years
   as_tibble()
 
 return(dyndata)

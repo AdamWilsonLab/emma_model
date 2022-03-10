@@ -1,22 +1,22 @@
 data {
-  int<lower=0> N;
-  int<lower=0> J;
-  int<lower=1,upper=J> pid[N];
-  vector[N] age;
-  vector[N] nd;
-  vector[J] envg1;
-  vector[J] envg2;
-
+  int<lower=0> N; // # of pixels * time steps
+  int<lower=0> J; // # of pixels
+  int<lower=0> P; // # of environment vars
+  int<lower=1,upper=J> pid[N]; // pixel count
+  matrix[J,P] x; // NxP environmental matrix
+  vector[N] age; // age at observation N
+  vector[N] ndvi; // ndvi at observation N
+  // a switch to evaluate the likelihood following:
+  // https://khakieconomics.github.io/2017/-6/30/An-easy-way-to-simulate-fake-data-in-stan.html
+  int<lower = 0, upper = 1> run_estimation;
 }
 parameters {
   vector[J] alpha;
   vector[J] gamma;
   vector[J] lambda;
   real alpha_mu;
-  real gamma_b1;
-  real gamma_b2;
-  real lambda_b1;
-  real lambda_b2;
+  vector[P] gamma_beta;
+  vector[P] lambda_beta;
   real<lower=0> tau_sq;
   real<lower=0> gamma_tau_sq;
   real<lower=0> lambda_tau_sq;
@@ -32,13 +32,12 @@ transformed parameters {
   real lambda_tau = sqrt(lambda_tau_sq);
   real alpha_tau = sqrt(alpha_tau_sq);
 
-  for (j in 1:J){
-    gamma_mu[j] = (envg1[j]*gamma_b1) + (envg2[j]*gamma_b2);
-    lambda_mu[j] = (envg1[j]*lambda_b1) + (envg2[j]*lambda_b2);
-  }
+// regressions
+    gamma_mu = x*gamma_beta;
+    lambda_mu = x*lambda_beta;
 
   for (i in 1:N){
-//    bid=pid[i] # pixel id for this observation
+//    bid[i]=pid[i]; //# links the dynamic data to the static env table
 //    mu[i] = exp(alpha[bid])+exp(gamma[bid])-exp(gamma[bid])*exp(-(age[i]/exp(lambda[bid])));
     mu[i] = exp(alpha[pid[i]])+exp(gamma[pid[i]])-exp(gamma[pid[i]])*exp(-(age[i]/exp(lambda[pid[i]])));
   }
@@ -46,30 +45,32 @@ transformed parameters {
 
 model {
 
+  // hyperpriors
   tau ~  student_t(4,0,1); //#inv_gamma(0.01, 0.01);
   gamma_tau ~ student_t(4,0,1); //#inv_gamma(0.01, 0.01);
   lambda_tau ~ student_t(4,0,1); //#inv_gamma(0.01, 0.01);
   alpha_tau ~ student_t(4,0,1); //#inv_gamma(0.01, 0.01);
 
+  // priors
   alpha_mu ~ normal(0.15,3);
-  gamma_b1 ~ normal(0,3);
-  gamma_b2 ~ normal(0,3);
-  lambda_b1 ~ normal(0,3);
-  lambda_b2 ~ normal(0,3);
+  gamma_beta ~ normal(0,3);
+  lambda_beta ~ normal(0,3);
 
-
+  // recovery curve
   alpha ~ normal(alpha_mu, alpha_tau);
   gamma ~ normal(gamma_mu,gamma_tau);
   lambda ~ normal(lambda_mu,lambda_tau);
 
-  nd ~ normal(mu, tau);
-
+  // likelihood
+  if(run_estimation==1){ // only run if desired
+    ndvi ~ normal(mu, tau);
+  }
 }
 
 generated quantities {
-  vector[N] nd_new;
+  vector[N] ndvi_pred;
 
   for (n in 1:N){
-    nd_new[n] = normal_rng(mu[n], tau);
+    ndvi_pred[n] = normal_rng(mu[n], tau);
   }
 }

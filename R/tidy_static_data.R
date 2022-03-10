@@ -25,7 +25,8 @@ td=data %>%
   group_by(model_domain) %>%
   mutate(training = sample(c(TRUE,FALSE),size=n(), replace = T,prob = c(sample_proportion, 1-sample_proportion))) %>%
   mutate(sample = ifelse(model_domain, training, FALSE)) %>%
-  compute()
+  compute() %>%
+  ungroup()
 
 
 
