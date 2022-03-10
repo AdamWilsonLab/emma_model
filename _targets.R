@@ -61,8 +61,8 @@ list(
       create_stan_data(
         data=data_training,
         dyndata=dyndata_training,
-        fit=0,
-        predict=0)
+        fit=1,
+        predict=1)
   ),
 
 # tried mcmc - 500 samples in ~12 hours

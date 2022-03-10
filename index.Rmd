@@ -46,12 +46,15 @@ Lets load up our Stan model which codes the model described above. This is not a
 
 
 ```{r p1, echo=T, eval=T, message=FALSE}
-params=c("tau","alpha_mu","gamma_beta","lambda_beta")
-posteriors=model_results %>% 
-  filter(model_results$parameter%in%params)
+betas=model_results %>% 
+  filter(type=="beta")
 
-ggplot(posteriors,aes(y=parameter, xmin=q5,x=median,xmax=q95))+
-  geom_pointrange(fill="grey")
+ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
+  geom_pointrange(fill="grey")+
+  facet_wrap(~parameter,nrow=1)+
+  geom_vline(xintercept=0,col="grey")+
+  xlab(expression(beta*" (regression coefficient +/- 95% CI)"))
+
 ```
 
 

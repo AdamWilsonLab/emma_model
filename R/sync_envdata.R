@@ -11,21 +11,19 @@ sync_envdata <- function(repo="AdamWilsonLab/emma_envdata",
 
   if(!file.exists(path)) dir.create(path,recursive = T)
 
-#  n=1 # repeat n times to get everything.
+
+  # piggyback::pb_download(repo = repo,
+  #                        tag = "current",
+  #                        dest = path,
+  #                        overwrite = F,
+  #                        show_progress = F)
+  #
 
 
-  piggyback::pb_download(repo = repo,
-                         tag = "current",
-                         dest = path,
-                         overwrite = F,
-                         show_progress = F)
-
-
-  robust_pb_download(file="stable_data.gz.parquet",
-                     repo=repo,
-                     tag = "current",
-                     dest = path,
-                     overwrite = F)
+    robust_pb_download(repo=repo,
+                        tag = "current",
+                        dest = path,
+                      overwrite = F)
 
 
   #  tryCatch(
