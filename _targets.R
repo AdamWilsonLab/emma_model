@@ -5,6 +5,7 @@ library(arrow)
 library(piggyback)
 #remotes::install_github("ropensci/stantargets")
 library(stantargets)
+source("https://raw.githubusercontent.com/AdamWilsonLab/emma_envdata/main/R/robust_pb_download.R")
 # source all files in R folder
 lapply(list.files("R",pattern="[.]R",full.names = T), source)
 
@@ -31,20 +32,21 @@ list(
   tar_target(
     envdata,
     sync_envdata(delete_all_first=F),
-    format="file",
-    cue = tar_cue(mode = "never")
-  ),
+    format="file"),
+#    cue = tar_cue(mode = "never")
+#  ),
   tar_target(data,
     tidy_static_data(
     envdata,
     remnant_distance=2, #drop pixels within this distance of remnant edge (km)
-    region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
-    #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
-    sample_proportion= 0.8)),
+    #region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
+    region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
+    sample_proportion= 0.5)),
   tar_target(
     data_training,
     filter_training_data(data,
-                         envvars=c("CHELSA_bio10_01_V1.2_clipped.tif","CHELSA_bio10_02_V1.2_clipped.tif"))
+                         envvars=c("CHELSA_bio10_01_V1.2_clipped.tif", #select env vars to use in model
+                                   "CHELSA_bio10_02_V1.2_clipped.tif"))
     ),
     tar_target(
     dyndata_training,
@@ -58,7 +60,9 @@ list(
       stan_data,
       create_stan_data(
         data=data_training,
-        dyndata=dyndata_training)
+        dyndata=dyndata_training,
+        fit=0,
+        predict=0)
   ),
 
 # tried mcmc - 500 samples in ~12 hours
@@ -74,14 +78,14 @@ list(
 #    stderr = R.utils::nullfile(),
     adapt_engaged=F,
     eta=0.11,
-    iter = 4000, #should be 1000 or more - 100 is just to run quickly
+    iter = 20000, #should be 1000 or more - 100 is just to run quickly
     garbage_collection=T,
     init=1,
     tol_rel_obj = 0.001
   ),
 
 tar_target(model_results,
-           summarize_model_output(model_output)),
+           summarize_model_output(model_output, stan_data, data)),
 
 tar_target(spatial_outputs,
                 create_spatial_outputs(model_results,data_training,data))

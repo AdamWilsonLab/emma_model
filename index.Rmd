@@ -19,7 +19,7 @@ library(raster)
 library(lubridate)
 library(sf)
 # load data saved in the pipeline
-tar_load(c(data, model,  model_fit, posterior_summary)) 
+tar_load(c(data, stan_data, model_results, spatial_outputs)) 
 ```
 
 The details are given in [@slingsby_near-real_2020;@wilson_climatic_2015], but in short what we do is estimate the age of a site by calculating the years since the last fire. We then fit a curve to model the recovery of vegetation (measured using NDVI) as a function of it's age. For this we use a negative exponential curve with the following form:
@@ -44,18 +44,14 @@ Lets load up our Stan model which codes the model described above. This is not a
 ### Geographic region
 
 
-## 
-The model took `r model_fit$time()$total/60` minutes to fit.  
-
 
 ```{r p1, echo=T, eval=T, message=FALSE}
-params=c("tau","alpha_mu","gamma_b2","gamma_b1","lambda_b1","lambda_b2")
-posteriors=model_fit$draws(params) %>% 
-  as_tibble() %>% 
-  gather(parameter)
-ggplot(posteriors,aes(x=value))+
-  geom_density(fill="grey")+
-  facet_wrap(~parameter,scales = "free")
+params=c("tau","alpha_mu","gamma_beta","lambda_beta")
+posteriors=model_results %>% 
+  filter(model_results$parameter%in%params)
+
+ggplot(posteriors,aes(y=parameter, xmin=q5,x=median,xmax=q95))+
+  geom_pointrange(fill="grey")
 ```
 
 

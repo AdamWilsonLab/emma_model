@@ -1,5 +1,5 @@
 #prep data for stan
-create_stan_data <- function(data,dyndata,run_estimation=T){
+create_stan_data <- function(data,dyndata,fit=1,predict=0){
 
     pid_lookup= data %>%
     dplyr::select(cellID, pid)
@@ -19,6 +19,7 @@ create_stan_data <- function(data,dyndata,run_estimation=T){
     pid=dyndata2$pid,
     x = xvar,
     P = ncol(xvar),
-    run_estimation=run_estimation)
+    fit=fit,
+    predict=predict)
 }
 

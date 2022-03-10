@@ -1,11 +1,13 @@
 
 # Summarize posteriors
-summarize_model_output <- function(model_output,data){
+summarize_model_output <- function(model_output,stan_data, data){
   #posterior predictive
   tdata<- model_output %>%
         mutate(pid=gsub("[]]","",gsub(".*[[]","",variable)),
                parameter=gsub("[[].*","",variable)) #extract pid from parameter names
-  return(tdata)
+
+
+    return(tdata)
 }
   #wrangle
   #  stan_ndvi <- rbind(stan_vb) %>%
