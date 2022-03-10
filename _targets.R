@@ -31,7 +31,8 @@ list(
   tar_target(
     envdata,
     sync_envdata(delete_all_first=F),
-    format="file"
+    format="file",
+    cue = tar_cue(mode = "never")
   ),
   tar_target(data,
     tidy_static_data(
@@ -73,7 +74,7 @@ list(
 #    stderr = R.utils::nullfile(),
     adapt_engaged=F,
     eta=0.11,
-    iter = 100000, #should be 1000 or more - 100 is just to run quickly
+    iter = 4000, #should be 1000 or more - 100 is just to run quickly
     garbage_collection=T,
     init=1,
     tol_rel_obj = 0.001
