@@ -1,9 +1,23 @@
 
 
 sync_envdata <- function(repo="AdamWilsonLab/emma_envdata",
-                         path="data/envdata"){
-  if(!file.exists(path)) dir.create(path,recursive = T)
-  piggyback::pb_download(repo = repo,
-                         dest = path)
-  return(path)
+                         path="data/envdata/")  {
+
+  # if running on github - delete the data files and get them again
+  #if(Sys.getenv("CI")!="") file.remove(list.files(path,full=T)) # delete all old files
+
+  # piggyback::pb_download(repo = repo,
+  #                        tag = "current",
+  #                        dest = path,
+  #                        overwrite = F,
+  #                        show_progress = F)
+  #
+
+    robust_pb_download(repo=repo,
+                        tag = "current",
+                        dest = path,
+                      overwrite = F)
+
+
+    return(path)
 }

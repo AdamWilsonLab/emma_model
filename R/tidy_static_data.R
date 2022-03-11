@@ -1,64 +1,40 @@
-## Download the most recent release from the emma_envdata
-tidy_static_data <- function(envdata){
 
-  # projection
+tidy_static_data <- function(envdata,region,remnant_distance,sample_proportion){
 
-  proj='PROJCRS["AEA_RSA_WGS84",
-    BASEGEOGCRS["WGS 84",
-        DATUM["World Geodetic System 1984",
-            ELLIPSOID["WGS 84",6378137,298.257223563,
-                LENGTHUNIT["metre",1]],
-            ID["EPSG",6326]],
-        PRIMEM["Greenwich",0,
-            ANGLEUNIT["Degree",0.0174532925199433]]],
-    CONVERSION["unnamed",
-        METHOD["Albers Equal Area",
-            ID["EPSG",9822]],
-        PARAMETER["Latitude of false origin",0,
-            ANGLEUNIT["Degree",0.0174532925199433],
-            ID["EPSG",8821]],
-        PARAMETER["Longitude of false origin",25,
-            ANGLEUNIT["Degree",0.0174532925199433],
-            ID["EPSG",8822]],
-        PARAMETER["Latitude of 1st standard parallel",-24,
-            ANGLEUNIT["Degree",0.0174532925199433],
-            ID["EPSG",8823]],
-        PARAMETER["Latitude of 2nd standard parallel",-33,
-            ANGLEUNIT["Degree",0.0174532925199433],
-            ID["EPSG",8824]],
-        PARAMETER["Easting at false origin",0,
-            LENGTHUNIT["metre",1],
-            ID["EPSG",8826]],
-        PARAMETER["Northing at false origin",0,
-            LENGTHUNIT["metre",1],
-            ID["EPSG",8827]]],
-    CS[Cartesian,2],
-        AXIS["(E)",east,
-            ORDER[1],
-            LENGTHUNIT["metre",1,
-                ID["EPSG",9001]]],
-        AXIS["(N)",north,
-            ORDER[2],
-            LENGTHUNIT["metre",1,
-                ID["EPSG",9001]]]]'
+# Load static parquet file
+data <- open_dataset(sources = file.path(envdata,"stable_data.gz.parquet"))
 
+# define region and reproject to modis sinusoidal
+region_bbox = st_bbox(region,crs = st_crs(4326)) %>%
+    st_as_sfc() %>%
+    st_transform(crs = "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs") %>%
+    st_bbox()
 
-# Data pre-processing
-
-data <- open_dataset(sources = "data/envdata/stable_data.gz.parquet")
-
-region=st_bbox(
-  c(xmin = 18.301425, xmax = 18.524242, ymin = -34.365951, ymax = -34.055531),
-  crs = st_crs(4326)) %>%
-  st_as_sfc() %>%
-  st_transform(crs = "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs") %>%
-  st_bbox()
-
-
-data %>%
-  filter(x>region$xmin,x<region$xmax,y>region$ymin,y<region$ymax) %>%
+# filter by remnant, distance, region, and add training/testing label according to sample_proportion
+td=data %>%
   collect() %>%
-  as_tibble() %>%
-  return()
+  mutate(
+    fynbos = case_when( #all remnants
+      remnant_distance.tif>0 ~ TRUE,
+      TRUE ~ FALSE),
+    model_domain = case_when( #core remnants within bbox domain
+      remnant_distance.tif>=remnant_distance &
+      x>region_bbox$xmin & x<region_bbox$xmax &
+      y>region_bbox$ymin & y<region_bbox$ymax ~ TRUE,
+      TRUE ~ FALSE)) %>%
+  group_by(model_domain) %>%
+  mutate(training = sample(c(TRUE,FALSE),size=n(), replace = T,prob = c(sample_proportion, 1-sample_proportion))) %>%
+  mutate(sample = ifelse(model_domain, training, FALSE)) %>%
+  compute() %>%
+  ungroup()
+
+
+
+if(F) {
+  # map domain for debugging
+  ggplot(td,aes(x=x,y=y,fill=sample))+geom_tile()+coord_equal()
+}
+
+return(td)
 
 }
