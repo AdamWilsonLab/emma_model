@@ -1,8 +1,7 @@
 name|type|parent|branches|progress
 model_output_batch|stem|model_output_batch|0|started
 model_output_batch|stem|model_output_batch|0|built
-model_output_file_firemodel_generate|stem|model_output_file_firemodel_generate|0|started
-model_output_file_firemodel_generate|stem|model_output_file_firemodel_generate|0|built
+model_output_file_firemodel_generate|stem|model_output_file_firemodel_generate|0|skipped
 envdata|stem|envdata|0|started
 envdata|stem|envdata|0|built
 data|stem|data|0|started
@@ -29,3 +28,5 @@ model_results|stem|model_results|0|started
 model_results|stem|model_results|0|built
 spatial_outputs|stem|spatial_outputs|0|started
 spatial_outputs|stem|spatial_outputs|0|built
+report|stem|report|0|started
+report|stem|report|0|built

@@ -43,12 +43,15 @@ list(
    remnant_distance=2, #drop pixels within this distance of remnant edge (km)
    #region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
    region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
-   sample_proportion= 0.5)),
+   sample_proportion= 1)),
 tar_target(
   data_training,
   filter_training_data(data,
                        envvars=c("CHELSA_bio10_01_V1.2_clipped.tif", #select env vars to use in model
-                                 "CHELSA_bio10_02_V1.2_clipped.tif"))
+                                 "CHELSA_bio10_02_V1.2_clipped.tif",
+                                 "MODCF_seasonality_concentration.tif",
+                                 "alos_chili.tif",
+                                 "alos_mtpi.tif"))
   ),
   tar_target(
   dyndata_training,
@@ -90,8 +93,9 @@ tar_target(model_results,
            summarize_model_output(model_output, stan_data, data)),
 
 tar_target(spatial_outputs,
-                create_spatial_outputs(model_results,data_training,data))
-# tar_render(report, "index.Rmd")
+                create_spatial_outputs(model_results,data_training,data)),
+
+tar_render(report, "index.Rmd")
 )
 
 

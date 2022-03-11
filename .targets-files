@@ -1287,5 +1287,6 @@ data/envdata/stable_data.gz.parquet
 firemodel_generate
 index.html
 index.md
+index_files/figure-gfm/compare_data2-1.png
 index_files/figure-gfm/p1-1.png
 index_files/figure-gfm/plot-1.png
