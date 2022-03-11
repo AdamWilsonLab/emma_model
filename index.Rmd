@@ -18,7 +18,7 @@ library(raster)
 library(lubridate)
 library(sf)
 # load data saved in the pipeline
-tar_load(c(data, stan_data, model_results, spatial_outputs)) 
+tar_load(c(data, stan_data, model_results, spatial_outputs,ndvi_prediction)) 
 ```
 
 # Model Overview
@@ -40,11 +40,11 @@ This repository was developed using the Targets framework as follows.
 
 ```{r, echo=F, results="hide"}
 targets::tar_glimpse() %>% 
-  htmlwidgets::saveWidget(file = "img/network.html")
+  htmlwidgets::saveWidget(file = "network.html")
 #webshot::install_phantomjs()
-webshot::webshot("img/network.html", "img/network.png")
+webshot::webshot("network.html", "network.png")
 ```
-![targets_network](img/network.png)
+![targets_network](network.png)
 
 ## Results
 
@@ -69,15 +69,20 @@ ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
 
 
 ```{r plot, echo=T, eval=F, message=FALSE}
-model_results %>% 
-  filter(parameter=="mu") %>% 
-  filter(pid %in% as.numeric(sample(levels(as.factor(posterior_summary$pid)),20))) %>% # just show a few
+cells_with_long_records<-
+  ndvi_prediction %>% 
+  group_by(cellID) %>% 
+  summarize(n=n()) %>% 
+  filter(n>100)
+
+ndvi_prediction %>% 
+  filter(cellID%in%cells_with_long_records$cellID) %>% 
+#  filter(pid %in% as.numeric(sample(levels(as.factor(posterior_summary$pid)),20))) %>% # just show a few
   ggplot(aes(x=age)) +
- geom_line(aes(y=mean),colour="blue") +
-  geom_line(aes(y=ndvi),colour="black",lwd=0.5,alpha=0.3) +
+ geom_line(aes(y=median),colour="blue") +
+  geom_line(aes(y=ndvi_obs),colour="black",lwd=0.5,alpha=0.3) +
   geom_ribbon(aes(ymin=q5,ymax=q95),alpha=0.5)+
-  facet_wrap(~pid) +
-#  xlim(c(0,25))+ ylim(c(0,10))+
+  facet_wrap(~cellID) +
   labs(x="time since fire (years)",y="NDVI") +
   theme_bw()
 ```

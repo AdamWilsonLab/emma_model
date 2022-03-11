@@ -31,23 +31,23 @@ testing_window=c("2020-01-01","2022-01-01")
 ## Download the most recent data release
 list(
   tar_target(
-  envdata,
+  envdata_files,
   robust_pb_download(file=NULL,
                      repo="AdamWilsonLab/emma_envdata",
                      dest="data/envdata/",
                      tag="current",
                      overwrite=F),
   format="file"),
-  tar_target(data,
+  tar_target(envdata,
    tidy_static_data(
-   envdata,
+   envdata_files,
    remnant_distance=2, #drop pixels within this distance of remnant edge (km)
    #region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
    region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
    sample_proportion= 1)),
 tar_target(
   data_training,
-  filter_training_data(data,
+  filter_training_data(envdata,
                        envvars=c("CHELSA_bio10_01_V1.2_clipped.tif", #select env vars to use in model
                                  "CHELSA_bio10_02_V1.2_clipped.tif",
                                  "MODCF_seasonality_concentration.tif",
@@ -56,11 +56,11 @@ tar_target(
   ),
   tar_target(
   dyndata_training,
-  tidy_dynamic_data(data,date_window=ymd(training_window))
+  tidy_dynamic_data(envdata,date_window=ymd(training_window))
   ),
   tar_target(
     dyndata_validation,
-    tidy_dynamic_data(data,date_window=ymd(testing_window))
+    tidy_dynamic_data(envdata,date_window=ymd(testing_window))
     ),
   tar_target(
     stan_data,
@@ -91,11 +91,11 @@ tar_target(
   ),
 
 tar_target(model_results,
-           summarize_model_output(model_output, stan_data, data)),
-
+           summarize_model_output(model_output, stan_data, envdata)),
+tar_target(ndvi_prediction,
+           summarize_predictions(model_results,stan_data,data_training, envdata)),#,
 tar_target(spatial_outputs,
-                create_spatial_outputs(model_results,data_training,data)),
-
+           create_spatial_outputs(model_results,data_training,envdata)),
 tar_render(report, "index.Rmd")
 )
 
