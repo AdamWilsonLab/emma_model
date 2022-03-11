@@ -44,22 +44,14 @@ jobs:
       GITHUB_PAT: ${{ secrets.GH_PAT }}
 #      RENV_PATHS_ROOT: ~/.local/share/renv
     steps:
-      - name: Check Build Space
-        run: |
-          echo "%%%%% Free space:"
-          df -h
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master # https://github.com/easimon/maximize-build-space
-        with:
-#          root-reserve-mb: 512
-#          swap-size-mb: 1024
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-      - name: Check Build Space
-        run: |
-          echo "%%%%% Free space:"
-          df -h
+#       - name: Maximize build space
+#         uses: easimon/maximize-build-space@master # https://github.com/easimon/maximize-build-space
+#         with:
+# #          root-reserve-mb: 512
+# #          swap-size-mb: 1024
+#           remove-dotnet: 'true'
+#           remove-android: 'true'
+#           remove-haskell: 'true'
       - uses: actions/checkout@v2
         with:
           lfs:  'true'

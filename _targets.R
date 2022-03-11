@@ -41,9 +41,9 @@ list(
    tidy_static_data(
    envdata,
    remnant_distance=2, #drop pixels within this distance of remnant edge (km)
-   region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
-   #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
-   sample_proportion= 0.5)),
+   #region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
+   region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
+   sample_proportion= 1)),
 tar_target(
   data_training,
   filter_training_data(data,
