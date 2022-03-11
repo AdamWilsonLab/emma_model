@@ -26,6 +26,11 @@ summarize_model_output <- function(model_output,stan_data, data){
     return(tdata)
 }
 
+## Summarize trajectories
+summarize_model_predictions <- function(model_results,dyndata){
+model_results
+
+}
 
 # Spatial Predictions
 

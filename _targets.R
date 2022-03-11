@@ -35,7 +35,8 @@ list(
   robust_pb_download(file=NULL,
                      repo="AdamWilsonLab/emma_envdata",
                      dest="data/envdata/",
-                     tag="current"),
+                     tag="current",
+                     overwrite=F),
   format="file"),
   tar_target(data,
    tidy_static_data(

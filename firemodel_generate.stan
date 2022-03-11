@@ -73,8 +73,9 @@ model {
 
 generated quantities {
 
+vector[N] ndvi_pred;
+
 if(predict==1){ // only run if prediction is desired
-  vector[N] ndvi_pred;
   for (i in 1:N){
     ndvi_pred[i] = normal_rng(mu[i], tau);
     }
