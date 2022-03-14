@@ -27,16 +27,16 @@ summarize_model_output <- function(model_output,stan_data, data){
 }
 
 ## Summarize trajectories
-summarize_predictions <- function(model_results,stan_data,data_training,envdata){
+summarize_predictions <- function(model_results,stan_data,envdata){
 
 
   sdata=tibble(
+    cellID=stan_data$y_cellID,
+    date=as_date(stan_data$y_date),
     pid=stan_data$pid,
     ndvi_obs=stan_data$ndvi,
     age=stan_data$age,
-    date=as_date(stan_data$y_date)
-  ) %>%
-    left_join(dplyr::select(data_training,cellID,pid),by="pid")
+  )
 
   print("sdata")
   glimpse(sdata)
@@ -48,7 +48,7 @@ summarize_predictions <- function(model_results,stan_data,data_training,envdata)
   state_vars <- model_results %>%
     filter(parameter=="ndvi_pred") %>%
     dplyr::select(variable,median,sd,q5,q95) %>%
-    bind_cols(sdata) %>% #this assumes there has been now row-shuffling
+    bind_cols(sdata) %>% #this assumes there has been no row-shuffling
     left_join(dplyr::select(envdata,cellID,x,y),by="cellID")
 
   return(state_vars)
