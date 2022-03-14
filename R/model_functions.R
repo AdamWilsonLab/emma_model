@@ -45,7 +45,7 @@ summarize_predictions <- function(model_results,stan_data,envdata){
   print(table(model_results$parameter))
   print("glimpse model results")
     model_results %>%
-    filter(parameter=="ndvi_pred") %>%
+    filter(parameter=="mu") %>%
     dplyr::select(variable,median,sd,q5,q95) %>%
     glimpse()
 
@@ -53,7 +53,7 @@ summarize_predictions <- function(model_results,stan_data,envdata){
   glimpse(envdata)
 
   state_vars <- model_results %>%
-    filter(parameter=="ndvi_pred") %>%
+    filter(parameter=="mu") %>%
     dplyr::select(variable,median,sd,q5,q95) %>%
     bind_cols(sdata) %>% #this assumes there has been no row-shuffling
     left_join(dplyr::select(envdata,cellID,x,y),by="cellID")

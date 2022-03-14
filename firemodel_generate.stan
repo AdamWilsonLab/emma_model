@@ -40,8 +40,6 @@ transformed parameters {
 
   if(fit==1){ // only run if fitting is desired
   for (i in 1:N){
-//    bid[i]=pid[i]; //# links the dynamic data to the static env table
-//    mu[i] = exp(alpha[bid])+exp(gamma[bid])-exp(gamma[bid])*exp(-(age[i]/exp(lambda[bid])));
     mu[i] = exp(alpha[pid[i]])+exp(gamma[pid[i]])-exp(gamma[pid[i]])*exp(-(age[i]/exp(lambda[pid[i]])));
 //    mu = exp(alpha[pid])+exp(gamma[pid])-exp(gamma[pid])*exp(-(age/exp(lambda[pid])));
   }
@@ -70,7 +68,7 @@ model {
 //  if(fit==1){ // only run if fitting is desired
     ndvi ~ normal(mu, tau);
 //  }
-}
+}`
 
 generated quantities {
 
