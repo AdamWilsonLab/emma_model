@@ -39,10 +39,11 @@ An additional level models the parameters of the negative exponential curve as a
 This repository was developed using the Targets framework as follows.
 
 ```{r, echo=F, results="hide"}
+tfile=paste0(tempfile(),".html")
 targets::tar_glimpse() %>% 
-  htmlwidgets::saveWidget(file = "network.html")
+  htmlwidgets::saveWidget(file = tfile)
 #webshot::install_phantomjs()
-webshot::webshot("network.html", "network.png")
+webshot::webshot(tfile, "network.png")
 #![targets_network](network.png)
 ```
 
