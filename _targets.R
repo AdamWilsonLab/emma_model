@@ -23,6 +23,7 @@ cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
 #cmdstanr::check_cmdstan_toolchain()
 #cmdstanr::install_cmdstan()
 
+tar_destroy(ask = F)
 
 # Testing and training time windows
 training_window=c("2000-01-01","2020-01-01")
