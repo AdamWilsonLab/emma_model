@@ -66,18 +66,19 @@ model {
   lambda ~ normal(lambda_mu,lambda_tau);
 
   // likelihood
-  if(fit==1){ // only run if fitting is desired
+//  if(fit==1){ // only run if fitting is desired
     ndvi ~ normal(mu, tau);
-  }
+//  }
 }
 
 generated quantities {
 
 vector[N] ndvi_pred;
 
-if(predict==1){ // only run if prediction is desired
-  for (i in 1:N){
-    ndvi_pred[i] = normal_rng(mu[i], tau);
-    }
-  }
+//if(predict==1){ // only run if prediction is desired
+//  for (i in 1:N){
+//    ndvi_pred[i] = normal_rng(mu[i], tau);
+    ndvi_pred = normal_rng(mu, tau);
+//    }
+//  }
 }
