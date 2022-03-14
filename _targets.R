@@ -36,6 +36,7 @@ list(
                        repo="AdamWilsonLab/emma_envdata",
                        dest="data/envdata/",
                        tag="current",
+                       show_progress=F,
                        overwrite=F),
     format="file"),
 

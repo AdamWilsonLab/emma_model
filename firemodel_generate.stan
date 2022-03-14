@@ -3,6 +3,7 @@ data {
   int<lower=0> J; // # of pixels
   int<lower=0> P; // # of environment vars
   array[N] int<lower=1,upper=N> pid; // pixel count
+//  vector<lower=1,upper=N>[N] pid; // pixel count
   matrix[J,P] x; // NxP environmental matrix
   vector<lower=-1>[N] age; // age at observation N
   vector<lower=-1,upper=1>[N] ndvi; // ndvi at observation N
@@ -73,12 +74,9 @@ model {
 
 generated quantities {
 
-vector[N] ndvi_pred;
+array[N] real ndvi_pred;
 
 //if(predict==1){ // only run if prediction is desired
-//  for (i in 1:N){
-//    ndvi_pred[i] = normal_rng(mu[i], tau);
     ndvi_pred = normal_rng(mu, tau);
-//    }
 //  }
 }
