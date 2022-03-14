@@ -21,10 +21,15 @@ create_stan_data <- function(data,dyndata,fit=1,predict=0){
     ndvi=dyndata2$ndvi,
     age= dyndata2$age,
     pid=dyndata2$pid,
-    date=as.numeric(dyndata2$date),
     x = xvar,
+    x_pid = data$pid,
     P = ncol(xvar),
     fit=fit,
-    predict=predict)
-}
+    predict=predict,
+    #keeping the following for easier matching later - not needed for model
+    y_date=as.numeric(dyndata2$date),
+    y_cellID=dyndata2$cellID,
+    x_cellID = data$cellID
+)
+    }
 

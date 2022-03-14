@@ -34,14 +34,14 @@ summarize_predictions <- function(model_results,stan_data,data_training,envdata)
     pid=stan_data$pid,
     ndvi_obs=stan_data$ndvi,
     age=stan_data$age,
-    date=as_date(stan_data$date)
+    date=as_date(stan_data$y_date)
   ) %>%
     left_join(dplyr::select(data_training,cellID,pid),by="pid")
 
   state_vars <- model_results %>%
     filter(parameter=="ndvi_pred") %>%
     dplyr::select(variable,median,sd,q5,q95) %>%
-    bind_cols(sdata) %>%
+    bind_cols(sdata) %>% #this assumes there has been now row-shuffling
     left_join(dplyr::select(envdata,cellID,x,y),by="cellID")
 
   return(state_vars)

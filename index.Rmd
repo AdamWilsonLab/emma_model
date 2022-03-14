@@ -43,8 +43,8 @@ targets::tar_glimpse() %>%
   htmlwidgets::saveWidget(file = "network.html")
 #webshot::install_phantomjs()
 webshot::webshot("network.html", "network.png")
+#![targets_network](network.png)
 ```
-![targets_network](network.png)
 
 ## Results
 
@@ -55,6 +55,7 @@ These parameters represent the relationship of the following environmental varia
 ```{r p1, echo=T, eval=T, message=FALSE}
 betas=model_results %>% 
   filter(type=="beta")
+
 
 ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
   geom_pointrange(fill="grey")+
@@ -68,7 +69,7 @@ ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
 ## Recovery Trajectories
 
 
-```{r plot, echo=T, eval=F, message=FALSE}
+```{r plot, echo=T, eval=T, message=FALSE}
 cells_with_long_records<-
   ndvi_prediction %>% 
   group_by(cellID) %>% 
