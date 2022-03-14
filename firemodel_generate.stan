@@ -6,7 +6,7 @@ data {
 //  vector<lower=1,upper=N>[N] pid; // pixel count
   matrix[J,P] x; // NxP environmental matrix
   vector<lower=-1>[N] age; // age at observation N
-  vector<lower=-1,upper=1>[N] ndvi; // ndvi at observation N
+  vector<lower=-1,upper=1>[N] y_obs; // ndvi at observation N
   // a switch to evaluate the likelihood following:
   // https://khakieconomics.github.io/2017/-6/30/An-easy-way-to-simulate-fake-data-in-stan.html
   int<lower = 0, upper = 1> fit; // fit the model? Or just run with the priors
@@ -66,15 +66,15 @@ model {
 
   // likelihood
 //  if(fit==1){ // only run if fitting is desired
-    ndvi ~ normal(mu, tau);
+    y_obs ~ normal(mu, tau);
 //  }
 }
 
 generated quantities {
 
-array[N] real ndvi_pred;
+array[N] real y_pred;
 
 //if(predict==1){ // only run if prediction is desired
-    ndvi_pred = normal_rng(mu, tau);
+    y_pred = normal_rng(mu, tau);
 //  }
 }

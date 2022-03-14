@@ -96,7 +96,7 @@ list(
 
   tar_target(model_results,
              summarize_model_output(model_output, stan_data, envdata)),
-  tar_target(ndvi_prediction,
+  tar_target(model_prediction,
              summarize_predictions(model_results,stan_data,envdata)),
   tar_target(spatial_outputs,
              create_spatial_outputs(model_results,data_training,envdata)),

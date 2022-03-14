@@ -16,7 +16,7 @@ summarize_model_output <- function(model_output,stan_data, data){
                  grepl("alpha$|gamma$|lambda$",parameter) ~ "spatial",
                  grepl("tau",parameter) ~ "variability",
                  grepl("^mu$",parameter) ~ "state",
-                 grepl("ndvi$",parameter) ~ "state",
+                 grepl("y_obs",parameter) ~ "state",
                  TRUE ~ "other"
                )) %>%  #extract pid from parameter names
   left_join(beta_names)
@@ -34,7 +34,7 @@ summarize_predictions <- function(model_results,stan_data,envdata){
     cellID=stan_data$y_cellID,
     date=as_date(stan_data$y_date),
     pid=stan_data$pid,
-    ndvi_obs=stan_data$ndvi,
+    y_obs=stan_data$y_obs,
     age=stan_data$age,
   )
 
