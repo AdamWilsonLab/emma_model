@@ -18,7 +18,7 @@ create_stan_data <- function(data,dyndata,fit=1,predict=0){
   stan_data =  list(
     N = nrow(dyndata2),
     J= nrow(data),
-    ndvi=dyndata2$ndvi,
+    y_obs=dyndata2$ndvi, #select variable to model
     age= dyndata2$age,
     pid=dyndata2$pid,
     x = xvar,
