@@ -41,8 +41,12 @@ summarize_predictions <- function(model_results,stan_data,envdata){
   print("sdata")
   glimpse(sdata)
   print("model_results")
-  glimpse(model_results)
-  print("envdata")
+  model_results %>%
+    filter(parameter=="ndvi_pred") %>%
+    dplyr::select(variable,median,sd,q5,q95) %>%
+    glimpse()
+
+    print("envdata")
   glimpse(envdata)
 
   state_vars <- model_results %>%
