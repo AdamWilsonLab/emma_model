@@ -77,6 +77,7 @@ tar_target(
     stan_files = "firemodel_generate.stan",
     data = stan_data,
     batches = 1,
+    quiet=T,
     reps = 1,
     combine=T,
     pedantic=T,

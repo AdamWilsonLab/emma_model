@@ -30,6 +30,10 @@ summarize_model_output <- function(model_output,stan_data, data){
 summarize_predictions <- function(model_results,stan_data,data_training,envdata){
 
 
+  print(glimpse(stan_data))
+
+  print(glimpse(data_training))
+
   sdata=tibble(
     pid=stan_data$pid,
     ndvi_obs=stan_data$ndvi,
@@ -37,6 +41,9 @@ summarize_predictions <- function(model_results,stan_data,data_training,envdata)
     date=as_date(stan_data$y_date)
   ) %>%
     left_join(dplyr::select(data_training,cellID,pid),by="pid")
+
+  print(glimpse(model_results))
+  print(glimpse(envdata))
 
   state_vars <- model_results %>%
     filter(parameter=="ndvi_pred") %>%
