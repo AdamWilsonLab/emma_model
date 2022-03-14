@@ -68,7 +68,7 @@ model {
 //  if(fit==1){ // only run if fitting is desired
     ndvi ~ normal(mu, tau);
 //  }
-}`
+}
 
 generated quantities {
 
