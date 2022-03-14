@@ -84,6 +84,7 @@ list(
     reps = 1,
     combine=T,
     pedantic=T,
+    force_recompile=T,
     #    stdout = R.utils::nullfile(),
     #    stderr = R.utils::nullfile(),
     adapt_engaged=F,
