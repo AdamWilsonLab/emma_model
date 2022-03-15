@@ -62,24 +62,26 @@ ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
   geom_pointrange(fill="grey")+
   facet_wrap(~parameter,nrow=1)+
   geom_vline(xintercept=0,col="grey")+
-  xlab(expression(beta*" (regression coefficient +/- 95% CI)"))
+  xlab(expression(beta*" (regression coefficient +/- 95% CI)"))+
+  ylab("Environmental Variable")
 
 ```
 
 
 ## Recovery Trajectories
 
+The plot below illustates some example recovery trajectories. It currently just shows the top 20 cells with the most observations.
 
-```{r plot, echo=T, eval=T, message=FALSE}
+```{r plot, echo=T, eval=T, message=FALSE,fig.height=12}
 cells_with_long_records<-
   model_prediction %>% 
   group_by(cellID) %>% 
   summarize(n=n()) %>% 
-  filter(n>100)
+  arrange(n) %>% 
+  slice(1:20) # top 20 cells with the most observations
 
 model_prediction %>% 
   filter(cellID%in%cells_with_long_records$cellID) %>% 
-#  filter(pid %in% as.numeric(sample(levels(as.factor(posterior_summary$pid)),20))) %>% # just show a few
   ggplot(aes(x=age)) +
  geom_line(aes(y=median),colour="blue") +
   geom_line(aes(y=y_obs),colour="black",lwd=0.5,alpha=0.3) +

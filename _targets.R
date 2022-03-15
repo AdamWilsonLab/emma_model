@@ -51,11 +51,14 @@ list(
   tar_target(
     data_training,
     filter_training_data(envdata,
-                         envvars=c("CHELSA_bio10_01_V1.2_clipped.tif", #select env vars to use in model
-                                   "CHELSA_bio10_02_V1.2_clipped.tif",
-                                   "MODCF_seasonality_concentration.tif",
-                                   "alos_chili.tif",
-                                   "alos_mtpi.tif"))
+                         envvars=c("Mean_Annual_Air_Temperature"="CHELSA_bio10_01_V1.2_clipped.tif", #select env vars to use in model
+                                   "Mean_Annual_Precipitation"="CHELSA_bio10_12_V1.2_clipped.tif",
+                                   "Mean_Monthly_Precipitation_In_Driest_Quarter"="CHELSA_bio10_17_V1.2_clipped.tif",
+                                   "Mean_Annual_Cloud_Frequency"="MODCF_meanannual.tif",
+                                   "Cloud_Seasonal_Concentration"="MODCF_seasonality_concentration.tif",
+                                   "Topographic_Diversity"="alos_topographic_diversity.tif",
+                                   "ALOS_CHILI"="alos_chili.tif",
+                                   "ALOS_MTPI"="alos_mtpi.tif"))
   ),
   tar_target(
     dyndata_training,
@@ -89,7 +92,7 @@ list(
     #    stderr = R.utils::nullfile(),
     adapt_engaged=F,
     eta=0.11,
-    iter = 5000, #should be 1000 or more - 100 is just to run quickly
+    iter = 10000, #should be 1000 or more - 100 is just to run quickly
     garbage_collection=T,
     init=1,
     tol_rel_obj = 0.001
