@@ -92,7 +92,7 @@ list(
     #    stderr = R.utils::nullfile(),
     adapt_engaged=F,
     eta=0.11,
-    iter = 10000, #should be 1000 or more - 100 is just to run quickly
+    iter = 10000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
     garbage_collection=T,
     init=1,
     tol_rel_obj = 0.001

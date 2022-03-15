@@ -77,7 +77,7 @@ cells_with_long_records<-
   model_prediction %>% 
   group_by(cellID) %>% 
   summarize(n=n()) %>% 
-  arrange(n) %>% 
+  arrange(desc(n)) %>% 
   slice(1:20) # top 20 cells with the most observations
 
 model_prediction %>% 
