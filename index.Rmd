@@ -38,7 +38,7 @@ An additional level models the parameters of the negative exponential curve as a
 
 This repository was developed using the Targets framework as follows.
 
-```{r, echo=F, results="hide"}
+```{r, echo=F, eval=F, results="hide"}
 tfile=paste0(tempfile(),".html")
 targets::tar_glimpse() %>% 
   htmlwidgets::saveWidget(file = tfile)
