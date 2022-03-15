@@ -45,6 +45,10 @@ jobs:
       GITHUB_PAT: ${{ secrets.GH_PAT }}
 #      RENV_PATHS_ROOT: ~/.local/share/renv
     steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
 #       - name: Maximize build space
 #         uses: easimon/maximize-build-space@master # https://github.com/easimon/maximize-build-space
 #         with:
@@ -77,14 +81,14 @@ jobs:
 
       - name: Check if previous runs exists
         id: runs-exist
-        run: git ls-remote --exit-code --heads origin targets-runs
+        run: git ls-remote --exit-code --heads origin ${{ steps.extract_branch.outputs.branch }}-runs
         continue-on-error: true
 
       - name: Checkout previous run
         if: steps.runs-exist.outcome == 'success'
         uses: actions/checkout@v2
         with:
-          ref: targets-runs
+          ref: ${{ steps.extract_branch.outputs.branch }}-runs
           fetch-depth: 1
           path: .targets-runs
 
@@ -106,7 +110,7 @@ jobs:
 
       - name: Create the runs branch if it does not already exist
         if: steps.runs-exist.outcome != 'success'
-        run: git checkout --orphan targets-runs
+        run: git checkout --orphan ${{ steps.extract_branch.outputs.branch }}-runs
 
       - name: Put the worktree in the runs branch if the latter already exists
         if: steps.runs-exist.outcome == 'success'
@@ -128,7 +132,7 @@ jobs:
             git add -f $file
           done
           git commit -am "Run pipeline"
-          git push origin targets-runs
+          git push origin ${{ steps.extract_branch.outputs.branch }}-runs
 
       - name: Prepare failure artifact
         if: failure()
