@@ -18,7 +18,7 @@ library(raster)
 library(lubridate)
 library(sf)
 # load data saved in the pipeline
-tar_load(c(data, stan_data, model_results, spatial_outputs,model_prediction)) 
+tar_load(c(envdata, stan_data, model_results, spatial_outputs,model_prediction)) 
 ```
 
 # Model Overview
