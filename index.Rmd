@@ -21,14 +21,14 @@ tar_load(c(envdata, stan_data, model_results, spatial_outputs,model_prediction))
 
 # Model Overview
 
-The details are given in [@slingsby_near-real_2020;@wilson_climatic_2015], but in short what we do is estimate the age of a site by calculating the years since the last fire. We then fit a curve to model the recovery of vegetation (measured using NDVI) as a function of it's age. An additional level models the parameters of the negative exponential curve as a function of environmental variables. This means that sites with similar environmental conditions should have similar recovery curves.
+We estimate the age of a site by calculating the years since the last fire. We then fit a curve to model the recovery of vegetation (measured using NDVI) as a function of it's age. An additional level models the parameters of the negative exponential curve as a function of environmental variables. This means that sites with similar environmental conditions should have similar recovery curves.
 
 
 ## Workflow
 
 This repository was developed using the Targets framework as follows.
 
-```{r, echo=F, eval=F, results="hide"}
+```{r, echo=F, eval=T, results="hide"}
 tfile=paste0(tempfile(),".html")
 targets::tar_glimpse() %>% 
   htmlwidgets::saveWidget(file = tfile)
