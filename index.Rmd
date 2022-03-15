@@ -5,9 +5,7 @@ author:
   - name: Adam Wilson & Glenn Moncrieff
 editor_options: 
   chunk_output_type: console
-output:
-  github_document:
-    html_preview: true
+output: github_document
 ---
 
 ```{r, echo=F, message=F,results="hide"}
@@ -29,6 +27,7 @@ $$\mu_{i,t}=\alpha_i+\gamma_i\Big(1-e^{-\frac{age_{i,t}}{\lambda_i}}\Big)$$
 where $\mu_{i,t}$ is the expected NDVI for site $i$ at time $t$
 
 The observed greenness $NDVI_{i,t}$  is assumed to follow a normal distribution with mean $\mu_{i,t}$
+
 $$NDVI_{i,t}\sim\mathcal{N}(\mu_{i,t},\sigma_)$$
 
 An additional level models the parameters of the negative exponential curve as a function of environmental variables. This means that sites with similar environmental conditions should have similar recovery curves. The full model also includes a sinusoidal term to capture seasonal variation, but lets keep it simple here.  
@@ -44,8 +43,9 @@ targets::tar_glimpse() %>%
   htmlwidgets::saveWidget(file = tfile)
 #webshot::install_phantomjs()
 webshot::webshot(tfile, "network.png")
-#![targets_network](network.png)
 ```
+#![targets_network](network.png)
+
 
 ## Results
 
