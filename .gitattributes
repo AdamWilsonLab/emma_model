@@ -1,0 +1,13 @@
+_targets/objects/data_training filter=lfs diff=lfs merge=lfs -text
+_targets/objects/dyndata_validation filter=lfs diff=lfs merge=lfs -text
+_targets/objects/model_output_batch filter=lfs diff=lfs merge=lfs -text
+_targets/objects/model_output_data_e4183434 filter=lfs diff=lfs merge=lfs -text
+_targets/objects/model_output_firemodel_generate_c5becf2b filter=lfs diff=lfs merge=lfs -text
+_targets/objects/model_prediction filter=lfs diff=lfs merge=lfs -text
+_targets/objects/model_results filter=lfs diff=lfs merge=lfs -text
+_targets/objects/spatial_outputs filter=lfs diff=lfs merge=lfs -text
+_targets/objects/stan_data filter=lfs diff=lfs merge=lfs -text
+_targets/objects/dyndata_training filter=lfs diff=lfs merge=lfs -text
+_targets/objects/envdata filter=lfs diff=lfs merge=lfs -text
+_targets/objects/model_output filter=lfs diff=lfs merge=lfs -text
+data/** filter=lfs diff=lfs merge=lfs -text
