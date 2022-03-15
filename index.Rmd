@@ -5,7 +5,7 @@ author:
   - name: Adam Wilson & Glenn Moncrieff
 editor_options: 
   chunk_output_type: console
-output: github_document
+output:  github_document
 ---
 
 ```{r, echo=F, message=F,results="hide"}
@@ -20,17 +20,8 @@ tar_load(c(envdata, stan_data, model_results, spatial_outputs,model_prediction))
 ```
 
 # Model Overview
-The details are given in [@slingsby_near-real_2020;@wilson_climatic_2015], but in short what we do is estimate the age of a site by calculating the years since the last fire. We then fit a curve to model the recovery of vegetation (measured using NDVI) as a function of it's age. For this we use a negative exponential curve with the following form:
 
-$$\mu_{i,t}=\alpha_i+\gamma_i\Big(1-e^{-\frac{age_{i,t}}{\lambda_i}}\Big)$$
-
-where $\mu_{i,t}$ is the expected NDVI for site $i$ at time $t$
-
-The observed greenness $NDVI_{i,t}$  is assumed to follow a normal distribution with mean $\mu_{i,t}$
-
-$$NDVI_{i,t}\sim\mathcal{N}(\mu_{i,t},\sigma_)$$
-
-An additional level models the parameters of the negative exponential curve as a function of environmental variables. This means that sites with similar environmental conditions should have similar recovery curves. The full model also includes a sinusoidal term to capture seasonal variation, but lets keep it simple here.  
+The details are given in [@slingsby_near-real_2020;@wilson_climatic_2015], but in short what we do is estimate the age of a site by calculating the years since the last fire. We then fit a curve to model the recovery of vegetation (measured using NDVI) as a function of it's age. An additional level models the parameters of the negative exponential curve as a function of environmental variables. This means that sites with similar environmental conditions should have similar recovery curves.
 
 
 ## Workflow
