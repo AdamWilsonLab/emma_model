@@ -9,6 +9,7 @@ _targets/objects/data_training
 _targets/objects/dyndata
 _targets/objects/dyndata_training
 _targets/objects/dyndata_validation
+_targets/objects/envdata
 _targets/objects/firemodel_predict
 _targets/objects/group_data
 _targets/objects/merge_data
@@ -16,8 +17,11 @@ _targets/objects/model
 _targets/objects/model_fit
 _targets/objects/model_output
 _targets/objects/model_output_batch
+_targets/objects/model_output_data_e4183434
 _targets/objects/model_output_data_f655cea1
 _targets/objects/model_output_firemodel_generate_7eb4ab38
+_targets/objects/model_output_firemodel_generate_c5becf2b
+_targets/objects/model_prediction
 _targets/objects/model_results
 _targets/objects/posterior_summary
 _targets/objects/spatial_outputs

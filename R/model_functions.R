@@ -16,7 +16,7 @@ summarize_model_output <- function(model_output,stan_data, data){
                  grepl("alpha$|gamma$|lambda$",parameter) ~ "spatial",
                  grepl("tau",parameter) ~ "variability",
                  grepl("^mu$",parameter) ~ "state",
-                 grepl("ndvi$",parameter) ~ "state",
+                 grepl("y_obs",parameter) ~ "state",
                  TRUE ~ "other"
                )) %>%  #extract pid from parameter names
   left_join(beta_names)
@@ -26,11 +26,45 @@ summarize_model_output <- function(model_output,stan_data, data){
     return(tdata)
 }
 
+## Summarize trajectories
+summarize_predictions <- function(model_results,stan_data,envdata){
+
+
+  sdata=tibble(
+    cellID=stan_data$y_cellID,
+    date=as_date(stan_data$y_date),
+    pid=stan_data$pid,
+    y_obs=stan_data$y_obs,
+    age=stan_data$age,
+  )
+
+  print("sdata")
+  glimpse(sdata)
+  print("model_results")
+  glimpse(model_results)
+  print(table(model_results$parameter))
+  print("glimpse model results")
+    model_results %>%
+    filter(parameter=="mu") %>%
+    dplyr::select(variable,median,sd,q5,q95) %>%
+    glimpse()
+
+    print("envdata")
+  glimpse(envdata)
+
+  state_vars <- model_results %>%
+    filter(parameter=="mu") %>%
+    dplyr::select(variable,median,sd,q5,q95) %>%
+    bind_cols(sdata) %>% #this assumes there has been no row-shuffling
+    left_join(dplyr::select(envdata,cellID,x,y),by="cellID")
+
+  return(state_vars)
+}
 
 # Spatial Predictions
 
-create_spatial_outputs <- function(model_results,data_training,data) {
-  td <- data %>%
+create_spatial_outputs <- function(model_results,data_training,envdata) {
+  td <- envdata %>%
     left_join(dplyr::select(data_training, cellID, pid))
 
   spatial_params=c("alpha","gamma","lambda")

@@ -3,7 +3,6 @@ title: "EMMA Prototype"
 description: Modeling vegetation postfire recovery data
 author:
   - name: Adam Wilson & Glenn Moncrieff
-date: 10-13-2021
 editor_options: 
   chunk_output_type: console
 output:
@@ -19,9 +18,10 @@ library(raster)
 library(lubridate)
 library(sf)
 # load data saved in the pipeline
-tar_load(c(data, stan_data, model_results, spatial_outputs)) 
+tar_load(c(envdata, stan_data, model_results, spatial_outputs,model_prediction)) 
 ```
 
+# Model Overview
 The details are given in [@slingsby_near-real_2020;@wilson_climatic_2015], but in short what we do is estimate the age of a site by calculating the years since the last fire. We then fit a curve to model the recovery of vegetation (measured using NDVI) as a function of it's age. For this we use a negative exponential curve with the following form:
 
 $$\mu_{i,t}=\alpha_i+\gamma_i\Big(1-e^{-\frac{age_{i,t}}{\lambda_i}}\Big)$$
@@ -33,21 +33,30 @@ $$NDVI_{i,t}\sim\mathcal{N}(\mu_{i,t},\sigma_)$$
 
 An additional level models the parameters of the negative exponential curve as a function of environmental variables. This means that sites with similar environmental conditions should have similar recovery curves. The full model also includes a sinusoidal term to capture seasonal variation, but lets keep it simple here.  
 
-## ADVI
 
-We have `age` in years, a plot identifier `pid`. the observed ndvi `nd` and two plot level environmental variable `env1`, which is mean annual precipitation, and `env2`, which is the summer maximum temperature.  
+## Workflow
 
-Lets load up our Stan model which codes the model described above. This is not a particularly clever or efficient way of coding the model, but it is nice and readable and works fine on this example dataset  
+This repository was developed using the Targets framework as follows.
 
-## Fitting Overview
+```{r, echo=F, eval=F, results="hide"}
+tfile=paste0(tempfile(),".html")
+targets::tar_glimpse() %>% 
+  htmlwidgets::saveWidget(file = tfile)
+#webshot::install_phantomjs()
+webshot::webshot(tfile, "network.png")
+#![targets_network](network.png)
+```
 
-### Geographic region
+## Results
 
+### Regression Coefficients 
 
+These parameters represent the relationship of the following environmental variables to the recovery trajectory.
 
 ```{r p1, echo=T, eval=T, message=FALSE}
 betas=model_results %>% 
   filter(type=="beta")
+
 
 ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
   geom_pointrange(fill="grey")+
@@ -58,25 +67,31 @@ ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
 ```
 
 
-## Plot
+## Recovery Trajectories
 
 
-```{r plot, echo=T, eval=F, message=FALSE}
-model_results %>% 
-  filter(pid %in% as.numeric(sample(levels(as.factor(posterior_summary$pid)),20))) %>% # just show a few
+```{r plot, echo=T, eval=T, message=FALSE}
+cells_with_long_records<-
+  model_prediction %>% 
+  group_by(cellID) %>% 
+  summarize(n=n()) %>% 
+  filter(n>100)
+
+model_prediction %>% 
+  filter(cellID%in%cells_with_long_records$cellID) %>% 
+#  filter(pid %in% as.numeric(sample(levels(as.factor(posterior_summary$pid)),20))) %>% # just show a few
   ggplot(aes(x=age)) +
- geom_line(aes(y=mean),colour="blue") +
-  geom_line(aes(y=ndvi),colour="black",lwd=0.5,alpha=0.3) +
+ geom_line(aes(y=median),colour="blue") +
+  geom_line(aes(y=y_obs),colour="black",lwd=0.5,alpha=0.3) +
   geom_ribbon(aes(ymin=q5,ymax=q95),alpha=0.5)+
-  facet_wrap(~pid) +
-#  xlim(c(0,25))+ ylim(c(0,10))+
+  facet_wrap(~cellID) +
   labs(x="time since fire (years)",y="NDVI") +
   theme_bw()
 ```
 
-# Spatial Predictions
+## Spatial Predictions
 
-Maps of spatial parameters.
+Maps of spatial parameters in the model.  
 
 ```{r compare_data2, echo=T, eval=T, message=FALSE}
 
