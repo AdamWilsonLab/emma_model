@@ -3,7 +3,6 @@ data {
   int<lower=0> J; // # of pixels
   int<lower=0> P; // # of environment vars
   array[N] int<lower=1,upper=N> pid; // pixel count
-//  vector<lower=1,upper=N>[N] pid; // pixel count
   matrix[J,P] x; // NxP environmental matrix
   vector<lower=-1>[N] age; // age at observation N
   vector<lower=-1,upper=1>[N] y_obs; // ndvi at observation N
