@@ -1,6 +1,6 @@
 
 # Summarize posteriors
-summarize_model_output <- function(model_summary_postfire,stan_data, data){
+summarize_model_output <- function(model_summary,stan_data, data){
   #posterior predictive
 
   beta_names<-data.frame(
@@ -8,10 +8,7 @@ summarize_model_output <- function(model_summary_postfire,stan_data, data){
     type="beta",
     xname=as.factor(colnames(stan_data$x)))
 
-  tdata<- model_summary_postfire %>%
-#    dplyr::select(-.rep,-.file,-.name) %>%
-#      summarise_draws(~quantile(.x,probs=c(0.05,0.5,0.95))) %>%
-#      rename(q5="5%",q50="50%",q95="95%") %>%
+  tdata<- model_summary %>%
             mutate(pid=gsub("[]]","",gsub(".*[[]","",variable)),
                parameter=gsub("[[].*","",variable),
                type=case_when(
@@ -56,7 +53,7 @@ create_spatial_outputs <- function(model_results,data_training,envdata) {
   td <- envdata %>%
     left_join(dplyr::select(data_training, cellID, pid))
 
-  spatial_params=c("alpha","gamma","lambda")
+  spatial_params=c("alpha","gamma","lambda","A")
 
   stan_spatial <- model_results %>%
     filter(parameter%in%spatial_params) %>%

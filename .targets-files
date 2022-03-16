@@ -10,6 +10,7 @@ _targets/objects/dyndata_validation
 _targets/objects/envdata
 _targets/objects/model_data
 _targets/objects/model_draws_postfire
+_targets/objects/model_draws_postfire_season
 _targets/objects/model_output
 _targets/objects/model_output_batch
 _targets/objects/model_output_data_e4183434
@@ -17,7 +18,9 @@ _targets/objects/model_output_firemodel_generate_c5becf2b
 _targets/objects/model_prediction
 _targets/objects/model_results
 _targets/objects/model_summary_postfire
+_targets/objects/model_summary_postfire_season
 _targets/objects/model_vb_postfire
+_targets/objects/model_vb_postfire_season
 _targets/objects/spatial_outputs
 _targets/objects/stan_data
 data/envdata/-dynamic_parquet-most_recent_burn_dates-11262.gz.parquet
@@ -1289,3 +1292,4 @@ index_files/figure-gfm/compare_data2-1.png
 index_files/figure-gfm/p1-1.png
 index_files/figure-gfm/plot-1.png
 postfire
+postfire_season
