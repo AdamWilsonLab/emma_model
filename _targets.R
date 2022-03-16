@@ -38,7 +38,8 @@ list(
                        dest="data/envdata/",
                        tag="current",
                        show_progress=F,
-                       overwrite=F),
+                       overwrite=F,
+                       sleep_time=3),
     format="file"),
 
   tar_target(envdata,
