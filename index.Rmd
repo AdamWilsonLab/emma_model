@@ -2,82 +2,80 @@
 title: "EMMA Prototype"
 description: Modeling vegetation postfire recovery data
 author:
-  - name: Adam Wilson & Glenn Moncrieff
+  - name: Adam M. Wilson
 editor_options: 
   chunk_output_type: console
 output:
-  github_document:
-    html_preview: true
+  html_document:
+    toc: true
+    toc_depth: 2
 ---
 
-```{r, echo=F, message=F,results="hide"}
+```{r, echo=F, message=F,include=F, results="hide"}
 library(targets)
 library(tidyverse)
 library(doParallel)
 library(raster)
 library(lubridate)
 library(sf)
+library(plotly)
+library(leaflet)
+
 # load data saved in the pipeline
 tar_load(c(envdata, stan_data, model_results, spatial_outputs,model_prediction)) 
 ```
 
 # Model Overview
-The details are given in [@slingsby_near-real_2020;@wilson_climatic_2015], but in short what we do is estimate the age of a site by calculating the years since the last fire. We then fit a curve to model the recovery of vegetation (measured using NDVI) as a function of it's age. For this we use a negative exponential curve with the following form:
 
-$$\mu_{i,t}=\alpha_i+\gamma_i\Big(1-e^{-\frac{age_{i,t}}{\lambda_i}}\Big)$$
-
-where $\mu_{i,t}$ is the expected NDVI for site $i$ at time $t$
-
-The observed greenness $NDVI_{i,t}$  is assumed to follow a normal distribution with mean $\mu_{i,t}$
-$$NDVI_{i,t}\sim\mathcal{N}(\mu_{i,t},\sigma_)$$
-
-An additional level models the parameters of the negative exponential curve as a function of environmental variables. This means that sites with similar environmental conditions should have similar recovery curves. The full model also includes a sinusoidal term to capture seasonal variation, but lets keep it simple here.  
+We estimate the age of a site by calculating the years since the last fire. We then fit a curve to model the recovery of vegetation (measured using NDVI) as a function of it's age. An additional level models the parameters of the negative exponential curve as a function of environmental variables. This means that sites with similar environmental conditions should have similar recovery curves.
 
 
 ## Workflow
 
-This repository was developed using the Targets framework as follows.
+This repository was developed using the Targets framework.
 
-```{r, echo=F, eval=F, results="hide"}
-tfile=paste0(tempfile(),".html")
-targets::tar_glimpse() %>% 
-  htmlwidgets::saveWidget(file = tfile)
+```{r, echo=F, eval=T, message=F, include=T, results="asis"}
+#tfile=paste0(tempfile(),".html")
+targets::tar_visnetwork() #%>% 
+#  htmlwidgets::saveWidget(file = tfile)
 #webshot::install_phantomjs()
-webshot::webshot(tfile, "network.png")
+#webshot::webshot(tfile, "network.png")
 #![targets_network](network.png)
 ```
 
+
 ## Results
 
-### Regression Coefficients 
+### Environmental Controls on Ecosystem Recovery
 
 These parameters represent the relationship of the following environmental variables to the recovery trajectory.
 
-```{r p1, echo=T, eval=T, message=FALSE}
+```{r p1, echo=F, eval=T, message=FALSE}
 betas=model_results %>% 
   filter(type=="beta")
 
 
-ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
+p1<-ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
   geom_pointrange(fill="grey")+
   facet_wrap(~parameter,nrow=1)+
   geom_vline(xintercept=0,col="grey")+
-  xlab(expression(beta*" (regression coefficient +/- 95% CI)"))+
-  ylab("Environmental Variable")
+  xlab("Beta (regression coefficient +/- 95% CI)")+
+  ylab("Environmental Variable") 
+ggplotly(p1)
 
 ```
 
 
 ## Recovery Trajectories
 
-The plot below illustates some example recovery trajectories. It currently just shows the top 20 cells with the most observations.
+The plot below illustrates some example recovery trajectories. It currently just shows the top 20 cells with the most observations.
 
-```{r plot, echo=T, eval=T, message=FALSE,fig.height=12}
+```{r plot, echo=F, eval=T, message=FALSE,fig.height=12}
 cells_with_long_records<-
   model_prediction %>% 
   group_by(cellID) %>% 
   summarize(n=n()) %>% 
-  arrange(n) %>% 
+  arrange(desc(n)) %>% 
   slice(1:20) # top 20 cells with the most observations
 
 model_prediction %>% 
@@ -95,8 +93,20 @@ model_prediction %>%
 
 Maps of spatial parameters in the model.  
 
-```{r compare_data2, echo=T, eval=T, message=FALSE}
+```{r compare_data2, echo=F, eval=T, warning=F, message=FALSE}
+rast=projectRaster(spatial_outputs,crs = "+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs")
 
-plot(spatial_outputs)
-
+leaflet() %>% setView(lng = 18.577, lat = -33.998707, zoom = 10) %>% 
+  addProviderTiles(providers$Esri.WorldImagery) %>% 
+  addRasterImage(rast[[1]],group=names(rast)[1]) %>% #, color = ~pal(values(rast)[,1]) 
+  addRasterImage(rast[[2]],group=names(rast)[2]) %>% 
+  addRasterImage(rast[[3]],group=names(rast)[3]) %>% 
+  addLayersControl(
+    baseGroups = names(rast),
+    options = layersControlOptions(collapsed = FALSE)) #%>% 
+#  addLegend("bottomright", pal = pal, values = ~,
+#    title = "Est. GDP (2010)",
+#    labFormat = labelFormat(prefix = "$"),
+#    opacity = 1
+#  )
 ```
