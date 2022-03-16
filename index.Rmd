@@ -1,8 +1,6 @@
 ---
 title: "EMMA Prototype"
 description: Modeling vegetation postfire recovery data
-author:
-  - name: Adam M. Wilson
 editor_options: 
   chunk_output_type: console
 output:
@@ -10,6 +8,9 @@ output:
     toc: true
     toc_depth: 2
 ---
+
+
+Model last updated at `r now()`.
 
 ```{r, echo=F, message=F,include=F, results="hide"}
 library(targets)
@@ -50,7 +51,7 @@ targets::tar_visnetwork() #%>%
 
 These parameters represent the relationship of the following environmental variables to the recovery trajectory.
 
-```{r p1, echo=F, eval=T, message=FALSE}
+```{r p1, echo=F, eval=T, warning=F, message=FALSE}
 betas=model_results %>% 
   filter(type=="beta")
 
@@ -101,6 +102,7 @@ leaflet() %>% setView(lng = 18.577, lat = -33.998707, zoom = 10) %>%
   addRasterImage(rast[[1]],group=names(rast)[1]) %>% #, color = ~pal(values(rast)[,1]) 
   addRasterImage(rast[[2]],group=names(rast)[2]) %>% 
   addRasterImage(rast[[3]],group=names(rast)[3]) %>% 
+  addRasterImage(rast[[4]],group=names(rast)[4]) %>% 
   addLayersControl(
     baseGroups = names(rast),
     options = layersControlOptions(collapsed = FALSE)) #%>% 

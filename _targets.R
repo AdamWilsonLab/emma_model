@@ -81,7 +81,7 @@ list(
   # tried mcmc - 500 samples in ~12 hours
   tar_stan_vb(
     model,
-    stan_files = "postfire.stan",
+    stan_files = "postfire_season.stan",
     data = stan_data,
     quiet=T,
     pedantic=F,
@@ -97,7 +97,7 @@ list(
   ),
 
    tar_target(model_results,
-              summarize_model_output(model_summary_postfire, stan_data, envdata)),
+              summarize_model_output(model_summary_postfire_season, stan_data, envdata)),
    tar_target(model_prediction,
              summarize_predictions(model_results,stan_data,envdata)),
   tar_target(spatial_outputs,

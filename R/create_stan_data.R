@@ -21,6 +21,7 @@ create_stan_data <- function(data,dyndata,fit=1,predict=0){
     y_obs=dyndata2$ndvi, #select variable to model
     age= dyndata2$age,
     pid=dyndata2$pid,
+    firemonth=ifelse(is.na(dyndata2$firemonth),4,dyndata2$firemonth),
     x = xvar,
     x_pid = data$pid,
     P = ncol(xvar),
