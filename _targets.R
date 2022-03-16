@@ -78,33 +78,36 @@ list(
   ),
 
   # tried mcmc - 500 samples in ~12 hours
-  tar_stan_vb_rep_summary(
-    model_output,
-    stan_files = "firemodel_generate.stan",
+  tar_stan_vb(
+    model,
+    stan_files = "postfire.stan",
     data = stan_data,
-    batches = 1,
     quiet=T,
-    reps = 1,
-    combine=T,
-    pedantic=T,
-    force_recompile=T,
-    #    stdout = R.utils::nullfile(),
-    #    stderr = R.utils::nullfile(),
+    pedantic=F,
     adapt_engaged=F,
     eta=0.11,
     iter = 10000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
     garbage_collection=T,
     init=1,
-    tol_rel_obj = 0.001
+    tol_rel_obj = 0.001,
+    output_samples = 1000,
+    format_df="parquet",
+    #format="parquet"
   ),
 
-  tar_target(model_results,
-             summarize_model_output(model_output, stan_data, envdata)),
-  tar_target(model_prediction,
+   tar_target(model_results,
+              summarize_model_output(model_summary_postfire, stan_data, envdata)),
+   tar_target(model_prediction,
              summarize_predictions(model_results,stan_data,envdata)),
   tar_target(spatial_outputs,
              create_spatial_outputs(model_results,data_training,envdata)),
-  tar_render(report, "index.Rmd")
+ # tar_target(release,
+ #            release_posteriors(
+ #              model_output,
+ #              file="targets/objects/model_results",
+ #              repo = "AdamWilsonLab/emma_model",
+ #              tag = "current")),
+   tar_render(report, "index.Rmd")
 )
 
 

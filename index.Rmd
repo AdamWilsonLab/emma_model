@@ -5,7 +5,10 @@ author:
   - name: Adam Wilson & Glenn Moncrieff
 editor_options: 
   chunk_output_type: console
-output:  github_document
+output:
+  github_document:
+    toc: true
+    toc_depth: 2
 ---
 
 ```{r, echo=F, message=F,results="hide"}
@@ -61,7 +64,7 @@ ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
 
 ## Recovery Trajectories
 
-The plot below illustates some example recovery trajectories. It currently just shows the top 20 cells with the most observations.
+The plot below illustrates some example recovery trajectories. It currently just shows the top 20 cells with the most observations.
 
 ```{r plot, echo=T, eval=T, message=FALSE,fig.height=12}
 cells_with_long_records<-
