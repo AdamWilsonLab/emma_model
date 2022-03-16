@@ -71,4 +71,6 @@ rasters =  foreach(t=spatial_params,.combine=stack) %do% {
     names(res)=t
     return(res)
   }
+    crs(rasters)=CRS("+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs")
+    return(rasters)
 }
