@@ -10,8 +10,6 @@ output:
 ---
 
 
-Model last updated at `r now()`.
-
 ```{r, echo=F, message=F,include=F, results="hide"}
 library(targets)
 library(tidyverse)
@@ -30,6 +28,11 @@ tar_load(c(envdata, stan_data, model_results, spatial_outputs,model_prediction))
 
 We estimate the age of a site by calculating the years since the last fire. We then fit a curve to model the recovery of vegetation (measured using NDVI) as a function of it's age. An additional level models the parameters of the negative exponential curve as a function of environmental variables. This means that sites with similar environmental conditions should have similar recovery curves.
 
+## Input data
+
+The model was last fit on `r now()`.
+
+This version of the model was fit with `r filter(envdata,training) %>% nrow()` pixels including data from `r as_date(range(stan_data$y_date))[1]` to `r as_date(range(stan_data$y_date))[2]`. 
 
 ## Workflow
 
@@ -47,7 +50,7 @@ targets::tar_visnetwork() #%>%
 
 ## Results
 
-### Environmental Controls on Ecosystem Recovery
+### Environmental Associations with Ecosystem Recovery
 
 These parameters represent the relationship of the following environmental variables to the recovery trajectory.
 
@@ -82,12 +85,35 @@ cells_with_long_records<-
 model_prediction %>% 
   filter(cellID%in%cells_with_long_records$cellID) %>% 
   ggplot(aes(x=age)) +
- geom_line(aes(y=median),colour="blue") +
-  geom_line(aes(y=y_obs),colour="black",lwd=0.5,alpha=0.3) +
   geom_ribbon(aes(ymin=q5,ymax=q95),alpha=0.5)+
+  geom_line(aes(y=y_obs),colour="darkred",lwd=0.5) +
+  geom_line(aes(y=median),colour="blue") +
   facet_wrap(~cellID) +
   labs(x="time since fire (years)",y="NDVI") +
   theme_bw()
+```
+
+
+## Model Performance
+
+Compare estimated vs observed values for all pixels. This is not true validation - these pixels were included in the model fitting.
+
+```{r}
+model_prediction %>% 
+#  filter(cellID%in%cells_with_long_records$cellID) %>% 
+  ggplot(aes(x=median,y=y_obs)) +
+  geom_hex(bins=50)+
+  geom_smooth(method = "lm",col="red")+
+  geom_abline(color="blue")+
+#  facet_wrap(~cellID) +
+  scale_fill_viridis_c()+
+  labs(x="Estimated NDVI",y="Observed NDVI",
+       caption = "Blue line is 1:1, Red line is least squares regression. Count is the number of pixels in that location",
+       title = "Estimated vs. Observed NDVI"
+      ) +
+  theme_bw()
+```
+
 ```
 
 ## Spatial Predictions
@@ -112,3 +138,4 @@ leaflet() %>% setView(lng = 18.577, lat = -33.998707, zoom = 10) %>%
 #    opacity = 1
 #  )
 ```
+
