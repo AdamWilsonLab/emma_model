@@ -8,7 +8,7 @@ library(stantargets)
 
 source("https://raw.githubusercontent.com/AdamWilsonLab/emma_envdata/main/R/robust_pb_download.R")
 # source all files in R folder
-lapply(list.files("R",pattern="[.]R",full.names = T)[-4], source)
+lapply(list.files("R",pattern="[.]R",full.names = T), source)
 
 options(tidyverse.quiet = TRUE)
 options(clustermq.scheduler = "multicore")
@@ -28,6 +28,8 @@ cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
 # Testing and training time windows
 training_window=c("2000-01-01","2020-01-01")
 testing_window=c("2020-01-01","2022-01-01")
+
+#tar_option_set(debug = "spatial_outputs")
 
 ## Download the most recent data release
 list(
@@ -49,24 +51,25 @@ list(
                #region=c(xmin = 18.3, xmax = 19.3, ymin = -34.3, ymax = -33.3), #core
                region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
                sample_proportion= 1)),
+  tar_target(envvars,c( #select and possibly rename envvars to be included in model
+    "Mean_Annual_Air_Temperature"="CHELSA_bio10_01_V1.2_clipped.tif", #select env vars to use in model
+    "Mean_Annual_Precipitation"="CHELSA_bio10_12_V1.2_clipped.tif",
+    "Mean_Monthly_Precipitation_In_Driest_Quarter"="CHELSA_bio10_17_V1.2_clipped.tif",
+    "Mean_Annual_Cloud_Frequency"="MODCF_meanannual.tif",
+    "Cloud_Seasonal_Concentration"="MODCF_seasonality_concentration.tif",
+    "Topographic_Diversity"="alos_topographic_diversity.tif",
+    "ALOS_CHILI"="alos_chili.tif",
+    "ALOS_MTPI"="alos_mtpi.tif")),
   tar_target(
     data_training,
-    filter_training_data(envdata,
-                         envvars=c("Mean_Annual_Air_Temperature"="CHELSA_bio10_01_V1.2_clipped.tif", #select env vars to use in model
-                                   "Mean_Annual_Precipitation"="CHELSA_bio10_12_V1.2_clipped.tif",
-                                   "Mean_Monthly_Precipitation_In_Driest_Quarter"="CHELSA_bio10_17_V1.2_clipped.tif",
-                                   "Mean_Annual_Cloud_Frequency"="MODCF_meanannual.tif",
-                                   "Cloud_Seasonal_Concentration"="MODCF_seasonality_concentration.tif",
-                                   "Topographic_Diversity"="alos_topographic_diversity.tif",
-                                   "ALOS_CHILI"="alos_chili.tif",
-                                   "ALOS_MTPI"="alos_mtpi.tif"))
+    filter_training_data(envdata,envvars)
   ),
   tar_target(
     dyndata_training,
     tidy_dynamic_data(envdata,date_window=ymd(training_window))
   ),
   tar_target(
-    dyndata_validation,
+    dyndata_testing,
     tidy_dynamic_data(envdata,date_window=ymd(testing_window))
   ),
   tar_target(
@@ -101,7 +104,7 @@ list(
    tar_target(model_prediction,
              summarize_predictions(model_results,stan_data,envdata)),
   tar_target(spatial_outputs,
-             create_spatial_outputs(model_results,data_training,envdata)),
+             create_spatial_outputs(envdata, envvars, model_results, data_training)),
  # tar_target(release,
  #            release_posteriors(
  #              model_output,

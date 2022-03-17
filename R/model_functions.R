@@ -47,27 +47,3 @@ summarize_predictions <- function(model_results,stan_data,envdata){
   return(state_vars)
 }
 
-# Spatial Predictions
-
-create_spatial_outputs <- function(model_results,data_training,envdata) {
-  td <- envdata %>%
-    left_join(dplyr::select(data_training, cellID, pid))
-
-  spatial_params=c("alpha","gamma","lambda","A")
-
-  stan_spatial <- model_results %>%
-    filter(parameter%in%spatial_params) %>%
-    mutate(pid=as.numeric(pid)) %>%
-    left_join(td,by="pid")
-
-rasters =  foreach(t=spatial_params,.combine=stack) %do% {
-    res <- stan_spatial %>%
-      filter(parameter==t) %>%
-      dplyr::select(x,y,median) %>%
-      rasterFromXYZ()
-    names(res)=t
-    return(res)
-  }
-    crs(rasters)=CRS("+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs")
-    return(rasters)
-}

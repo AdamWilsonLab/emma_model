@@ -65,18 +65,18 @@ model {
   A_tau ~ student_t(4,0,1); //#inv_gamma(0.01, 0.01);
 
   // priors
-  A_mu ~ normal(0,3);
   alpha_mu ~ normal(0.15,3);
   gamma_beta ~ normal(0,3);
   lambda_beta ~ normal(0,3);
+  A_mu ~ normal(0,3);
   // month effects
   phi  ~ uniform(-3.141593,3.141593);
 
   // recovery curve
-  A ~ normal(A_mu, A_tau);
   alpha ~ normal(alpha_mu, alpha_tau);
   gamma ~ normal(gamma_mu,gamma_tau);
   lambda ~ normal(lambda_mu,lambda_tau);
+  A ~ normal(A_mu, A_tau);
 
   // likelihood
 //  if(fit==1){ // only run if fitting is desired

@@ -93,16 +93,38 @@ model_prediction %>%
   theme_bw()
 ```
 
+```{r, echo=F, eval=F}
+
+cells_with_fires<-
+  model_prediction %>% 
+  filter(date>as_date("2010-01-01"),date<as_date("2015-01-01")) %>% 
+  group_by(cellID) %>% 
+  summarize(minage=min(age),n=n()) %>%
+  filter(minage<1) %>% 
+  arrange(desc(n)) %>% 
+  slice(1:20) # top 20 cells with the most observations
+
+model_prediction %>% 
+  filter(cellID%in%cells_with_fires$cellID) %>% 
+  ggplot(aes(x=date)) +
+  geom_ribbon(aes(ymin=q5,ymax=q95),alpha=0.5)+
+  geom_line(aes(y=y_obs),colour="darkred",lwd=0.5) +
+  geom_line(aes(y=median),colour="blue") +
+  facet_wrap(~cellID) +
+  labs(x="time since fire (years)",y="NDVI") +
+  theme_bw()
+```
+
+
 
 ## Model Performance
 
 Compare estimated vs observed values for all pixels. This is not true validation - these pixels were included in the model fitting.
 
-```{r}
+```{r, message=F, echo=F}
 model_prediction %>% 
-#  filter(cellID%in%cells_with_long_records$cellID) %>% 
   ggplot(aes(x=median,y=y_obs)) +
-  geom_hex(bins=50)+
+  geom_hex(bins=30)+
   geom_smooth(method = "lm",col="red")+
   geom_abline(color="blue")+
 #  facet_wrap(~cellID) +
@@ -114,13 +136,13 @@ model_prediction %>%
   theme_bw()
 ```
 
-```
 
 ## Spatial Predictions
 
 Maps of spatial parameters in the model.  
 
-```{r compare_data2, echo=F, eval=T, warning=F, message=FALSE}
+```{r, leaflet_map, echo=F, eval=T, warning=FALSE, message=FALSE,  results='asis'}
+
 rast=projectRaster(spatial_outputs,crs = "+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs")
 
 leaflet() %>% setView(lng = 18.577, lat = -33.998707, zoom = 10) %>% 
@@ -131,11 +153,12 @@ leaflet() %>% setView(lng = 18.577, lat = -33.998707, zoom = 10) %>%
   addRasterImage(rast[[4]],group=names(rast)[4]) %>% 
   addLayersControl(
     baseGroups = names(rast),
-    options = layersControlOptions(collapsed = FALSE)) #%>% 
+    options = layersControlOptions(collapsed = FALSE))  
 #  addLegend("bottomright", pal = pal, values = ~,
 #    title = "Est. GDP (2010)",
 #    labFormat = labelFormat(prefix = "$"),
 #    opacity = 1
 #  )
+
 ```
 
