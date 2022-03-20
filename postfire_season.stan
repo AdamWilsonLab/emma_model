@@ -17,7 +17,7 @@ parameters {
   vector[J] gamma;
   vector[J] lambda;
   vector[J] A;
-  real<lower=0, upper=1> alpha_mu;
+  real alpha_mu;
   vector[P] gamma_beta;
   vector[P] lambda_beta;
   vector[P] A_beta;
@@ -65,7 +65,7 @@ model {
   A_tau ~ student_t(4,0,1); //#inv_gamma(0.01, 0.01);
 
   // priors
-  alpha_mu ~ normal(0.15,3);
+  alpha_mu ~ normal(0.2,.2);
   gamma_beta ~ normal(0,3);
   lambda_beta ~ normal(0,3);
   A_mu ~ normal(0,3);
@@ -90,5 +90,5 @@ array[N] real y_pred;
 
 //if(predict==1){ // only run if prediction is desired
     y_pred = normal_rng(mu, tau);
-//  }
-}
+  }
+//}

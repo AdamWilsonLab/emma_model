@@ -1,8 +1,8 @@
 
-tidy_static_data <- function(envdata,region,remnant_distance,sample_proportion){
+tidy_static_data <- function(envdata_files,region,remnant_distance,sample_proportion,long_pixels){
 
 # Load static parquet file
-data <- open_dataset(sources = file.path(envdata,"stable_data.gz.parquet"))
+data <- open_dataset(sources = file.path(envdata_files,"stable_data.gz.parquet"))
 
 # define region and reproject to modis sinusoidal
 region_bbox = st_bbox(region,crs = st_crs(4326)) %>%
@@ -13,12 +13,15 @@ region_bbox = st_bbox(region,crs = st_crs(4326)) %>%
 # filter by remnant, distance, region, and add training/testing label according to sample_proportion
 td=data %>%
   collect() %>%
+  as_tibble() %>%
+  left_join(bind_cols(long_pixels,long=1),by="cellID") %>% # add column for pixels with long records
   mutate(
     fynbos = case_when( #all remnants
       remnant_distance.tif>0 ~ TRUE,
       TRUE ~ FALSE),
     model_domain = case_when( #core remnants within bbox domain
       remnant_distance.tif>=remnant_distance &
+        long==1 & #flag the long records
       x>region_bbox$xmin & x<region_bbox$xmax &
       y>region_bbox$ymin & y<region_bbox$ymax ~ TRUE,
       TRUE ~ FALSE)) %>%

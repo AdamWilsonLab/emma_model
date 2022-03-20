@@ -29,6 +29,9 @@ cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
 training_window=c("2000-01-01","2020-01-01")
 testing_window=c("2020-01-01","2022-01-01")
 
+# decide sampling proportion
+total_fynbos_pixels=348911
+sample_proportion=round(18000/total_fynbos_pixels,2);sample_proportion
 #tar_option_set(debug = "spatial_outputs")
 
 ## Download the most recent data release
@@ -44,13 +47,16 @@ list(
                        sleep_time=3),
     format="file"),
 
+  tar_target(long_pixels,
+             find_long_records(envdata_files)),
   tar_target(envdata,
              tidy_static_data(
                envdata_files,
                remnant_distance=2, #drop pixels within this distance of remnant edge (km)
-               region=c(xmin = 18.3, xmax = 19.3, ymin = -34.3, ymax = -33.3), #core
+               #region=c(xmin = 18.3, xmax = 19.3, ymin = -34.3, ymax = -33.3), #core
+               region=c(xmin = 0, xmax = 30, ymin = -35, ymax = -20), #core
                #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
-               sample_proportion= 0.5)),
+               sample_proportion= sample_proportion, long_pixels=long_pixels)),
   tar_target(envvars,c( #select and possibly rename envvars to be included in model
     "Mean_Annual_Air_Temperature"="CHELSA_bio10_01_V1.2_clipped.tif", #select env vars to use in model
     "Mean_Annual_Precipitation"="CHELSA_bio10_12_V1.2_clipped.tif",
@@ -90,7 +96,7 @@ list(
     pedantic=F,
     adapt_engaged=F,
     eta=0.11,
-    iter = 20000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
+    iter = 80000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
     garbage_collection=T,
     init=1,
     tol_rel_obj = 0.001,
