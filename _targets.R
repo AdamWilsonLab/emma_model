@@ -51,8 +51,8 @@ list(
   tar_target(
     data_training,
     filter_training_data(envdata,
-                         envvars=c("CHELSA_bio10_01_V1.2_clipped.tif", #select env vars to use in model
-                                   "CHELSA_bio10_02_V1.2_clipped.tif",
+                         envvars=c("CHELSA_bio10_01_V1.2.tif", #select env vars to use in model
+                                   "CHELSA_bio10_02_V1.2.tif",
                                    "MODCF_seasonality_concentration.tif",
                                    "alos_chili.tif",
                                    "alos_mtpi.tif"))
