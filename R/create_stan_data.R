@@ -22,6 +22,7 @@ create_stan_data <- function(data,dyndata,fit=1,predict=0){
     age= dyndata2$age,
     pid=dyndata2$pid,
     firemonth=ifelse(is.na(dyndata2$firemonth),4,dyndata2$firemonth),
+#    month=decimal_date(dyndata2$date)-as.integer(decimal_date(dyndata2$date)),
     x = xvar,
     x_pid = data$pid,
     P = ncol(xvar),

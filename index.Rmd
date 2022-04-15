@@ -9,7 +9,6 @@ output:
     toc_depth: 2
 ---
 
-
 ```{r, echo=F, message=F,include=F, results="hide"}
 library(targets)
 library(tidyverse)
@@ -32,7 +31,7 @@ We estimate the age of a site by calculating the years since the last fire. We t
 
 The model was last fit on `r now()`.
 
-This version of the model was fit with `r filter(envdata,training) %>% nrow()` pixels including data from `r as_date(range(stan_data$y_date))[1]` to `r as_date(range(stan_data$y_date))[2]`. 
+This version of the model was fit with `r filter(envdata,training) %>% nrow()` pixels including data from `r as_date(range(stan_data$y_date))[1]` to `r as_date(range(stan_data$y_date))[2]`.
 
 ## Workflow
 
@@ -47,10 +46,9 @@ targets::tar_visnetwork() #%>%
 #![targets_network](network.png)
 ```
 
-
 ## Results
 
-### Environmental Associations with Ecosystem Recovery
+### Environmental Drivers
 
 These parameters represent the relationship of the following environmental variables to the recovery trajectory.
 
@@ -68,7 +66,6 @@ p1<-ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
 ggplotly(p1)
 
 ```
-
 
 ## Recovery Trajectories
 
@@ -115,8 +112,6 @@ model_prediction %>%
   theme_bw()
 ```
 
-
-
 ## Model Performance
 
 Compare estimated vs observed values for all pixels. This is not true validation - these pixels were included in the model fitting.
@@ -133,13 +128,13 @@ model_prediction %>%
        caption = "Blue line is 1:1, Red line is least squares regression. Count is the number of pixels in that location",
        title = "Estimated vs. Observed NDVI"
       ) +
-  theme_bw()
+  theme_bw()+
+  coord_equal()
 ```
-
 
 ## Spatial Predictions
 
-Maps of spatial parameters in the model.  
+Maps of spatial parameters in the model.
 
 ```{r, leaflet_map, echo=F, eval=T, warning=FALSE, message=FALSE,  results='asis'}
 
@@ -161,4 +156,3 @@ leaflet() %>% setView(lng = 18.577, lat = -33.998707, zoom = 10) %>%
 #  )
 
 ```
-
