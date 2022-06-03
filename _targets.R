@@ -52,12 +52,12 @@ list(
   tar_target(
     data_training,
     filter_training_data(envdata,
-                         envvars=c("Mean_Annual_Air_Temperature"="CHELSA_bio10_01_V1.2_clipped.tif", #select env vars to use in model
-                                   "Mean_Annual_Precipitation"="CHELSA_bio10_12_V1.2_clipped.tif",
-                                   "Mean_Monthly_Precipitation_In_Driest_Quarter"="CHELSA_bio10_17_V1.2_clipped.tif",
+                         envvars=c("Mean_Annual_Air_Temperature"="CHELSA_bio10_01_V1.2.tif", #select env vars to use in model
+                                   "Mean_Annual_Precipitation"="CHELSA_bio10_12_V1.2.tif",
+                                   "Mean_Monthly_Precipitation_In_Driest_Quarter"="CHELSA_bio10_17_V1.2.tif",
                                    "Mean_Annual_Cloud_Frequency"="MODCF_meanannual.tif",
                                    "Cloud_Seasonal_Concentration"="MODCF_seasonality_concentration.tif",
-                                   "Topographic_Diversity"="alos_topographic_diversity.tif",
+                                   "Topographic_Diversity"="alos_topodiversity.tif",
                                    "ALOS_CHILI"="alos_chili.tif",
                                    "ALOS_MTPI"="alos_mtpi.tif"))
   ),
