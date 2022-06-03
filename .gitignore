@@ -44,3 +44,8 @@ vignettes/*.pdf
 data/envdata*
 .DS_Store
 _targets
+index.html
+index.md
+index_files
+network.html
+img/
