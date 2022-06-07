@@ -6,8 +6,11 @@ library(piggyback)
 library(plotly)
 library(leaflet)
 #remotes::install_github("ropensci/stantargets")
+if(!"basemapR" %in% rownames(installed.packages())){
+  devtools::install_github('Chrisjb/basemapR')
+}
 library(stantargets)
-source("scratch_code/report_generator.R") #this needs to be packaged into an fx and moved
+source("scratch_code/report_generator.R") #this should be moved
 source("https://raw.githubusercontent.com/AdamWilsonLab/emma_envdata/main/R/robust_pb_download.R")
 # source all files in R folder
 lapply(list.files("R",pattern="[.]R",full.names = T)[-4], source)
