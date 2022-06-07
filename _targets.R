@@ -6,9 +6,9 @@ library(piggyback)
 library(plotly)
 library(leaflet)
 #remotes::install_github("ropensci/stantargets")
-if(!"basemapR" %in% rownames(installed.packages())){
-  devtools::install_github('Chrisjb/basemapR')
-}
+# if(!"basemapR" %in% rownames(installed.packages())){
+#   devtools::install_github('Chrisjb/basemapR')
+# }
 library(stantargets)
 source("scratch_code/report_generator.R") #this should be moved
 source("https://raw.githubusercontent.com/AdamWilsonLab/emma_envdata/main/R/robust_pb_download.R")
