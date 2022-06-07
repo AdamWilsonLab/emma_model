@@ -2,7 +2,6 @@ library(rmarkdown)
 library(stars)
 library(tidyverse)
 library(lubridate)
-library(basemapR)
 #webshot::install_phantomjs()
 source("R/get_park_polygons.R")
 #tar_load(model_results)
@@ -26,7 +25,6 @@ generate_reports <- function(output_directory = "reports/",
 
     }
 
-  #install basemapR if needed
 
   # Load Park Polygons
   parks <- get_park_polygons(temp_directory = temp_directory,
