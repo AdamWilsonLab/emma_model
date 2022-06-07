@@ -16,6 +16,9 @@ generate_reports <- function(output_directory = "reports/",
 
   #create directories if needed
 
+    print("report env:")
+    print(environment())
+
     if(!dir.exists(file.path(output_directory))){
 
       dir.create(file.path(output_directory), recursive = TRUE)
@@ -99,16 +102,13 @@ generate_reports <- function(output_directory = "reports/",
 
   for (park_name in unique(parks$CUR_NME)){
 
+  #for (park_name in unique(parks$CUR_NME)[1]){
+
+
     focal_park <- parks %>%
       filter(CUR_NME == park_name)
 
-    # render("scratch_code/report_prototype.rmd",
-    #        output_file = file.path(output_directory,
-    #                                gsub(pattern = " ",replacement = "_",
-    #                                     x = paste0('report.', park_name, '.html')))
-    #        )
-
-    render(input = report_location,
+  render(input = report_location,
            output_file = gsub(pattern = " ",replacement = "_",
                                         x = paste0('report.', park_name, '.html')),
            output_dir = output_directory
