@@ -3,9 +3,11 @@ library(tarchetypes)
 library(tidyverse)
 library(arrow)
 library(piggyback)
+library(plotly)
+library(leaflet)
 #remotes::install_github("ropensci/stantargets")
 library(stantargets)
-
+source("scratch_code/report_generator.R") #this needs to be packaged into an fx and moved
 source("https://raw.githubusercontent.com/AdamWilsonLab/emma_envdata/main/R/robust_pb_download.R")
 # source all files in R folder
 lapply(list.files("R",pattern="[.]R",full.names = T)[-4], source)
@@ -108,5 +110,12 @@ list(
  #              file="targets/objects/model_results",
  #              repo = "AdamWilsonLab/emma_model",
  #              tag = "current")),
-   tar_render(report, "index.Rmd")
+   tar_render(report, "index.Rmd"),
+ tar_target(name = reports,
+            command = generate_reports(output_directory = "reports/",
+                                       temp_directory = "data/temp/",
+                                       report_location = "report_prototype.rmd",
+                                       model_results = model_results,
+                                       model_prediction = model_prediction,
+                                       spatial_outputs = spatial_outputs))
 )

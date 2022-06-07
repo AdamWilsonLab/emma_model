@@ -39,6 +39,8 @@ get_park_polygons <- function(temp_directory = "data/temp/parks",
                 repo = "AdamWilsonLab/emma_envdata",
                 dest = temp_directory)
 
+
+
   # Read domain
 
     domain <- st_read(file.path(temp_directory, "domain.gpkg"))
