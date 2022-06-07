@@ -336,14 +336,14 @@ Figure X. Leaflet map showing NDVI and the number of years since the most recent
 
 
 
-```{r basemap1, fig.width = 10, echo = FALSE, warning = FALSE, message = FALSE}
+```{r basemap1, eval=FALSE, fig.width = 10, echo = FALSE, warning = FALSE, message = FALSE}
 
 # Time since fire
   #library(ggmmap) # doesn't play well with ggplot
   #library(basemaps) # doesn't play well with ggplot
 
   #Trying with basemapR
-  library(basemapR)
+  #library(basemapR)
 
 
   suppressMessages(
@@ -361,7 +361,7 @@ Figure X. Leaflet map showing NDVI and the number of years since the most recent
 
 ```
 
-```{r basemap2, fig.width = 10, echo = FALSE, warning = FALSE, message = FALSE}
+```{r basemap2, eval=FALSE, fig.width = 10, echo = FALSE, warning = FALSE, message = FALSE}
 
 # Time since fire
   #library(ggmmap) # doesn't play well with ggplot
@@ -369,7 +369,7 @@ Figure X. Leaflet map showing NDVI and the number of years since the most recent
 
   #Trying with basemapR
   ##devtools::install_github('Chrisjb/basemapR')
-  library(basemapR)
+  #library(basemapR)
 
     focal_park %>% 
     st_transform(crs = st_crs(4326)) -> focal_wgs
