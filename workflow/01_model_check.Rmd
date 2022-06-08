@@ -1,0 +1,144 @@
+---
+title: "EMMA Prototype"
+description: Modeling vegetation postfire recovery data
+editor_options: 
+  chunk_output_type: console
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+```{r, echo=F, message=F,include=F, results="hide"}
+library(prioritizr)
+library(cmdstanr)
+library(tidyverse)
+library(lubridate)
+library(rasterVis)
+RandomFields::RFoptions(install="no")
+
+Sys.setenv(HOME="/home/rstudio")
+cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
+```
+
+
+# Generate data
+
+```{r, echo=F, message=F,include=F, results="hide"}
+generated_data=generate_stan_data()
+glimpse(generated_data$stan_data)
+```
+
+# fit model
+```{r}
+file="postfire_season2.stan"
+mod <- cmdstan_model(file, cpp_options = list(stan_threads = TRUE))
+```
+
+```{r fitmodels}
+fit_vb <- mod$variational(data = generated_data$stan_data,threads=12)
+fit_mcmc <- mod$sample(data = generated_data$stan_data, parallel_chains = 4,threads_per_chain = 3)
+```
+
+
+```{r}
+# summarize VB model
+s1_vb=fit_vb$summary()
+s2_vb=summarize_model_output(s1_vb,
+                             generated_data$stan_data, 
+                             generated_data$static) %>% 
+  mutate(fit="VB")
+s3_vb=summarize_predictions(model_results = s2_vb,
+                            stan_data = generated_data$stan_data,
+                            envdata=generated_data$static)
+
+# summarize MCMC model
+s1_mcmc=fit_vb$summary()
+s2_mcmc=summarize_model_output(s1_mcmc,
+                               generated_data$stan_data, 
+                               generated_data$static)%>% 
+  mutate(fit="MCMC")
+s3_mcmc=summarize_predictions(model_results = s2_mcmc,
+                              stan_data = generated_data$stan_data,
+                              envdata=generated_data$static)
+
+```
+
+
+
+## compare betas
+```{r}
+betas=bind_rows(
+  filter(s2_vb, type=="beta"),
+  filter(s2_mcmc, type=="beta")) %>%
+  left_join(gather(generated_data$params,parameter,true,-xname))
+
+
+ggplot(betas,aes(x=median,y=xname,col=fit))+
+  geom_point()+
+  geom_segment(aes(x=q5,xend=q95,yend=xname))+
+  geom_point(aes(x=true))+
+  geom_vline(aes(xintercept=0),alpha=.3)+
+  facet_wrap(~parameter,scales="free_x")
+```
+
+
+## compare spatial parameters
+```{r}
+pmaps=s2 %>%
+  filter(type=="spatial") %>%
+  mutate(pid=as.integer(pid)) %>%
+  dplyr::select(parameter,estimated=median,cellID=pid) %>%
+  left_join(gather(static,parameter,true,-cellID,-x,-y)) %>%
+  gather(type,value,-parameter,-x,-y,-cellID)
+
+
+
+ggplot(pmaps,aes(x=x,y=y,fill=value))+
+  geom_tile()+
+  facet_grid(parameter~type)+
+  scale_fill_viridis_c()
+```
+
+
+## compare predictions
+```{r}
+pred <- dynamic %>%
+  left_join(s3,by=c("cellID"="pid","date"="date"))
+
+
+ggplot(pred,aes(x=as.integer(date)))+
+  geom_line(aes(y=exp),col="red",alpha=.5)+
+  geom_line(aes(y=mu),col="red",alpha=.5)+
+  geom_line(aes(y=obs),col="red",alpha=.5)+
+  geom_line(aes(y=median),col="black")+
+  facet_wrap(~cellID)+
+  theme(
+    strip.background = element_blank(),
+    strip.text.x = element_blank()
+  )
+```
+
+
+# predicted vs observed
+```{r}
+ggplot(pred,aes(x=obs,y=median))+
+  geom_hex()+
+  geom_abline(aes(intercept=0,slope=1),col="red")+
+  geom_smooth(method="lm")+
+  coord_equal()
+```
+
+# ggplot(res,aes(x=age))+
+#   geom_line(aes(y=month))+
+#   geom_line(aes(y=age))+
+#   facet_wrap(~id)
+
+
+<!-- res %>% -->
+<!--   dplyr::select(id,alpha,gamma,lambda,A,phi) %>% -->
+<!--   distinct() %>% -->
+<!--   gather(parameter,value,-id) %>% -->
+<!--   ggplot(aes(x=value,col=parameter))+ -->
+<!--   geom_density()+ -->
+<!--   facet_wrap(~parameter,scales = "free",ncol=1) -->
