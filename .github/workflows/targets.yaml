@@ -66,6 +66,11 @@ jobs:
       - name: Install R Package Dependencies
         run: |-
           Rscript -e "questionr::qscan(list.files(pattern='*.R',recursive=T), load = TRUE, detail = TRUE)" # this scans all scripts and installs any needed packages
+      - name: Authorize Github for R
+        run: |-
+      - name: Install R Package Dependencies
+        run: |-
+          Rscript -e "gitcreds::gitcreds_set($GH_PAT)" 
       # - name: Cache packages
       #   uses: actions/cache@v1
       #   with:
