@@ -21,6 +21,7 @@ library(doParallel)
 library(raster)
 library(lubridate)
 library(sf)
+library(rnoaa)
 
 # load data saved in the pipeline
   tar_load(c(envdata, stan_data, model_results, spatial_outputs,model_prediction)) 
