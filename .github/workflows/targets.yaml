@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-18.04
     container: adamwilsonlab/emma:latest
     env:
-      GITHUB_PAT: ${{ secrets.GH_PAT }}
+      GITHUB_PAT: ${{ secrets.GH_PAT_BSM }}
 #      RENV_PATHS_ROOT: ~/.local/share/renv
     steps:
       - name: Extract branch name
@@ -66,7 +66,9 @@ jobs:
         continue-on-error: true
       - name: Install R Package Dependencies
         run: |-
-          Rscript -e "questionr::qscan(list.files(pattern='*.R',recursive=T), load = TRUE, detail = FALSE)" # this scans all scripts and installs any needed packages
+          Rscript -e "questionr::qscan(list.files(pattern='*.R',recursive=T), load = TRUE, detail = TRUE)" # this scans all scripts and installs any needed packages
+      - name: Authorize Github for R
+        run: |-
       # - name: Cache packages
       #   uses: actions/cache@v1
       #   with:

@@ -1,4 +1,3 @@
-
 # Summarize posteriors
 summarize_model_output <- function(model_summary,stan_data, data){
   #posterior predictive

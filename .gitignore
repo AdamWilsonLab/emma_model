@@ -41,7 +41,7 @@ vignettes/*.pdf
 
 
 # Targets files
-data*
+data/envdata*
 .DS_Store
 _targets
 index.html

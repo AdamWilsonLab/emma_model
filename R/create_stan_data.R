@@ -34,4 +34,3 @@ create_stan_data <- function(data,dyndata,fit=1,predict=0){
     x_cellID = data$cellID
 )
     }
-
