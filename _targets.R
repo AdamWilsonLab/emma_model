@@ -5,6 +5,7 @@ library(arrow)
 library(piggyback)
 library(plotly)
 library(leaflet)
+library(rnoaa)
 #remotes::install_github("ropensci/stantargets")
 # if(!"basemapR" %in% rownames(installed.packages())){
 #   devtools::install_github('Chrisjb/basemapR')
