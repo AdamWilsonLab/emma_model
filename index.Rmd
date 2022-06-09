@@ -157,3 +157,18 @@ leaflet() %>% setView(lng = 18.577, lat = -33.998707, zoom = 10) %>%
 #  )
 
 ```
+
+# Park Reports
+
+See the links below for park-level reports on vegetation status.
+
+[Addo-Elephant_National_Park](reports/report.Addo-Elephant_National_Park.html)
+[Agulhas_National_Park](reports/report.Agulhas_National_Park.html)
+[Bontebok_National_Park](reports/report.Bontebok_National_Park.html)
+[Garden_Route_National_Park](reports/report.Garden_Route_National_Park.html)
+[Karoo_National_Park](reports/report.Karoo_National_Park.html)
+[Namaqua_National_Park](reports/report.Namaqua_National_Park.html)
+[Richtersveld_National_Park](reports/report.Richtersveld_National_Park.html)
+[Table_Mountain_National_Park](reports/report.Table_Mountain_National_Park.html)
+[Tankwa-Karoo_National_Park](reports/report.Tankwa-Karoo_National_Park.html)
+[West_Coast_National_Park](reports/report.West_Coast_National_Park.html)
