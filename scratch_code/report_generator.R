@@ -12,7 +12,8 @@ generate_reports <- function(output_directory = "reports/",
                              report_location = "report_prototype.rmd",
                              model_results = model_results,
                              model_prediction = model_prediction,
-                             spatial_outputs = spatial_outputs
+                             spatial_outputs = spatial_outputs,
+                             time_window_days = 120
 ){
 
   #create directories if needed

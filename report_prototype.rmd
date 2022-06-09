@@ -390,3 +390,66 @@ Figure X. Leaflet map showing NDVI and the number of years since the most recent
 ```
 
 
+### Climate Data
+
+```{r precip, fig.width = 10, echo = FALSE, warning = FALSE, message = FALSE}
+
+#construct needed bounding box
+  bb1 <- focal_wgs %>%st_bbox()
+  class(bb1) <- "numeric"
+
+#get climate data  
+  focal_arc <- arc2(date = seq(Sys.Date()-(time_window_days+1), Sys.Date()-1, "days"),
+                    box = bb1) %>%
+                bind_rows()
+  
+#toss values outside of the park (unless there aren't any)  
+?st_as_sf
+
+focal_arc %>%
+  st_as_sf(coords = c("lon","lat"),
+           crs = st_crs(focal_wgs)) -> focal_arc
+
+
+st_intersection(x = focal_arc,
+                y = focal_wgs) -> park_arc
+
+#make a plot
+  if(nrow(park_arc) == 0){
+    
+    focal_arc %>%
+      group_by(date)%>%
+      summarize(mean_precip = mean(precip)) %>%
+      st_drop_geometry()%>% mutate(date = as.Date(date))%>%
+      ggplot(mapping = aes(x = date, y = mean_precip))+
+      geom_line()+
+      xlab("Date")+
+      ylab("Mean Precipitation (mm)")
+
+    
+  }else{
+    
+    park_arc %>%
+      group_by(date)%>%
+      summarize(mean_precip = mean(precip)) %>%
+      st_drop_geometry()%>% mutate(date = as.Date(date))%>%
+      ggplot(mapping = aes(x = date, y = mean_precip))+
+      geom_line()+
+      xlab("Date")+
+      ylab("Mean Precipitation (mm)")
+  
+  }
+
+rm(focal_arc,park_arc)
+
+
+```
+
+
+
+
+
+
+
+
+
