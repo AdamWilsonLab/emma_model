@@ -1,6 +1,5 @@
 name|type|parent|branches|progress
-model_file_postfire_season|stem|model_file_postfire_season|0|started
-model_file_postfire_season|stem|model_file_postfire_season|0|built
+model_file_postfire_season|stem|model_file_postfire_season|0|skipped
 envdata_files|stem|envdata_files|0|started
 envdata_files|stem|envdata_files|0|built
 envdata|stem|envdata|0|started
@@ -27,7 +26,6 @@ model_prediction|stem|model_prediction|0|started
 model_prediction|stem|model_prediction|0|built
 spatial_outputs|stem|spatial_outputs|0|started
 spatial_outputs|stem|spatial_outputs|0|built
-report|stem|report|0|started
-report|stem|report|0|built
+report|stem|report|0|skipped
 reports|stem|reports|0|started
 reports|stem|reports|0|built

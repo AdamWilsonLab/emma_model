@@ -10,14 +10,19 @@ library(dplyr)
 #' @return sf dataframe object containing the parks
 get_park_polygons <- function(temp_directory = "data/temp/parks",
                               sacad_filename = "data/manual_downloads/protected_areas/SACAD_OR_2021_Q4.shp",
-                              sapad_filename = "data/manual_downloads/protected_areas/SAPAD_OR_2021_Q4.shp"){
+                              sapad_filename = "data/manual_downloads/protected_areas/SAPAD_OR_2021_Q4.shp",
+                              cape_nature_filename = "data/manual_downloads/protected_areas/Provincial_Nature_Reserves/CapeNature_Reserves_gw.shp"){
 
   # Pull in different protected areas
 
     sacad <- st_read(sacad_filename)
     sapad <- st_read(sapad_filename)
 
-  # Combine the two datasets
+  # Pull in CapeNature reserves
+
+    cn <- st_read(cape_nature_filename)
+
+  # Combine the two pa datasets
 
     sacad %>%
       mutate( PROC_DOC = NA) %>%
@@ -25,6 +30,7 @@ get_park_polygons <- function(temp_directory = "data/temp/parks",
       bind_rows(sapad) -> all_pas
 
   rm(sacad,sapad)
+
 
   # Create directory if needed
 
@@ -39,8 +45,6 @@ get_park_polygons <- function(temp_directory = "data/temp/parks",
                 repo = "AdamWilsonLab/emma_envdata",
                 dest = temp_directory)
 
-
-
   # Read domain
 
     domain <- st_read(file.path(temp_directory, "domain.gpkg"))
@@ -49,6 +53,9 @@ get_park_polygons <- function(temp_directory = "data/temp/parks",
 
     all_pas <- st_transform(x = all_pas,
                            crs = st_crs(domain))
+
+    cn <- st_transform(x = cn,
+                            crs = st_crs(domain))
 
   # Filter to National Parks only
 
@@ -67,6 +74,7 @@ get_park_polygons <- function(temp_directory = "data/temp/parks",
 
     #Use this if you just want intersecting parks, even the bits outside our domain
     all_pas <- all_pas[which(as.logical(st_intersects(x = all_pas, y = domain))),]
+    cn <- cn[which(as.logical(st_intersects(x = cn, y = domain))),]
 
   # update projection
     pb_download(file = "template.tif",
@@ -80,11 +88,22 @@ get_park_polygons <- function(temp_directory = "data/temp/parks",
     st_transform(x = all_pas,
                  crs = st_crs(template))
 
+    cn <-
+      st_transform(x = cn,
+                   crs = st_crs(template))
+
   # cleanup
     unlink(file.path(temp_directory),recursive = TRUE,force = TRUE)
 
+
+  # make output
+
+    out <-
+      list("cape_nature" = cn,
+         "national_parks" = all_pas)
+
   # return data product
-    return(all_pas)
+    return(out)
 
 }
 ############################################
