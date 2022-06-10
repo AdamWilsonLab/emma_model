@@ -73,8 +73,11 @@ get_park_polygons <- function(temp_directory = "data/temp/parks",
     #   dplyr::select(-domain)
 
     #Use this if you just want intersecting parks, even the bits outside our domain
-    all_pas <- all_pas[which(as.logical(st_intersects(x = all_pas, y = domain))),]
-    cn <- cn[which(as.logical(st_intersects(x = cn, y = domain))),]
+    all_pas <- all_pas[which(as.logical(st_intersects(x = all_pas, y = domain))),] %>%
+                  st_make_valid()
+
+    cn <- cn[which(as.logical(st_intersects(x = cn, y = domain))),]%>%
+              st_make_valid()
 
   # update projection
     pb_download(file = "template.tif",
