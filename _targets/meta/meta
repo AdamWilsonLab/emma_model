@@ -2,12 +2,12 @@ name|type|data|command|depend|seed|path|time|size|bytes|format|iteration|parent|
 reports|stem|2ba2286ddb57a2d6|3db9ffba23d9d640|dfb9bb453e8a93d3|-653841556||t19152.7648766004s|a1c456b03adbfbf8|44|rds|vector|||1296.527|input and ouput crs are the same|
 create_stan_data|function|7c6e224a02e15f45||||||||||||||
 summarize_predictions|function|561550e942ee3728||||||||||||||
-release_model_outputs|function|eed8fe4e6d61953e||||||||||||||
+release_model_outputs|function|61215c7740c59457||||||||||||||
 tidy_dynamic_data|function|3ec9d16fbf3cb1b7||||||||||||||
 robust_pb_download_solo|function|d44089898bbdda39||||||||||||||
 release_posteriors|function|e85e8a50366c3522||||||||||||||
 training_window|object|8e7f2acd96dbcecf||||||||||||||
-.Random.seed|object|f6a14d1daaaf0b05||||||||||||||
+.Random.seed|object|1e37b11d7a7e4fc5||||||||||||||
 get_park_polygons|function|ed8f59a7182a19f5||||||||||||||
 tidy_static_data|function|43f7289642705070||||||||||||||
 summarize_model_output|function|50f2b753a815b00e||||||||||||||
@@ -17,19 +17,19 @@ create_spatial_outputs|function|a2e2e9f6e48f4565||||||||||||||
 robust_pb_download|function|6feaa7b59ae05f87||||||||||||||
 generate_reports|function|5a4024ecee020eb2||||||||||||||
 sync_envdata|function|0593aa59bbd1bd55||||||||||||||
-model_file_postfire_season|stem|5da5e866c9954818|03ead3f32234b56f|ef46db3751d8e999|1561732577|postfire_season.stan|t19160.7019094815s|f6bdd4bf180d7d58|2674|file|vector|||0.001||
-envdata_files|stem|ceb5942924c3eeab|c119f28deb8a0aa8|626a326919153b31|-1206656041|data/envdata/|t19160.7055110966s|15caea60777a26c3|3089069375|file|vector|||285.085||
-envdata|stem|63a5fd1e17341004|ddd04bd3d673b48f|6b9cafc568638868|736623833||t19160.7062132849s|865a8cab00c249d1|157576448|rds|vector|||2.422||
-data_training|stem|897a26decf265f54|a66a8a69670e5a81|eff756ebe1a508f7|1776579871||t19160.7062150905s|143352aeb8655ec8|13327|rds|vector|||0.027||
-dyndata_training|stem|ba61a4aeea4002bf|d7c7d25f38d6d72a|0dfa95099abd3328|919408461||t19160.7074562217s|848389466d8af3d2|414559|rds|vector|||107.064||
-dyndata_validation|stem|634696f9f509e377|239f651c21118bdf|0403e0e056d8a08e|821702066||t19160.7087048976s|3a615637bf4fd338|67603|rds|vector|||107.858||
-stan_data|stem|074f9c167eca91aa|2368a1968219679e|9b7323a8e255811b|-24570201||t19160.7087060087s|12e87a05de3b6da9|118650|rds|vector|||0.066||
-model_data|stem|eaf7163486dd7106|0c37f0f44657e5b0|d92709262b7d696b|-495503059||t19160.7087096662s|fa1f8474e2c73ea7|271203|qs|vector|||0.001||
-model_vb_postfire_season|stem|af8bd9d533d06273|8aa1bfc58d04cd78|30bb6589bb31e745|-392649669||t19160.7102451504s|880b071d809c5222|374044793|qs|vector|||130.254||
-model_summary_postfire_season|stem|bc29a47a51d9b8e2|a4d0b10da400a3f4|944280bbef6238ca|-1928972307||t19160.7130217606s|0fad1bf3e197d259|5024670|parquet|vector|||238.989||
-model_draws_postfire_season|stem|0a4ce47de899c46f|bbf31e832c2ba78f|2728856f3112222b|201587515||t19160.7131174562s|daea68cddb60ed78|538329633|parquet|vector|||0.533||
-model_results|stem|d7e099d4363f0eea|dd14532a621c25be|20977b2f327536bc|-1393141758||t19160.7131275027s|41b3f5f621214bdd|3666614|rds|vector|||0.15||
-model_prediction|stem|30fbc23b1e49fbdc|af3cd1ac69bacb77|e38e4e80972231ad|1564443633||t19160.7131304194s|36061498ee3eb824|719394|rds|vector|||0.159||
-spatial_outputs|stem|5fcacc989c82bd00|330f5f4e3ddb6ad9|d88cf1e700b19814|-1659775273||t19160.713138475s|8f1609308eb3a189|12532|rds|vector|||0.689|Discarded datum unknown in Proj4 definition|
-release_outputs|stem|f0595d234fcffd69|caa1b38125e4d61d|b6634d45c6edc4b6|-1747594467||t19160.7131742162s|ded833868582137a|50|rds|vector|||3.083||
-report|stem|e9e63bbec3fdced0|5e01f99a6889ed5f|7d17cb6b218e7f09|-237041703|index.html*index.Rmd|t19160.7021487947s|293c0d65a916412f|5874425|file|vector|||14.548|input and ouput crs are the same|
+model_file_postfire_season|stem|5da5e866c9954818|03ead3f32234b56f|ef46db3751d8e999|1561732577|postfire_season.stan|t19160.8621876429s|f6bdd4bf180d7d58|2674|file|vector|||0.001||
+envdata_files|stem|ceb5942924c3eeab|c119f28deb8a0aa8|626a326919153b31|-1206656041|data/envdata/|t19160.8710938862s|15caea60777a26c3|3089069375|file|vector|||740.025||
+envdata|stem|63a5fd1e17341004|ddd04bd3d673b48f|6b9cafc568638868|736623833||t19160.8717965715s|865a8cab00c249d1|157576448|rds|vector|||2.39||
+data_training|stem|897a26decf265f54|a66a8a69670e5a81|eff756ebe1a508f7|1776579871||t19160.8717983308s|143352aeb8655ec8|13327|rds|vector|||0.023||
+dyndata_training|stem|51185ec6e0478844|d7c7d25f38d6d72a|0dfa95099abd3328|919408461||t19160.8730392107s|880d84a8e6495fbd|414535|rds|vector|||107.041||
+dyndata_validation|stem|e1d89682fa5c7e73|239f651c21118bdf|0403e0e056d8a08e|821702066||t19160.8742776371s|4b03159b3134ff8a|67624|rds|vector|||106.974||
+stan_data|stem|074f9c167eca91aa|2368a1968219679e|59eef2ed430461c1|-24570201||t19160.8742787945s|12e87a05de3b6da9|118650|rds|vector|||0.067||
+model_data|stem|eaf7163486dd7106|0c37f0f44657e5b0|d92709262b7d696b|-495503059||t19160.8742823593s|fa1f8474e2c73ea7|271203|qs|vector|||0||
+model_vb_postfire_season|stem|5096e1a7254c6310|8aa1bfc58d04cd78|30bb6589bb31e745|-392649669||t19160.8758536563s|9ceebd885e6bf015|374044794|qs|vector|||133.608||
+model_summary_postfire_season|stem|bc29a47a51d9b8e2|a4d0b10da400a3f4|e16a91d3122577c7|-1928972307||t19160.8785851856s|0fad1bf3e197d259|5024670|parquet|vector|||234.881||
+model_draws_postfire_season|stem|0a4ce47de899c46f|bbf31e832c2ba78f|d85023f5d8a42571|201587515||t19160.8786761115s|daea68cddb60ed78|538329633|parquet|vector|||0.524||
+model_results|stem|d7e099d4363f0eea|dd14532a621c25be|20977b2f327536bc|-1393141758||t19160.8786943523s|41b3f5f621214bdd|3666614|rds|vector|||0.149||
+model_prediction|stem|30fbc23b1e49fbdc|af3cd1ac69bacb77|e38e4e80972231ad|1564443633||t19160.878697269s|36061498ee3eb824|719394|rds|vector|||0.155||
+spatial_outputs|stem|5fcacc989c82bd00|330f5f4e3ddb6ad9|d88cf1e700b19814|-1659775273||t19160.8787059727s|8f1609308eb3a189|12532|rds|vector|||0.744|Discarded datum unknown in Proj4 definition|
+release_outputs|stem|f0595d234fcffd69|caa1b38125e4d61d|9488650776834fc4|-1747594467||t19160.8787506023s|ded833868582137a|50|rds|vector|||3.849||
+report|stem|e9e63bbec3fdced0|5e01f99a6889ed5f|7d17cb6b218e7f09|-237041703|index.html*index.Rmd|t19160.8624766701s|293c0d65a916412f|5874425|file|vector|||14.548|input and ouput crs are the same|

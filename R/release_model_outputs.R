@@ -27,7 +27,7 @@ release_model_outputs <- function(model_results,
 
   #temporarily save objects
     saveRDS(object = model_results,
-            file = file.path(temp_directory, "model_results_rds"))
+            file = file.path(temp_directory, "model_results.rds"))
 
     saveRDS(object = spatial_outputs,
             file = file.path(temp_directory, "spatial_outputs.rds"))
@@ -37,7 +37,7 @@ release_model_outputs <- function(model_results,
 
   #uploads
 
-    pb_upload(file = c(file.path(temp_directory, "model_results_rds"),
+    pb_upload(file = c(file.path(temp_directory, "model_results.rds"),
                        file.path(temp_directory, "spatial_outputs.rds"),
                        file.path(temp_directory, "model_prediction.rds")
                        ),
@@ -47,7 +47,7 @@ release_model_outputs <- function(model_results,
 
   #cleanup
 
-    file.remove(c(file.path(temp_directory, "model_results_rds"),
+    file.remove(c(file.path(temp_directory, "model_results.rds"),
                   file.path(temp_directory, "spatial_outputs.rds"),
                   file.path(temp_directory, "model_prediction.rds")
                   )
