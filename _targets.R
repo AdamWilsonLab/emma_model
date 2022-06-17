@@ -108,18 +108,28 @@ list(
              summarize_predictions(model_results,stan_data,envdata)),
   tar_target(spatial_outputs,
              create_spatial_outputs(model_results,data_training,envdata)),
+  tar_target(name = release_model_outputs,
+             command = release_model_outputs(model_results = model_results,
+                                             spatial_outputs = spatial_outputs,
+                                             model_prediction = model_prediction,
+                                             temp_directory = "data/temp/release/")),
  # tar_target(release,
  #            release_posteriors(
  #              model_output,
  #              file="targets/objects/model_results",
  #              repo = "AdamWilsonLab/emma_model",
  #              tag = "current")),
-   tar_render(report, "index.Rmd"),
- tar_target(name = reports,
-            command = generate_reports(output_directory = "reports/",
-                                       temp_directory = "data/temp/",
-                                       report_location = "report_prototype.rmd",
-                                       model_results = model_results,
-                                       model_prediction = model_prediction,
-                                       spatial_outputs = spatial_outputs))
+   tar_render(report, "index.Rmd")
+
+ # tar_target(name = reports,
+ #            command = generate_reports(output_directory = "reports/",
+ #                                       temp_directory = "data/temp/",
+ #                                       report_location = "report_prototype.rmd",
+ #                                       model_results = model_results,
+ #                                       model_prediction = model_prediction,
+ #                                       spatial_outputs = spatial_outputs))
+
+
+
+
 )
