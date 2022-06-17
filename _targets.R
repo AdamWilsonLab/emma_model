@@ -108,7 +108,8 @@ list(
              summarize_predictions(model_results,stan_data,envdata)),
   tar_target(spatial_outputs,
              create_spatial_outputs(model_results,data_training,envdata)),
-  tar_target(name = release_model_outputs,
+
+  tar_target(name = release_outputs,
              command = release_model_outputs(model_results = model_results,
                                              spatial_outputs = spatial_outputs,
                                              model_prediction = model_prediction,

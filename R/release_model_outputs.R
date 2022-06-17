@@ -19,7 +19,7 @@ release_model_outputs <- function(model_results,
 
     assets <- pb_list(repo = "AdamWilsonLab/emma_model")
 
-    if(!release %in% assets){
+    if(!release %in% assets$tag){
 
       pb_new_release(repo = "AdamWilsonLab/emma_model",
                      tag = release)
