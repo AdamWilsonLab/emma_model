@@ -280,6 +280,8 @@ data/envdata/-dynamic_parquet-most_recent_burn_dates-18871.gz.parquet
 data/envdata/-dynamic_parquet-most_recent_burn_dates-18901.gz.parquet
 data/envdata/-dynamic_parquet-most_recent_burn_dates-18932.gz.parquet
 data/envdata/-dynamic_parquet-most_recent_burn_dates-18962.gz.parquet
+data/envdata/-dynamic_parquet-most_recent_burn_dates-18993.gz.parquet
+data/envdata/-dynamic_parquet-most_recent_burn_dates-19024.gz.parquet
 data/envdata/-dynamic_parquet-ndvi-11005.gz.parquet
 data/envdata/-dynamic_parquet-ndvi-11021.gz.parquet
 data/envdata/-dynamic_parquet-ndvi-11037.gz.parquet
@@ -1287,6 +1289,9 @@ data/envdata/-dynamic_parquet-time_since_fire-18916.gz.parquet
 data/envdata/-dynamic_parquet-time_since_fire-18932.gz.parquet
 data/envdata/-dynamic_parquet-time_since_fire-18948.gz.parquet
 data/envdata/-dynamic_parquet-time_since_fire-18964.gz.parquet
+data/envdata/-dynamic_parquet-time_since_fire-18980.gz.parquet
+data/envdata/-dynamic_parquet-time_since_fire-18993.gz.parquet
+data/envdata/-dynamic_parquet-time_since_fire-19009.gz.parquet
 data/envdata/stable_data.gz.parquet
 firemodel_generate
 index.html
