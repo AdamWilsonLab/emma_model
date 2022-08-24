@@ -37,7 +37,7 @@ testing_window=c("2020-01-01","2022-01-01")
 # decide sampling proportion
 total_fynbos_pixels=348911
 #sample_proportion=round(18000/total_fynbos_pixels,2);sample_proportion # ~5% works on github actions
-sample_proportion=round(100000/total_fynbos_pixels,2);sample_proportion
+sample_proportion=round(20000/total_fynbos_pixels,2);sample_proportion
 #tar_option_set(debug = "spatial_outputs")
 
 ## Download the most recent data release
