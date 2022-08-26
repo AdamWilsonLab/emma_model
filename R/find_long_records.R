@@ -20,7 +20,7 @@ find_long_records<-function(env_files,age_range=c(2,10),ndvi_prob=0.8){
   good_ndvi_pixels <-
     ndvi_files  %>%
     filter(!is.na(value)) %>%
-    filter(cellID %in% long_aged_pixels$cellID)%>% #new line to save space
+    filter(cellID %in% long_aged_pixels$cellID) %>% #new line to save space
     collect() %>%
     as_tibble() %>%
     group_by(cellID) %>%
