@@ -9,9 +9,6 @@ output:
     toc_depth: 2
 ---
 
-
-Model last updated at `r now()`.
-
 ```{r, echo=F, message=F,include=F, results="hide"}
 library(targets)
 library(tidyverse)
@@ -30,6 +27,11 @@ tar_load(c(envdata, stan_data, model_results, spatial_outputs,model_prediction))
 
 We estimate the age of a site by calculating the years since the last fire. We then fit a curve to model the recovery of vegetation (measured using NDVI) as a function of it's age. An additional level models the parameters of the negative exponential curve as a function of environmental variables. This means that sites with similar environmental conditions should have similar recovery curves.
 
+## Input data
+
+The model was last fit on `r now()`.
+
+This version of the model was fit with `r filter(envdata,training) %>% nrow()` pixels including data from `r as_date(range(stan_data$y_date))[1]` to `r as_date(range(stan_data$y_date))[2]`.
 
 ## Workflow
 
@@ -45,10 +47,9 @@ targets::tar_visnetwork() #%>%
 
 ```
 
-
 ## Results
 
-### Environmental Controls on Ecosystem Recovery
+### Environmental Drivers
 
 These parameters represent the relationship of the following environmental variables to the recovery trajectory.
 
@@ -67,7 +68,6 @@ ggplotly(p1)
 
 ```
 
-
 ## Recovery Trajectories
 
 The plot below illustrates some example recovery trajectories. It currently just shows the top 20 cells with the most observations.
@@ -83,19 +83,62 @@ cells_with_long_records<-
 model_prediction %>% 
   filter(cellID%in%cells_with_long_records$cellID) %>% 
   ggplot(aes(x=age)) +
- geom_line(aes(y=median),colour="blue") +
-  geom_line(aes(y=y_obs),colour="black",lwd=0.5,alpha=0.3) +
   geom_ribbon(aes(ymin=q5,ymax=q95),alpha=0.5)+
+  geom_line(aes(y=y_obs),colour="darkred",lwd=0.5) +
+  geom_line(aes(y=median),colour="blue") +
   facet_wrap(~cellID) +
   labs(x="time since fire (years)",y="NDVI") +
   theme_bw()
 ```
 
+```{r, echo=F, eval=F}
+
+cells_with_fires<-
+  model_prediction %>% 
+  filter(date>as_date("2010-01-01"),date<as_date("2015-01-01")) %>% 
+  group_by(cellID) %>% 
+  summarize(minage=min(age),n=n()) %>%
+  filter(minage<1) %>% 
+  arrange(desc(n)) %>% 
+  slice(1:20) # top 20 cells with the most observations
+
+model_prediction %>% 
+  filter(cellID%in%cells_with_fires$cellID) %>% 
+  ggplot(aes(x=date)) +
+  geom_ribbon(aes(ymin=q5,ymax=q95),alpha=0.5)+
+  geom_line(aes(y=y_obs),colour="darkred",lwd=0.5) +
+  geom_line(aes(y=median),colour="blue") +
+  facet_wrap(~cellID) +
+  labs(x="time since fire (years)",y="NDVI") +
+  theme_bw()
+```
+
+## Model Performance
+
+Compare estimated vs observed values for all pixels. This is not true validation - these pixels were included in the model fitting.
+
+```{r, message=F, echo=F}
+model_prediction %>% 
+  ggplot(aes(x=median,y=y_obs)) +
+  geom_hex(bins=30)+
+  geom_smooth(method = "lm",col="red")+
+  geom_abline(color="blue")+
+#  facet_wrap(~cellID) +
+  scale_fill_viridis_c()+
+  labs(x="Estimated NDVI",y="Observed NDVI",
+       caption = "Blue line is 1:1, Red line is least squares regression. Count is the number of pixels in that location",
+       title = "Estimated vs. Observed NDVI"
+      ) +
+  theme_bw()+
+  coord_equal()
+```
+
 ## Spatial Predictions
 
-Maps of spatial parameters in the model.  
+Maps of spatial parameters in the model.
 
-```{r compare_data2, echo=F, eval=T, warning=F, message=FALSE}
+```{r, leaflet_map, echo=F, eval=T, warning=FALSE, message=FALSE,  results='asis'}
+
 rast=projectRaster(spatial_outputs,crs = "+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs")
 
 leaflet() %>% setView(lng = 18.577, lat = -33.998707, zoom = 10) %>% 
@@ -106,10 +149,26 @@ leaflet() %>% setView(lng = 18.577, lat = -33.998707, zoom = 10) %>%
   addRasterImage(rast[[4]],group=names(rast)[4]) %>% 
   addLayersControl(
     baseGroups = names(rast),
-    options = layersControlOptions(collapsed = FALSE)) #%>% 
+    options = layersControlOptions(collapsed = FALSE))  
 #  addLegend("bottomright", pal = pal, values = ~,
 #    title = "Est. GDP (2010)",
 #    labFormat = labelFormat(prefix = "$"),
 #    opacity = 1
 #  )
+
 ```
+
+# Park Reports
+
+See the links below for park-level reports on vegetation status.
+
+[Addo-Elephant_National_Park](reports/report.Addo-Elephant_National_Park.html)
+[Agulhas_National_Park](reports/report.Agulhas_National_Park.html)
+[Bontebok_National_Park](reports/report.Bontebok_National_Park.html)
+[Garden_Route_National_Park](reports/report.Garden_Route_National_Park.html)
+[Karoo_National_Park](reports/report.Karoo_National_Park.html)
+[Namaqua_National_Park](reports/report.Namaqua_National_Park.html)
+[Richtersveld_National_Park](reports/report.Richtersveld_National_Park.html)
+[Table_Mountain_National_Park](reports/report.Table_Mountain_National_Park.html)
+[Tankwa-Karoo_National_Park](reports/report.Tankwa-Karoo_National_Park.html)
+[West_Coast_National_Park](reports/report.West_Coast_National_Park.html)
