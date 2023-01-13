@@ -7,8 +7,16 @@ library(piggyback)
 library(stantargets)
 
 source("https://raw.githubusercontent.com/AdamWilsonLab/emma_envdata/main/R/robust_pb_download.R")
+
 # source all files in R folder
-lapply(list.files("R",pattern="[.]R",full.names = T)[-4], source)
+  #lapply(list.files("R",pattern="[.]R",full.names = T)[-4], source)
+  list.files("R",pattern="[.]R",full.names = T) %>%
+    as.data.frame()%>%
+    rename(file=".")%>%
+    filter(!file %in% c("R/sync_envdata.R","R/detect_anomalies.R"))%>%
+    pull(file)%>%
+    lapply(source)
+
 
 options(tidyverse.quiet = TRUE)
 options(clustermq.scheduler = "multicore")
