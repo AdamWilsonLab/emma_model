@@ -6,7 +6,7 @@ tidy_dynamic_data <- function(data,date_window) {
 
 dynfiles <- open_dataset(sources = list.files("data/envdata","dynamic",full=T))
 
-cells_to_keep<- data %>%
+cells_to_keep <- data %>%
   dplyr::filter(sample) %>%
   dplyr::select(cellID)
 

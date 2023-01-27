@@ -36,9 +36,12 @@ cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
 # Testing and training time windows
 training_window=c("2000-01-01","2020-01-01")
 testing_window=c("2020-01-01","2022-01-01")
+predicting_window=c("2022-01-01", as.character(Sys.Date()))
+
 
 ## Download the most recent data release
 list(
+
   tar_target(
     envdata_files,
     robust_pb_download(file=NULL,
@@ -56,6 +59,7 @@ list(
                #region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
                region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
                sample_proportion= 0.8)),
+
   tar_target(
     data_training,
     filter_training_data(envdata,
@@ -65,14 +69,18 @@ list(
                                    "alos_chili.tif",
                                    "alos_mtpi.tif"))
   ),
+
   tar_target(
     dyndata_training,
-    tidy_dynamic_data(envdata,date_window=ymd(training_window))
+    tidy_dynamic_data(data = envdata,
+                      date_window = ymd(training_window))
   ),
+
   tar_target(
     dyndata_validation,
     tidy_dynamic_data(envdata,date_window=ymd(testing_window))
-  ),
+    ),
+
   tar_target(
     stan_data,
     create_stan_data(
@@ -92,16 +100,73 @@ list(
     reps = 1,
     combine=T,
     pedantic=T,
-    force_recompile=T,
+    force_recompile=F,
     #    stdout = R.utils::nullfile(),
     #    stderr = R.utils::nullfile(),
     adapt_engaged=F,
     eta=0.11,
-    iter = 5000, #should be 1000 or more - 100 is just to run quickly
+    iter = 100, #should be 1000 or more - 100 is just to run quickly
     garbage_collection=T,
     init=1,
     tol_rel_obj = 0.001
   ),
+
+
+
+  #~~~~~~~~~~V
+
+  # note: don't make the region too large or it will break things (e.g. -180 to 180, -90 to 90), probably because of great circle issues?
+
+  # note: it may be better to move the ndvi_relative fire dates into the current repo and remove the raw fire dates in there.
+
+  # tar_target(
+  #   prediction_envdata_files,
+  #   robust_pb_download(file=NULL,
+  #                      repo="AdamWilsonLab/emma_envdata",
+  #                      dest="data/envdata/",
+  #                      tag="processed_ndvi_relative_days_since_fire",
+  #                      show_progress=F,
+  #                      overwrite=F),
+  #   format="file"),
+  #
+  tar_target(envdata_predicting,
+             tidy_static_data(
+               envdata = envdata_files,
+               remnant_distance=2, #drop pixels within this distance of remnant edge (km)
+               region=c(xmin = 16, xmax = 28, ymin = -35, ymax = -28), #whole region
+               sample_proportion= 1)),
+
+
+  tar_target(
+    data_predicting,
+    filter_training_data(data = envdata_predicting,
+                         envvars=c("CHELSA_bio10_01_V1.2.tif", #select env vars to use in model
+                                   "CHELSA_bio10_02_V1.2.tif",
+                                   "MODCF_seasonality_concentration.tif",
+                                   "alos_chili.tif",
+                                   "alos_mtpi.tif"))
+  ),
+
+  tar_target(
+    dyndata_predicting,
+    tidy_dynamic_data(data = envdata_predicting,
+                      date_window = ymd(predicting_window))
+  ),
+
+  tar_target(
+    predict_data,
+    create_stan_data_prediction(
+      data=data_predicting,
+      dyndata=dyndata_predicting,
+      fit=0,
+      predict=1,
+      default_fire_age = 40.001)
+  ),
+
+
+
+  #~~~~~~~~~~~^
+
 
   tar_target(model_results,
              summarize_model_output(model_output, stan_data, envdata)),
