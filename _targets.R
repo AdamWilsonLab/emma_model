@@ -117,8 +117,6 @@ list(
 
   # note: don't make the region too large or it will break things (e.g. -180 to 180, -90 to 90), probably because of great circle issues?
 
-  # note: it may be better to move the ndvi_relative fire dates into the current repo and remove the raw fire dates in there.
-
   # tar_target(
   #   prediction_envdata_files,
   #   robust_pb_download(file=NULL,
@@ -163,6 +161,17 @@ list(
       default_fire_age = 40.001)
   ),
 
+
+
+  # tar_target(
+  # model_prediction,
+  # predict_from_model()
+  # ),
+
+  # tar_target(
+  # anomaly_detection,
+  # detect_anomalies(model_prediction = model_prediction)
+  # ),
 
 
   #~~~~~~~~~~~^
