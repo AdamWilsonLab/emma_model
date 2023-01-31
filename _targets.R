@@ -171,7 +171,7 @@ list(
 
   # tar_target(
   # anomaly_detection,
-  # detect_anomalies(model_prediction = model_prediction)
+  # detect_anomalies(predicted_data = predicted_data)
   # ),
 
 
