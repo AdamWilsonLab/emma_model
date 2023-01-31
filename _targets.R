@@ -163,10 +163,11 @@ list(
 
 
 
-  # tar_target(
-  # model_prediction,
-  # predict_from_model()
-  # ),
+  tar_target(
+  predicted_data,
+  predict_from_model(model_output = model_output,
+                     predict_data = predict_data)
+  ),
 
   # tar_target(
   # anomaly_detection,

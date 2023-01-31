@@ -4,13 +4,11 @@
 #tar_load(model_output)
 #tar_load(predict_data)
 
-predict_from_model <- function(model_output = NULL,
-                               predict_data = NULL){
+predict_from_model <- function(model_output,
+                               predict_data){
 
 
   #Pull relevant parameters from model
-
-  unique(model_output$variable)
 
 
       #Calculating gamma
@@ -90,24 +88,19 @@ predict_from_model <- function(model_output = NULL,
 
             #mu[i] = exp(alpha[pid[i]])+exp(gamma[pid[i]])-exp(gamma[pid[i]])*exp(-(age[i]/exp(lambda[pid[i]])));
 
-
-              model_parms <- data.frame(cellID = pid_lookup$cellID,
+              model_parms <- data.frame(cellID = predict_data$x_cellID,
                                         alpha = alpha,
                                         lambda = t(lambda),
                                         gamma = t(gamma))
 
-            #so all we need is the ages and pixelID (from which we get the gmma and lambda)
+            #so all we need is the ages and pixelID (from which we get the gamma and lambda)
 
-            predict_data$N #pixels x time steps
-            predict_data$J #pixels
-            predict_data$y_cellID
-
-            predict_data$age
-            unique(as_date(predict_data$y_date))
+              #predict_data$N #pixels x time steps
+              #predict_data$J #pixels
+              #predict_data$y_cellID
 
 
             #Merge the predict data with the model parms
-              predict_data #age and cellID
 
               predict_df <- data.frame(date = predict_data$y_date,
                                        age = predict_data$age,
@@ -129,14 +122,7 @@ predict_from_model <- function(model_output = NULL,
               }
 
 
-              predict_df
-
-              hist(predict_df$mu)
-
-              min(predict_df$ndvi,na.rm = TRUE)
-
-
-
+              return(predict_df)
 
 
 }
