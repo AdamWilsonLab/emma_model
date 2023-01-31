@@ -119,7 +119,21 @@ predict_from_model <- function(model_output = NULL,
               predict_df %>%
                 mutate(mu = exp(alpha)+exp(gamma)-exp(gamma)*exp(-(age/exp(lambda)))) -> predict_df
 
+              if(any(predict_df$age < 0)){
 
+                message("Impossible ages in data (negatives)")
+
+                predict_df %>%
+                  dplyr::filter(age >=0) -> predict_df
+
+              }
+
+
+              predict_df
+
+              hist(predict_df$mu)
+
+              min(predict_df$ndvi,na.rm = TRUE)
 
 
 
