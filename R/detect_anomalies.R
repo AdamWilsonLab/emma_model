@@ -14,7 +14,10 @@ library(sf)
 # Estimated anomaly field: “ano_ti_est” in YYYYMMDD format #for now, use the first date of
 # Anomaly score (0-1)
 
-detect_anomalies <- function(predicted_data, temp_folder = "data/temp/anomalies",tag = "test", repo = "AdamWilsonLab/emma_model"){
+detect_anomalies <- function(predicted_data,
+                             temp_folder = "data/temp/anomalies",
+                             tag = "test",
+                             repo = "AdamWilsonLab/emma_model"){
 
   # For now, the important part is the output
   # 1) table of cellIDs, various anomaly scores
@@ -35,6 +38,9 @@ detect_anomalies <- function(predicted_data, temp_folder = "data/temp/anomalies"
     filter(date == min(date)) %>%
     mutate(ano_ti_est = date) -> temp
 
+
+
+  #Generate anomaly rasters
 
 
   temp %>%
