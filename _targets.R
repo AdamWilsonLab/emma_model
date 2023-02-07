@@ -13,7 +13,9 @@ source("https://raw.githubusercontent.com/AdamWilsonLab/emma_envdata/main/R/robu
   list.files("R",pattern="[.]R",full.names = T) %>%
     as.data.frame()%>%
     rename(file=".")%>%
-    filter(!file %in% c("R/sync_envdata.R","R/detect_anomalies.R"))%>%
+    filter(!file %in% c("R/sync_envdata.R",
+                        "R/detect_anomalies.R",
+                        "R/plot_timeseries.R"))%>%
     pull(file)%>%
     lapply(source)
 
@@ -34,9 +36,9 @@ cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
 # tar_destroy(ask = F)
 
 # Testing and training time windows
-training_window=c("2019-01-01","2020-01-01")
+training_window=c("2010-01-01","2020-01-01")
 testing_window=c("2020-01-01","2022-01-01")
-predicting_window=c("2019-01-01","2020-01-01") #need to revise the predicting code to make it more memory efficient
+predicting_window=c("2010-01-01","2020-01-01") #need to revise the predicting code to make it more memory efficient
 #predicting_window=c("2020-01-01", as.character(Sys.Date()))
 
 
@@ -50,7 +52,7 @@ list(
                                        tag="current",
                                        show_progress=F,
                                        overwrite=F),
-          age = as.difftime(0, units = "days"),
+          age = as.difftime(7, units = "days"),
           #age = as.difftime(12, units = "hours"),
           format = "file"
           ),
@@ -69,9 +71,9 @@ list(
              tidy_static_data(
                envdata_files,
                remnant_distance=2, #drop pixels within this distance of remnant edge (km)
-               region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
-               #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
-               sample_proportion= 0.2)),
+               #region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
+               region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
+               sample_proportion= 0.8)),
 
   tar_target(
     data_training,
@@ -81,6 +83,26 @@ list(
                                    "MODCF_seasonality_concentration.tif",
                                    "alos_chili.tif",
                                    "alos_mtpi.tif"))
+  ),
+
+  tar_target(
+    soil_data_training,
+    filter_training_data(envdata,
+                         envvars=c("alos_chili.tif",
+                                   "alos_landforms.tif",
+                                   "alos_mtpi.tif",
+                                   "alos_topodiversity.tif",
+                                   "nasadem.tif",
+                                   "soil_EC_mS_m.tif",
+                                   "soil_Ext_K_cmol_kg.tif",
+                                   "soil_Ext_Na_cmol_kg.tif",
+                                   "soil_Ext_P_mg_kg.tif",
+                                   "soil_pH.tif",
+                                   "soil_soil_Total_N_.tif",
+                                   "soil_Total_C_.tif",
+                                   "soil_Total_C_pct.tif",
+                                   "soil_Total_N_.tif",
+                                   "soil_Total_N_pct.tif"))
   ),
 
   tar_target(
@@ -99,6 +121,7 @@ list(
     stan_data,
     create_stan_data(
       data=data_training,
+      soil_data = soil_data_training,
       dyndata=dyndata_training,
       fit=1,
       predict=1)
@@ -119,7 +142,7 @@ list(
     #    stderr = R.utils::nullfile(),
     adapt_engaged=F,
     eta=0.11,
-    iter = 1000, #should be 1000 or more - 100 is just to run quickly
+    iter = 50000, #should be 1000 or more - 100 is just to run quickly
     garbage_collection=T,
     init=1,
     tol_rel_obj = 0.001
@@ -145,7 +168,8 @@ list(
              tidy_static_data(
                envdata = envdata_files,
                remnant_distance=2, #drop pixels within this distance of remnant edge (km)
-               region=c(xmin = 16, xmax = 28, ymin = -35, ymax = -28), #whole region
+               #region=c(xmin = 16, xmax = 28, ymin = -35, ymax = -28), #whole region
+               region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531),
                sample_proportion= 1)),
 
 
@@ -156,7 +180,67 @@ list(
                                    "CHELSA_bio10_02_V1.2.tif",
                                    "MODCF_seasonality_concentration.tif",
                                    "alos_chili.tif",
-                                   "alos_mtpi.tif"))
+                                   "alos_mtpi.tif",
+                                   "alos_landforms.tif",
+                                   "alos_topodiversity.tif",
+                                   "nasadem.tif",
+                                   "soil_EC_mS_m.tif",
+                                   "soil_Ext_K_cmol_kg.tif",
+                                   "soil_Ext_Na_cmol_kg.tif",
+                                   "soil_Ext_P_mg_kg.tif",
+                                   "soil_pH.tif",
+                                   "soil_soil_Total_N_.tif",
+                                   "soil_Total_C_.tif",
+                                   "soil_Total_C_pct.tif",
+                                   "soil_Total_N_.tif",
+                                   "soil_Total_N_pct.tif"))%>%
+      dplyr::select(cellID,
+             CHELSA_bio10_01_V1.2.tif,
+             CHELSA_bio10_02_V1.2.tif,
+             MODCF_seasonality_concentration.tif,
+             alos_chili.tif,
+             alos_mtpi.tif,
+             pid)
+  ),
+
+  tar_target(
+    soil_data_predicting,
+    filter_training_data(envdata_predicting,
+                         envvars=c("alos_chili.tif",
+                                   "alos_landforms.tif",
+                                   "alos_mtpi.tif",
+                                   "alos_topodiversity.tif",
+                                   "nasadem.tif",
+                                   "soil_EC_mS_m.tif",
+                                   "soil_Ext_K_cmol_kg.tif",
+                                   "soil_Ext_Na_cmol_kg.tif",
+                                   "soil_Ext_P_mg_kg.tif",
+                                   "soil_pH.tif",
+                                   "soil_soil_Total_N_.tif",
+                                   "soil_Total_C_.tif",
+                                   "soil_Total_C_pct.tif",
+                                   "soil_Total_N_.tif",
+                                   "soil_Total_N_pct.tif",
+                                   "CHELSA_bio10_01_V1.2.tif",
+                                   "CHELSA_bio10_02_V1.2.tif",
+                                   "MODCF_seasonality_concentration.tif"))%>%
+      dplyr::select(cellID,
+                    alos_chili.tif,
+                    alos_landforms.tif,
+                    alos_mtpi.tif,
+                    alos_topodiversity.tif,
+                    nasadem.tif,
+                    soil_EC_mS_m.tif,
+                    soil_Ext_K_cmol_kg.tif,
+                    soil_Ext_Na_cmol_kg.tif,
+                    soil_Ext_P_mg_kg.tif,
+                    soil_pH.tif,
+                    soil_soil_Total_N_.tif,
+                    soil_Total_C_.tif,
+                    soil_Total_C_pct.tif,
+                    soil_Total_N_.tif,
+                    soil_Total_N_pct.tif,
+                    pid)
   ),
 
   tar_target(
@@ -169,6 +253,7 @@ list(
     predict_data,
     create_stan_data_prediction(
       data=data_predicting,
+      soil_data = soil_data_predicting,
       dyndata=dyndata_predicting,
       fit=0,
       predict=1,

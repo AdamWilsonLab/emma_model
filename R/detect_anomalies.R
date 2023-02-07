@@ -3,7 +3,7 @@
 #' @param observed_data Still not sure about the format here.
 #tar_load(model_output)
 #tar_load(predict_data)
-
+#tar_load(predicted_data)
 
 library(terra)
 library(sf)
@@ -130,7 +130,6 @@ detect_anomalies <- function(predicted_data,
 
 
 ####################
-
 
 
 

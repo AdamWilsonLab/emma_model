@@ -68,20 +68,44 @@ predict_from_model <- function(model_output,
             #
             # plot(lambda_raster,main="lamda")
 
-          # Calculating alpha
+          # # Calculating alpha
+          #
+          #   #alpha_mu
+          #   #alpha ~ normal(alpha_mu,alpha_tau)
+          #   #alpha goes into model
+          #
+          #   # #alpha beta should be a single value
+          #   #
+          #   #   alpha_mu <-
+          #   #     model_output %>%
+          #   #     filter(grepl(pattern = "alpha_mu",x = variable,fixed = TRUE)) %>%
+          #   #     pull(median)
+          #   #
+          #   #   alpha <- alpha_mu #ignoring uncertainty for now
+          #
 
-            #alpha_mu
+            #Calculating alpha
+
+            #alpha_mu = x*alpha_beta
             #alpha ~ normal(alpha_mu,alpha_tau)
             #alpha goes into model
 
-            #alpha beta should be a single value
+            #alpha beta should be a vector of length equal to the number of pixels
+            alpha_beta <-
+              model_output %>%
+              filter(grepl(pattern = "alpha_beta",x = variable,fixed = TRUE)) %>%
+              pull(median)
 
-              alpha_mu <-
-                model_output %>%
-                filter(grepl(pattern = "alpha_mu",x = variable,fixed = TRUE)) %>%
-                pull(median)
+            # alpha should be equal to the number of cells
 
-              alpha <- alpha_mu #ignoring uncertainty for now
+            alpha <- as.vector(alpha_beta) %*% t(as.matrix(predict_data$s))
+
+            # plot lambda
+
+            # lambda_raster <- template
+            # lambda_raster[predict_data$x_cellID] <- as.vector(lambda)
+            #
+            # plot(lambda_raster,main="lamda")
 
 
           # Predict from model components
@@ -89,7 +113,7 @@ predict_from_model <- function(model_output,
             #mu[i] = exp(alpha[pid[i]])+exp(gamma[pid[i]])-exp(gamma[pid[i]])*exp(-(age[i]/exp(lambda[pid[i]])));
 
               model_parms <- data.frame(cellID = predict_data$x_cellID,
-                                        alpha = alpha,
+                                        alpha = t(alpha),
                                         lambda = t(lambda),
                                         gamma = t(gamma))
 
