@@ -36,36 +36,36 @@ cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
 # tar_destroy(ask = F)
 
 # Testing and training time windows
-training_window=c("2010-01-01","2020-01-01")
+training_window=c("2000-01-01","2020-01-01")
 testing_window=c("2020-01-01","2022-01-01")
-predicting_window=c("2010-01-01","2020-01-01") #need to revise the predicting code to make it more memory efficient
+predicting_window=c("2000-01-01","2020-01-01") #need to revise the predicting code to make it more memory efficient
 #predicting_window=c("2020-01-01", as.character(Sys.Date()))
 
 
 ## Download the most recent data release
 list(
 
-  tar_age(name = envdata_files,
-          command = robust_pb_download(file=NULL,
-                                       repo="AdamWilsonLab/emma_envdata",
-                                       dest="data/envdata/",
-                                       tag="current",
-                                       show_progress=F,
-                                       overwrite=F),
-          age = as.difftime(7, units = "days"),
-          #age = as.difftime(12, units = "hours"),
-          format = "file"
-          ),
+  # tar_age(name = envdata_files,
+  #         command = robust_pb_download(file=NULL,
+  #                                      repo="AdamWilsonLab/emma_envdata",
+  #                                      dest="data/envdata/",
+  #                                      tag="current",
+  #                                      show_progress=F,
+  #                                      overwrite=F),
+  #         age = as.difftime(7, units = "days"),
+  #         #age = as.difftime(12, units = "hours"),
+  #         format = "file"
+  #         ),
 
-  # tar_target(
-  #   envdata_files,
-  #   robust_pb_download(file=NULL,
-  #                      repo="AdamWilsonLab/emma_envdata",
-  #                      dest="data/envdata/",
-  #                      tag="current",
-  #                      show_progress=F,
-  #                      overwrite=T),
-  #   format="file"),
+  tar_target(
+    envdata_files,
+    robust_pb_download(file=NULL,
+                       repo="AdamWilsonLab/emma_envdata",
+                       dest="data/envdata/",
+                       tag="current",
+                       show_progress=F,
+                       overwrite=T),
+    format="file"),
 
   tar_target(envdata,
              tidy_static_data(
@@ -73,7 +73,7 @@ list(
                remnant_distance=2, #drop pixels within this distance of remnant edge (km)
                #region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
                region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
-               sample_proportion= 0.8)),
+               sample_proportion= .05)),
 
   tar_target(
     data_training,
@@ -82,15 +82,8 @@ list(
                                    "CHELSA_bio10_02_V1.2.tif",
                                    "MODCF_seasonality_concentration.tif",
                                    "alos_chili.tif",
-                                   "alos_mtpi.tif"))
-  ),
-
-  tar_target(
-    soil_data_training,
-    filter_training_data(envdata,
-                         envvars=c("alos_chili.tif",
-                                   "alos_landforms.tif",
                                    "alos_mtpi.tif",
+                                   "alos_landforms.tif",
                                    "alos_topodiversity.tif",
                                    "nasadem.tif",
                                    "soil_EC_mS_m.tif",
@@ -102,7 +95,54 @@ list(
                                    "soil_Total_C_.tif",
                                    "soil_Total_C_pct.tif",
                                    "soil_Total_N_.tif",
-                                   "soil_Total_N_pct.tif"))
+                                   "soil_Total_N_pct.tif"))%>%
+      dplyr::select(cellID,
+                    CHELSA_bio10_01_V1.2.tif,
+                    CHELSA_bio10_02_V1.2.tif,
+                    MODCF_seasonality_concentration.tif,
+                    alos_chili.tif,
+                    alos_mtpi.tif,
+                    pid)
+  ),
+
+  tar_target(
+    soil_data_training,
+    filter_training_data(envdata,
+                         envvars=c("CHELSA_bio10_01_V1.2.tif", #select env vars to use in model
+                                   "CHELSA_bio10_02_V1.2.tif",
+                                   "MODCF_seasonality_concentration.tif",
+                                   "alos_chili.tif",
+                                   "alos_mtpi.tif",
+                                   "alos_landforms.tif",
+                                   "alos_topodiversity.tif",
+                                   "nasadem.tif",
+                                   "soil_EC_mS_m.tif",
+                                   "soil_Ext_K_cmol_kg.tif",
+                                   "soil_Ext_Na_cmol_kg.tif",
+                                   "soil_Ext_P_mg_kg.tif",
+                                   "soil_pH.tif",
+                                   "soil_soil_Total_N_.tif",
+                                   "soil_Total_C_.tif",
+                                   "soil_Total_C_pct.tif",
+                                   "soil_Total_N_.tif",
+                                   "soil_Total_N_pct.tif"))%>%
+      dplyr::select(cellID,
+                    alos_chili.tif,
+                    alos_landforms.tif,
+                    alos_mtpi.tif,
+                    alos_topodiversity.tif,
+                    nasadem.tif,
+                    soil_EC_mS_m.tif,
+                    soil_Ext_K_cmol_kg.tif,
+                    soil_Ext_Na_cmol_kg.tif,
+                    soil_Ext_P_mg_kg.tif,
+                    soil_pH.tif,
+                    soil_soil_Total_N_.tif,
+                    soil_Total_C_.tif,
+                    soil_Total_C_pct.tif,
+                    soil_Total_N_.tif,
+                    soil_Total_N_pct.tif,
+                    pid)
   ),
 
   tar_target(
@@ -142,7 +182,7 @@ list(
     #    stderr = R.utils::nullfile(),
     adapt_engaged=F,
     eta=0.11,
-    iter = 50000, #should be 1000 or more - 100 is just to run quickly
+    iter = 1000, #should be 1000 or more - 100 is just to run quickly
     garbage_collection=T,
     init=1,
     tol_rel_obj = 0.001
@@ -169,7 +209,8 @@ list(
                envdata = envdata_files,
                remnant_distance=2, #drop pixels within this distance of remnant edge (km)
                #region=c(xmin = 16, xmax = 28, ymin = -35, ymax = -28), #whole region
-               region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531),
+               region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531),#peninsula
+               #region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
                sample_proportion= 1)),
 
 
@@ -272,6 +313,28 @@ list(
   # anomaly_detection,
   # detect_anomalies(predicted_data = predicted_data)
   # ),
+
+
+  tar_stan_vb_rep_summary(
+    prior_predict_output,
+    stan_files = "firemodel_prior_predict.stan",
+    data = stan_data,
+    batches = 1,
+    quiet=T,
+    reps = 1,
+    combine=T,
+    pedantic=T,
+    force_recompile=F,
+    #    stdout = R.utils::nullfile(),
+    #    stderr = R.utils::nullfile(),
+    adapt_engaged=F,
+    eta=0.11,
+    iter = 100, #should be 1000 or more - 100 is just to run quickly
+    garbage_collection=T,
+    init=1,
+    tol_rel_obj = 0.001
+  ),
+
 
 
   #~~~~~~~~~~~^
