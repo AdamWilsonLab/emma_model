@@ -17,8 +17,8 @@ data {
 parameters {
   //vector<lower=0>[J] alpha;
   vector[J] alpha;
-  vector<lower=0>[J] gamma;
-  //vector[J] gamma;
+  //vector<lower=0>[J] gamma;
+  vector[J] gamma;
   vector[J] lambda;
   vector[P] gamma_beta;
   vector[P] lambda_beta;

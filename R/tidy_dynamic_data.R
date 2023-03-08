@@ -23,5 +23,13 @@ dyndata <- dynfiles  %>%
          age=time_since_fire/365.23) %>% #convert age from days to years
   as_tibble()
 
+  if(any(na.omit(dyndata$age)<0)){
+    message("Impossible ages found! Brian should look into this.  Pruning for now")
+
+    dyndata %>%
+      filter(age >0) -> dyndata
+
+  }
+
 return(dyndata)
 }

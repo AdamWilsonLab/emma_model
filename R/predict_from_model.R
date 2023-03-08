@@ -136,7 +136,7 @@ predict_from_model <- function(model_output,
               predict_df %>%
                 mutate(mu = exp(alpha)+exp(gamma)-exp(gamma)*exp(-(age/exp(lambda)))) -> predict_df
 
-              if(any(predict_df$age < 0)){
+              if(any(na.omit(predict_df$age) < 0)){
 
                 message("Impossible ages in data (negatives)")
 
