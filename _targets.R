@@ -28,9 +28,9 @@ tar_option_set(packages = c("piggyback","cmdstanr", "posterior", "bayesplot", "t
                             "doParallel","raster"),
                deployment="main")
 
-Sys.setenv(HOME="/home/rstudio")
-cmdstanr::install_cmdstan()
-#cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1") #causes error when run on server, or if omitted
+#Sys.setenv(HOME="/home/rstudio")
+#cmdstanr::install_cmdstan()
+cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
 #cmdstanr::check_cmdstan_toolchain()
 #cmdstanr::install_cmdstan()
 
