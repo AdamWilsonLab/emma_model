@@ -29,7 +29,7 @@ tar_option_set(packages = c("piggyback","cmdstanr", "posterior", "bayesplot", "t
                deployment="main")
 
 Sys.setenv(HOME="/home/rstudio")
-cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
+#cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1") #commented out to see if it was causing cluster error
 #cmdstanr::check_cmdstan_toolchain()
 #cmdstanr::install_cmdstan()
 
@@ -63,8 +63,8 @@ list(
                        repo="AdamWilsonLab/emma_envdata",
                        dest="data/envdata/",
                        tag="current",
-                       show_progress=F,
-                       overwrite=T),
+                       show_progress=T,
+                       overwrite=F),
     format="file"),
 
   tar_target(envdata,
