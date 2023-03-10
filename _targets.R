@@ -39,8 +39,8 @@ cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
 # Testing and training time windows
 training_window=c("2010-01-01","2020-01-01")
 testing_window=c("2020-01-01","2022-01-01")
-predicting_window=c("2010-01-01","2020-01-01") #need to revise the predicting code to make it more memory efficient
-#predicting_window=c("2020-01-01", as.character(Sys.Date()))
+#predicting_window=c("2010-01-01","2020-01-01") #need to revise the predicting code to make it more memory efficient
+predicting_window=c("2020-01-01", as.character(Sys.Date()))
 
 
 ## Download the most recent data release
@@ -74,7 +74,7 @@ list(
                remnant_distance=2, #drop pixels within this distance of remnant edge (km)
                region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
                #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
-               sample_proportion= .1)),
+               sample_proportion= .05)),
 
   tar_target(
     data_training,
