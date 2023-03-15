@@ -46,28 +46,28 @@ predicting_window=c("2020-01-01", as.character(Sys.Date()))
 
 ## Download the most recent data release
 list(
+#
+#   tar_age(name = envdata_files,
+#           command = robust_pb_download(file=NULL,
+#                                        repo="AdamWilsonLab/emma_envdata",
+#                                        dest="data/envdata/",
+#                                        tag="current",
+#                                        show_progress=F,
+#                                        overwrite=F),
+#           age = as.difftime(7, units = "days"),
+#           #age = as.difftime(12, units = "hours"),
+#           format = "file"
+#           ),
 
-  tar_age(name = envdata_files,
-          command = robust_pb_download(file=NULL,
-                                       repo="AdamWilsonLab/emma_envdata",
-                                       dest="data/envdata/",
-                                       tag="current",
-                                       show_progress=F,
-                                       overwrite=F),
-          age = as.difftime(7, units = "days"),
-          #age = as.difftime(12, units = "hours"),
-          format = "file"
-          ),
-
-  # tar_target(
-  #   envdata_files,
-  #   robust_pb_download(file=NULL,
-  #                      repo="AdamWilsonLab/emma_envdata",
-  #                      dest="data/envdata/",
-  #                      tag="current",
-  #                      show_progress=T,
-  #                      overwrite=F),
-  #   format="file"),
+tar_target(
+  envdata_files,
+  robust_pb_download(file=NULL,
+                     repo="AdamWilsonLab/emma_envdata",
+                     dest="data/envdata/",
+                     tag="current",
+                     show_progress=T,
+                     overwrite=F),
+  format="file"),
 
   tar_target(envdata,
              tidy_static_data(
