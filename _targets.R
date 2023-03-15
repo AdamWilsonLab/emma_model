@@ -41,8 +41,8 @@ cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
 training_window=c("2010-01-01","2020-01-01")
 testing_window=c("2020-01-01","2022-01-01")
 #predicting_window=c("2010-01-01","2020-01-01") #need to revise the predicting code to make it more memory efficient
-predicting_window=c("2020-01-01", as.character(Sys.Date()))
-
+#predicting_window=c("2020-01-01", as.character(Sys.Date()))
+predicting_window=c("2020-01-01", "2023-01-01")
 
 ## Download the most recent data release
 list(
