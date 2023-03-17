@@ -317,25 +317,25 @@ tar_target(
   # ),
 
 
-  tar_stan_vb_rep_summary(
-    prior_predict_output,
-    stan_files = "firemodel_prior_predict.stan",
-    data = stan_data,
-    batches = 1,
-    quiet=T,
-    reps = 1,
-    combine=T,
-    pedantic=T,
-    force_recompile=F,
-    #    stdout = R.utils::nullfile(),
-    #    stderr = R.utils::nullfile(),
-    adapt_engaged=F,
-    eta=0.11,
-    iter = 100, #should be 1000 or more - 100 is just to run quickly
-    garbage_collection=T,
-    init=1,
-    tol_rel_obj = 0.001
-  ),
+  # tar_stan_vb_rep_summary(
+  #   prior_predict_output,
+  #   stan_files = "firemodel_prior_predict.stan",
+  #   data = stan_data,
+  #   batches = 1,
+  #   quiet=T,
+  #   reps = 1,
+  #   combine=T,
+  #   pedantic=T,
+  #   force_recompile=F,
+  #   #    stdout = R.utils::nullfile(),
+  #   #    stderr = R.utils::nullfile(),
+  #   adapt_engaged=F,
+  #   eta=0.11,
+  #   iter = 100, #should be 1000 or more - 100 is just to run quickly
+  #   garbage_collection=T,
+  #   init=1,
+  #   tol_rel_obj = 0.001
+  # ),
 
 
 
