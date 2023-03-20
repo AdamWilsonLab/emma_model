@@ -337,10 +337,10 @@ list(
   #~~~~~~~~~~~^
 
   # Release outputs
-    tar_target(publish_model_parameters,
-               release_model_parameters(model_prediction = model_prediction,
-                                        temp_directory_output = "data/model_parameters",
-                                        output_tag = "model_parameters",
+    tar_target(publish_model_output,
+               release_model_output(model_output = model_output,
+                                        temp_directory_output = "data/model_output",
+                                        output_tag = "model_output",
                                         chunk_size = NULL,
                                         sleep_time = 1)),
 
