@@ -341,14 +341,14 @@ list(
                release_model_parameters(model_prediction = model_prediction,
                                         temp_directory_output = "data/model_parameters",
                                         output_tag = "model_parameters",
-                                        chunk_size = 200000,
+                                        chunk_size = NULL,
                                         sleep_time = 1)),
 
   tar_target(publish_model_predictions,
              release_ndvi_predictions(predicted_data = predicted_data,
                                       temp_directory_output = "data/predicted_data",
                                       output_tag = "ndvi_predictions",
-                                      chunk_size = 200000,
+                                      chunk_size = NULL,
                                       sleep_time = 1)),
 
   # Summaries
