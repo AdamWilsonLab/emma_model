@@ -36,15 +36,15 @@ cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
 # tar_destroy(ask = F)
 
 # Testing and training time windows
-# training_window=c("2000-01-01","2020-01-01")
-# testing_window=c("2020-01-01","2022-01-01")
-# predicting_window=c("2000-01-01","2020-01-01") #need to revise the predicting code to make it more memory efficient
+training_window=c("2000-01-01","2020-01-01")
+testing_window=c("2020-01-01","2023-01-01")
+predicting_window=c("2000-01-01","2023-01-01")
 #predicting_window=c("2020-01-01", as.character(Sys.Date()))
 
 #For dev
-training_window=c("2020-01-01","2022-01-01")
-testing_window=c("2022-01-01","2023-01-01")
-predicting_window=c("2022-01-01","2023-01-01") #need to revise the predicting code to make it more memory efficient
+# training_window=c("2020-01-01","2022-01-01")
+# testing_window=c("2022-01-01","2023-01-01")
+# predicting_window=c("2022-01-01","2023-01-01") #need to revise the predicting code to make it more memory efficient
 
 
 
@@ -77,8 +77,8 @@ list(
              tidy_static_data(
                envdata_files,
                remnant_distance=2, #drop pixels within this distance of remnant edge (km)
-               #region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
-               region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
+               region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
+               #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
                sample_proportion= .05)),
 
   tar_target(
@@ -188,7 +188,7 @@ list(
     #    stderr = R.utils::nullfile(),
     adapt_engaged=F,
     eta=0.11,
-    iter = 1000, #should be 1000 or more - 100 is just to run quickly
+    iter = 2000, #should be 1000 or more - 100 is just to run quickly
     garbage_collection=T,
     init=1,
     tol_rel_obj = 0.001
@@ -200,23 +200,14 @@ list(
 
   # note: don't make the region too large or it will break things (e.g. -180 to 180, -90 to 90), probably because of great circle issues?
 
-  # tar_target(
-  #   prediction_envdata_files,
-  #   robust_pb_download(file=NULL,
-  #                      repo="AdamWilsonLab/emma_envdata",
-  #                      dest="data/envdata/",
-  #                      tag="processed_ndvi_relative_days_since_fire",
-  #                      show_progress=F,
-  #                      overwrite=F),
-  #   format="file"),
-  #
+
   tar_target(envdata_predicting,
              tidy_static_data(
                envdata = envdata_files,
                remnant_distance=2, #drop pixels within this distance of remnant edge (km)
                #region=c(xmin = 16, xmax = 28, ymin = -35, ymax = -28), #whole region
-               region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531),#peninsula
-               #region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
+               #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531),#peninsula
+               region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
                sample_proportion= 1)),
 
 
@@ -321,35 +312,42 @@ list(
   # ),
 
 
-  tar_stan_vb_rep_summary(
-    prior_predict_output,
-    stan_files = "firemodel_prior_predict.stan",
-    data = stan_data,
-    batches = 1,
-    quiet=T,
-    reps = 1,
-    combine=T,
-    pedantic=T,
-    force_recompile=F,
-    #    stdout = R.utils::nullfile(),
-    #    stderr = R.utils::nullfile(),
-    adapt_engaged=F,
-    eta=0.11,
-    iter = 100, #should be 1000 or more - 100 is just to run quickly
-    garbage_collection=T,
-    init=1,
-    tol_rel_obj = 0.001
-  ),
+  # tar_stan_vb_rep_summary(
+  #   prior_predict_output,
+  #   stan_files = "firemodel_prior_predict.stan",
+  #   data = stan_data,
+  #   batches = 1,
+  #   quiet=T,
+  #   reps = 1,
+  #   combine=T,
+  #   pedantic=T,
+  #   force_recompile=F,
+  #   #    stdout = R.utils::nullfile(),
+  #   #    stderr = R.utils::nullfile(),
+  #   adapt_engaged=F,
+  #   eta=0.11,
+  #   iter = 100, #should be 1000 or more - 100 is just to run quickly
+  #   garbage_collection=T,
+  #   init=1,
+  #   tol_rel_obj = 0.001
+  # ),
 
 
 
   #~~~~~~~~~~~^
 
   # Release outputs
-  tar_target(publish_model_parameters,
-             release_model_parameters(model_prediction = model_prediction,
-                                      temp_directory_output = "data/model_parameters",
-                                      output_tag = "model_parameters",
+    tar_target(publish_model_parameters,
+               release_model_parameters(model_prediction = model_prediction,
+                                        temp_directory_output = "data/model_parameters",
+                                        output_tag = "model_parameters",
+                                        chunk_size = 200000,
+                                        sleep_time = 1)),
+
+  tar_target(publish_model_predictions,
+             release_ndvi_predictions(predicted_data = predicted_data,
+                                      temp_directory_output = "data/predicted_data",
+                                      output_tag = "ndvi_predictions",
                                       chunk_size = 200000,
                                       sleep_time = 1)),
 
