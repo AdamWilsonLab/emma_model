@@ -79,7 +79,7 @@ list(
                remnant_distance=2, #drop pixels within this distance of remnant edge (km)
                region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
                #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
-               sample_proportion= .05)),
+               sample_proportion= .1)),
 
   tar_target(
     data_training,
@@ -188,7 +188,7 @@ list(
     #    stderr = R.utils::nullfile(),
     adapt_engaged=F,
     eta=0.11,
-    iter = 2000, #should be 1000 or more - 100 is just to run quickly
+    iter = 5000, #should be 1000 or more - 100 is just to run quickly
     garbage_collection=T,
     init=1,
     tol_rel_obj = 0.001
