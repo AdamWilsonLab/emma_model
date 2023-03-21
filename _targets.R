@@ -351,6 +351,14 @@ list(
                                       chunk_size = NULL,
                                       sleep_time = 1)),
 
+  tar_target(publish_training_cellIDs,
+             release_training_cellIDs(envdata,
+                                      temp_directory_output = "data/cellIDs",
+                                      output_tag = "cellIDs",
+                                      chunk_size = NULL,
+                                      sleep_time = 1)),
+
+
   # Summaries
 
     tar_target(model_results,
