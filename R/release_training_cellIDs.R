@@ -5,7 +5,6 @@
 #' @param output_tag The tag to use for the release
 #' @param chunk_size The number of rows to include in each parquet chunk.  If left NULL, will use all (up to 250 million)
 #' @param sleep_time Positive numeric.  Number of seconds to wait between each Github or piggyback query
-
 release_training_cellIDs <- function(envdata,
                                      temp_directory_output = "data/cellIDs",
                                      output_tag = "cellIDs",
