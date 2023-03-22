@@ -11,44 +11,44 @@ release_training_cellIDs <- function(envdata,
                                      output_tag = "cellIDs",
                                      chunk_size = NULL,
                                      sleep_time = 1){
-  
+
   # make folder if needed
-  
+
   if(!dir.exists(temp_directory_output)){
     dir.create(temp_directory_output, recursive = TRUE)
     }
-  
+
   # clear out any accidental remnants
-  
+
   file.remove(list.files(temp_directory_output,full.names = TRUE))
-  
+
   # Make sure there is a release or else create one.
-  
+
   pb_assests <- pb_list(repo = "AdamWilsonLab/emma_model")
-  
+
   if(!output_tag %in% pb_assests$tag){
-    
+
     tryCatch(expr =   pb_new_release(repo = "AdamWilsonLab/emma_model",
                                      tag =  output_tag),
              error = function(e){message("Previous release found")})
-    
+
     Sys.sleep(sleep_time) #We need to limit our rate in order to keep Github happy
-    
+
   }
-  
+
   # Create arrow datasets
-  
+
   envdata %>%
-    filter(sample == 1)%>%
-    select(cellID)%>%
+    dplyr::filter(sample == 1) %>%
+    dplyr::select(cellID) %>%
   write_parquet(sink = file.path(temp_directory_output,
                                  paste(output_tag,
                                        ".gz.parquet", sep = "")),
                 compression = "gzip",
                 chunk_size = chunk_size)
-  
+
   # Upload ith file
-  
+
   pb_upload(file = file.path(temp_directory_output,
                              paste(output_tag,
                                    ".gz.parquet", sep = "")),
@@ -56,14 +56,14 @@ release_training_cellIDs <- function(envdata,
             tag = output_tag,
             overwrite = TRUE
   )
-  
+
   #Clear out the temporary directory
-  
+
   unlink(temp_directory_output, recursive = TRUE, force = TRUE)
-  
+
   #End
   return(invisible(NULL))
-  
-  
-  
+
+
+
 }
