@@ -192,7 +192,8 @@ list(
     iter = 10000, #should be 1000 or more - 100 is just to run quickly
     garbage_collection=T,
     init=1,
-    tol_rel_obj = 0.001
+    tol_rel_obj = 0.001,
+    output_samples = 100 #I THINK this might save on space
   ),
 
 
