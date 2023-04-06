@@ -5,7 +5,8 @@
 #tar_load(predict_data)
 
 predict_from_model <- function(model_output,
-                               predict_data){
+                               predict_data,
+                               ...){
 
 
   #Pull relevant parameters from model

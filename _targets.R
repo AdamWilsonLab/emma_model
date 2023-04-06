@@ -306,7 +306,8 @@ list(
   tar_target(
   predicted_data,
   predict_from_model(model_output = model_output,
-                     predict_data = predict_data)
+                     predict_data = predict_data,
+                     ... = model_output_data)
   ),
 
   # tar_target(
@@ -346,7 +347,7 @@ list(
                                         output_tag = "model_output",
                                         chunk_size = NULL,
                                         sleep_time = 1,
-                                        ... = predicted_data)), #note that the predicted data object is an input only to force targets to correctly order things
+                                        ... = model_output_data)), #note that the predicted data object is an input only to force targets to correctly order things
 
   tar_target(publish_model_predictions,
              release_ndvi_predictions(predicted_data = predicted_data,
