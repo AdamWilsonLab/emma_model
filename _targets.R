@@ -80,7 +80,7 @@ list(
                #region=c(xmin = 16, xmax = 28, ymin = -35, ymax = -28), #whole region
                region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
                #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
-               sample_proportion= .7)),
+               sample_proportion= .2)),
 
   tar_target(
     data_training,
@@ -182,7 +182,7 @@ list(
     batches = 1,
     quiet=T,
     reps = 1,
-    combine=T,
+    combine=F, #was set to T, but trying F as the docs say this saves space
     pedantic=T,
     force_recompile=F,
     #    stdout = R.utils::nullfile(),
@@ -190,6 +190,7 @@ list(
     adapt_engaged=F,
     eta=0.11,
     iter = 10000, #should be 1000 or more - 100 is just to run quickly
+    memory = "transient",
     garbage_collection=T,
     init=1,
     tol_rel_obj = 0.001,
