@@ -345,7 +345,8 @@ list(
                                         temp_directory_output = "data/model_output",
                                         output_tag = "model_output",
                                         chunk_size = NULL,
-                                        sleep_time = 1)),
+                                        sleep_time = 1,
+                                        ... = predicted_data)), #note that the predicted data object is an input only to force targets to correctly order things
 
   tar_target(publish_model_predictions,
              release_ndvi_predictions(predicted_data = predicted_data,

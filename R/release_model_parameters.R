@@ -5,12 +5,14 @@
 #' @param output_tag The tag to use for the release
 #' @param chunk_size The number of rows to include in each parquet chunk.  If left NULL, will use all (up to 250 million)
 #' @param sleep_time Positive numeric.  Number of seconds to wait between each Github or piggyback query
+#' @param ... Does nothing at present, but is used to trick targets into running this after the model.
 
 release_model_output <- function(model_output,
-                                     temp_directory_output = "data/model_output",
-                                     output_tag = "model_output",
-                                     chunk_size = 200000,
-                                     sleep_time = 1){
+                                 temp_directory_output = "data/model_output",
+                                 output_tag = "model_output",
+                                 chunk_size = 200000,
+                                 sleep_time = 1,
+                                 ...){
 
   # make folder if needed
 
