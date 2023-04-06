@@ -182,7 +182,7 @@ list(
     batches = 1,
     quiet=T,
     reps = 1,
-    combine=F, #was set to T, but trying F as the docs say this saves space
+    combine=T, #I THINK setting this to false changes the model output, breaking downsteam code
     pedantic=T,
     force_recompile=F,
     #    stdout = R.utils::nullfile(),
@@ -306,8 +306,7 @@ list(
   tar_target(
   predicted_data,
   predict_from_model(model_output = model_output,
-                     predict_data = predict_data,
-                     ... = model_output_data)
+                     predict_data = predict_data)
   ),
 
   # tar_target(
@@ -346,8 +345,7 @@ list(
                                         temp_directory_output = "data/model_output",
                                         output_tag = "model_output",
                                         chunk_size = NULL,
-                                        sleep_time = 1,
-                                        ... = model_output_data)), #note that the predicted data object is an input only to force targets to correctly order things
+                                        sleep_time = 1)),
 
   tar_target(publish_model_predictions,
              release_ndvi_predictions(predicted_data = predicted_data,
