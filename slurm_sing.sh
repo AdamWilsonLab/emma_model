@@ -16,8 +16,8 @@
   export SIF_FILE="AdamWilsonLab-emma_docker-latest.sif"
 
 
-  mkdir "$APPTAINER_CACHEDIR/tmp"
-  mkdir "$APPTAINER_CACHEDIR/run"
+  mkdir -p "$APPTAINER_CACHEDIR/tmp"
+  mkdir -p "$APPTAINER_CACHEDIR/run"
 
   singularity run \
   --bind $PROJECT_FOLDER:$PROJECT_FOLDER \
