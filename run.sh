@@ -8,4 +8,4 @@ nohup nice -4 R CMD BATCH run.R &
 # for your situation and system.
 
 # Removing .RData is recommended.
-# rm -f .RData
+ rm -f .RData
