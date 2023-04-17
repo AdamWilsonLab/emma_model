@@ -10,6 +10,7 @@
 #SBATCH  -C INTEL
 #SBATCH --time=1:00:00
 
+
   export PROJECT_FOLDER="/projects/academic/adamw/"
   export APPTAINER_CACHEDIR="/scratch/"$USER"/singularity"
   export SIF_PATH=$PROJECT_FOLDER"/users/"$USER"/singularity"
@@ -23,4 +24,4 @@
   --bind $PROJECT_FOLDER:$PROJECT_FOLDER \
   --bind $APPTAINER_CACHEDIR/tmp:/tmp \
   --bind $APPTAINER_CACHEDIR/run:/run \
-  $SIF_PATH/$SIF_FILE ./emma_model/run.sh
+  $SIF_PATH/$SIF_FILE ./run.sh
