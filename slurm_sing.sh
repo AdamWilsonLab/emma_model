@@ -15,6 +15,10 @@
   export SIF_PATH=$PROJECT_FOLDER"/users/"$USER"/singularity"
   export SIF_FILE="AdamWilsonLab-emma_docker-latest.sif"
 
+
+  mkdir "$APPTAINER_CACHEDIR/tmp"
+  mkdir "$APPTAINER_CACHEDIR/run"
+
   singularity run \
   --bind $PROJECT_FOLDER:$PROJECT_FOLDER \
   --bind $APPTAINER_CACHEDIR/tmp:/tmp \
