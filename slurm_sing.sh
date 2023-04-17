@@ -15,9 +15,8 @@
   export SIF_PATH=$PROJECT_FOLDER"/users/"$USER"/singularity"
   export SIF_FILE="AdamWilsonLab-emma_docker-latest.sif"
 
-  singularity shell \
+  singularity run \
   --bind $PROJECT_FOLDER:$PROJECT_FOLDER \
   --bind $APPTAINER_CACHEDIR/tmp:/tmp \
   --bind $APPTAINER_CACHEDIR/run:/run \
   $SIF_PATH/$SIF_FILE ./emma_model/run.sh
-  
