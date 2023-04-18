@@ -209,8 +209,8 @@ list(
                envdata = envdata_files,
                remnant_distance=2, #drop pixels within this distance of remnant edge (km)
                #region=c(xmin = 16, xmax = 28, ymin = -35, ymax = -28), #whole region
-               region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531),#peninsula
-               #region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
+               #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531),#peninsula
+               region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
                sample_proportion= 1)),
 
 
