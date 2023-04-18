@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=60G
 #SBATCH  -C INTEL
-#SBATCH --time=1:00:00
+#SBATCH --time=4:00:00
 
 
   export PROJECT_FOLDER="/projects/academic/adamw/"

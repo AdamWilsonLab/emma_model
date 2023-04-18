@@ -77,11 +77,11 @@ model {
 //  }
 }
 
-generated quantities {
-
-array[N] real y_pred;
-
-//if(predict==1){ // only run if prediction is desired
-    y_pred = normal_rng(mu, tau);
+// generated quantities {
+//
+// array[N] real y_pred;
+//
+// if(predict==1){ // only run if prediction is desired
+//     y_pred = normal_rng(mu, tau);
 //  }
-}
+// }
