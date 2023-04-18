@@ -162,8 +162,7 @@ list(
     dyndata_validation,
     tidy_dynamic_data(envdata,
                       date_window = ymd(testing_window))
-    ),
-
+  ),
   tar_target(
     stan_data,
     create_stan_data(
@@ -195,7 +194,8 @@ list(
     init=1,
     tol_rel_obj = 0.001,
     output_samples = 100
-  ),
+  )
+  ,
 
 
 
@@ -211,8 +211,7 @@ list(
                #region=c(xmin = 16, xmax = 28, ymin = -35, ymax = -28), #whole region
                #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531),#peninsula
                region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
-               sample_proportion= .5),
-
+               sample_proportion= .5)),
 
   tar_target(
     data_predicting,
@@ -236,13 +235,12 @@ list(
                                    "soil_Total_N_.tif",
                                    "soil_Total_N_pct.tif"))%>%
       dplyr::select(cellID,
-             CHELSA_bio10_01_V1.2.tif,
-             CHELSA_bio10_02_V1.2.tif,
-             MODCF_seasonality_concentration.tif,
-             alos_chili.tif,
-             alos_mtpi.tif,
-             pid)
-  ),
+                    CHELSA_bio10_01_V1.2.tif,
+                    CHELSA_bio10_02_V1.2.tif,
+                    MODCF_seasonality_concentration.tif,
+                    alos_chili.tif,
+                    alos_mtpi.tif,
+                    pid)),
 
   tar_target(
     soil_data_predicting,
@@ -304,9 +302,9 @@ list(
 
 
   tar_target(
-  predicted_data,
-  predict_from_model(model_output = model_output,
-                     predict_data = predict_data)
+    predicted_data,
+    predict_from_model(model_output = model_output,
+                       predict_data = predict_data)
   ),
 
   # tar_target(
@@ -340,12 +338,12 @@ list(
   #~~~~~~~~~~~^
 
   # Release outputs
-    tar_target(publish_model_output,
-               release_model_output(model_output = model_output,
-                                        temp_directory_output = "data/model_output",
-                                        output_tag = "model_output",
-                                        chunk_size = NULL,
-                                        sleep_time = 1)),
+  tar_target(publish_model_output,
+             release_model_output(model_output = model_output,
+                                  temp_directory_output = "data/model_output",
+                                  output_tag = "model_output",
+                                  chunk_size = NULL,
+                                  sleep_time = 1)),
 
   tar_target(publish_model_predictions,
              release_ndvi_predictions(predicted_data = predicted_data,
@@ -364,13 +362,15 @@ list(
 
   # Summaries
 
-    tar_target(model_results,
-               summarize_model_output(model_output, stan_data, envdata)),
-    tar_target(model_prediction,
-               summarize_predictions(model_results,stan_data,envdata)),
-    tar_target(spatial_outputs,
-               create_spatial_outputs(model_results,data_training,envdata))
-    #,tar_render(report, "index.Rmd")
+  tar_target(model_results,
+             summarize_model_output(model_output, stan_data, envdata)),
+  tar_target(model_prediction,
+             summarize_predictions(model_results,stan_data,envdata)),
+  tar_target(spatial_outputs,
+             create_spatial_outputs(model_results,data_training,envdata))
+  #,tar_render(report, "index.Rmd")
 
-)
 
+
+
+)#end of list of targets
