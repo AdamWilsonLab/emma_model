@@ -26,7 +26,7 @@
 
 # Print elapsed time
   elapsed_time <- difftime(time2 = start_time,
-           time1 = Sys.time(),units = "hours") %>% round(digits = 2)
+           time1 = Sys.time(),units = "hours") |> round(digits = 2)
 
   print(paste("Targets workflow ran for a total of ", elapsed_time, " hours.",sep = ""))
 
