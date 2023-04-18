@@ -5,7 +5,6 @@
 #SBATCH --job-name "targets run"
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=2
 #SBATCH --mem=60G
 #SBATCH  -C INTEL
 #SBATCH --time=240:00:00
