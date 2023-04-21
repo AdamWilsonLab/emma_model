@@ -1,10 +1,14 @@
 ## Download the most recent release from the emma_envdata
-tidy_dynamic_data <- function(data,date_window) {
+tidy_dynamic_data <- function(data,date_window,verbose=TRUE) {
 
 
 # Data pre-processing
 
+if(verbose){message("Opening dataset")}
+
 dynfiles <- open_dataset(sources = list.files("data/envdata","dynamic",full=T))
+
+if(verbose){message("Getting list of cells to keep")}
 
 cells_to_keep <- data %>%
   dplyr::filter(sample) %>%
@@ -12,6 +16,8 @@ cells_to_keep <- data %>%
 
 start_date = as.numeric(as_date(date_window[1]))
 stop_date = as.numeric(as_date(date_window[2]))
+
+if(verbose){message("Collecting data")}
 
 dyndata <- dynfiles  %>%
   semi_join(cells_to_keep,by="cellID") %>% #keep only pixels in data
@@ -23,6 +29,8 @@ dyndata <- dynfiles  %>%
          age=time_since_fire/365.23) %>% #convert age from days to years
   as_tibble()
 
+if(verbose){message("Checking ages")}
+
   if(any(na.omit(dyndata$age)<0)){
     message("Impossible ages found! Brian should look into this.  Pruning for now")
 
@@ -30,6 +38,8 @@ dyndata <- dynfiles  %>%
       filter(age >0) -> dyndata
 
   }
+
+if(verbose){message("Returning output")}
 
 return(dyndata)
 }
