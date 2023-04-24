@@ -15,7 +15,7 @@
   export SIF_PATH=$PROJECT_FOLDER"/"$USER"/singularity"
   export SIF_FILE="AdamWilsonLab-emma_docker-latest.sif"
 
-  cp -r "/projects/academic/adamw/users/"$USER"/singularity"$SIF_FILE $SIF_PATH/$SIF_FILE
+  cp -r "/projects/academic/adamw/users/"$USER"/singularity/"$SIF_FILE $SIF_PATH/$SIF_FILE
 
   mkdir -p "$APPTAINER_CACHEDIR/tmp"
   mkdir -p "$APPTAINER_CACHEDIR/run"
