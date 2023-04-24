@@ -10,9 +10,9 @@
 #SBATCH --time=240:00:00
 
 
-  export PROJECT_FOLDER="/projects/academic/adamw/"
-  export APPTAINER_CACHEDIR="/panasas/scratch/grp-adamw/brianmai/singularity"
-  export SIF_PATH=$PROJECT_FOLDER"/users/"$USER"/singularity"
+  export PROJECT_FOLDER="/panasas/scratch/grp-adamw/"
+  export APPTAINER_CACHEDIR="/panasas/scratch/grp-adamw/"$USER"/singularity"
+  export SIF_PATH=$PROJECT_FOLDER"/"$USER"/singularity"
   export SIF_FILE="AdamWilsonLab-emma_docker-latest.sif"
 
 
