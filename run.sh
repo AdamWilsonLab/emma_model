@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 #SBATCH --cluster=faculty
 #SBATCH --qos=adamw
 #SBATCH --partition=adamw
-#SBATCH --job-name "EMMA model"
+#SBATCH --job-name "EMMA model pt 2"
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mem=120G
