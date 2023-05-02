@@ -3,7 +3,7 @@
 #SBATCH --cluster=faculty
 #SBATCH --qos=adamw
 #SBATCH --partition=adamw
-#SBATCH --job-name "EMMA model"
+#SBATCH --job-name "EMMA model slurm_sing2.sh"
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mem=120G
@@ -28,4 +28,4 @@
   --bind $PROJECT_FOLDER:$PROJECT_FOLDER \
   --bind $APPTAINER_CACHEDIR/tmp:/tmp \
   --bind $APPTAINER_CACHEDIR/run:/run \
-  $SIF_PATH/$SIF_FILE ./run.sh
+  $SIF_PATH/$SIF_FILE sbatch ./run.sh
