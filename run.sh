@@ -1,18 +1,4 @@
-#!/bin/sh
-#
-#SBATCH --cluster=faculty
-#SBATCH --qos=adamw
-#SBATCH --partition=adamw
-#SBATCH --job-name "EMMA model pt 2"
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --mem=120G
-#SBATCH  -C INTEL
-#SBATCH --time=120:00:00
-#SBATCH --mail-user=bmaitner@gmail.com
-#SBATCH --mail-type=begin
-#SBATCH --mail-type=end
-
+#!/bin/bash
 
 # Submit the pipeline as a background process with ./run.sh
 # module load R # Uncomment if R is an environment module.
