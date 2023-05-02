@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #SBATCH --cluster=faculty
 #SBATCH --qos=adamw
 #SBATCH --partition=adamw
