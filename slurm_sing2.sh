@@ -8,7 +8,7 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=120G
 #SBATCH  -C INTEL
-#SBATCH --time=120:00:00
+#SBATCH --time=2:00:00
 #SBATCH --mail-user=bmaitner@gmail.com
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
@@ -28,4 +28,4 @@
   --bind $PROJECT_FOLDER:$PROJECT_FOLDER \
   --bind $APPTAINER_CACHEDIR/tmp:/tmp \
   --bind $APPTAINER_CACHEDIR/run:/run \
-  $SIF_PATH/$SIF_FILE sbatch ./run.sh
+  $SIF_PATH/$SIF_FILE ./run.sh
