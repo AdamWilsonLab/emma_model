@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=120G
 #SBATCH  -C INTEL
-#SBATCH --time=240:00:00
+#SBATCH --time=120:00:00
 
   export PROJECT_FOLDER="/panasas/scratch/grp-adamw/"
   export APPTAINER_CACHEDIR="/panasas/scratch/grp-adamw/"$USER"/singularity"
