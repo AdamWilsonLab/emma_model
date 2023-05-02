@@ -1,4 +1,5 @@
 #!/bin/sh
+#
 #SBATCH --cluster=faculty
 #SBATCH --qos=adamw
 #SBATCH --partition=adamw
@@ -8,6 +9,10 @@
 #SBATCH --mem=120G
 #SBATCH  -C INTEL
 #SBATCH --time=120:00:00
+#SBATCH --mail-user=bmaitner@gmail.com
+#SBATCH --mail-type=start
+#SBATCH --mail-type=end
+
 
   export PROJECT_FOLDER="/panasas/scratch/grp-adamw/"
   export APPTAINER_CACHEDIR="/panasas/scratch/grp-adamw/"$USER"/singularity"
