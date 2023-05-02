@@ -10,7 +10,7 @@
 #SBATCH  -C INTEL
 #SBATCH --time=120:00:00
 #SBATCH --mail-user=bmaitner@gmail.com
-#SBATCH --mail-type=start
+#SBATCH --mail-type=begin
 #SBATCH --mail-type=end
 
 
