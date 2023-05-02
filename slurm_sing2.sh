@@ -2,16 +2,12 @@
 #SBATCH --cluster=faculty
 #SBATCH --qos=adamw
 #SBATCH --partition=adamw
-#SBATCH --job-name "targets run"
+#SBATCH --job-name "EMMA model"
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mem=120G
 #SBATCH  -C INTEL
 #SBATCH --time=240:00:00
-#SBATCH --cluster=faculty
-#SBATCH --qos=adamw
-#SBATCH --partition=adamw
-#SBATCH --job-name "EMMA model"
 
   export PROJECT_FOLDER="/panasas/scratch/grp-adamw/"
   export APPTAINER_CACHEDIR="/panasas/scratch/grp-adamw/"$USER"/singularity"
