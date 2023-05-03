@@ -24,7 +24,7 @@
   mkdir -p "$APPTAINER_CACHEDIR/tmp"
   mkdir -p "$APPTAINER_CACHEDIR/run"
 
-  singularity run \
+  singularity exec \
   --bind $PROJECT_FOLDER:$PROJECT_FOLDER \
   --bind $APPTAINER_CACHEDIR/tmp:/tmp \
   --bind $APPTAINER_CACHEDIR/run:/run \
