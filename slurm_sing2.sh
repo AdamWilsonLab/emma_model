@@ -30,7 +30,7 @@
   --bind $PROJECT_FOLDER:$PROJECT_FOLDER \
   --bind $APPTAINER_CACHEDIR/tmp:/tmp \
   --bind $APPTAINER_CACHEDIR/run:/run \
-  $SIF_PATH/$SIF_FILE cat /etc/os-release
+  $SIF_PATH/$SIF_FILE ./run2.sh
 
 
   echo "v2"

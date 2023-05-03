@@ -31,7 +31,7 @@
   --bind $PROJECT_FOLDER:$PROJECT_FOLDER \
   --bind $APPTAINER_CACHEDIR/tmp:/tmp \
   --bind $APPTAINER_CACHEDIR/run:/run \
-  $SIF_PATH/$SIF_FILE ./run.sh
+  $SIF_PATH/$SIF_FILE ./run3.sh
 
 
   echo "v3"
