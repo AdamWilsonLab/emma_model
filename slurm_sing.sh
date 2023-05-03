@@ -24,8 +24,12 @@
   mkdir -p "$APPTAINER_CACHEDIR/tmp"
   mkdir -p "$APPTAINER_CACHEDIR/run"
 
+#this code works fine when executed interactively or by running this file, but fails when run with sbatch
+
   singularity run \
   --bind $PROJECT_FOLDER:$PROJECT_FOLDER \
   --bind $APPTAINER_CACHEDIR/tmp:/tmp \
   --bind $APPTAINER_CACHEDIR/run:/run \
   $SIF_PATH/$SIF_FILE ./run.sh
+
+  echo "v1"
