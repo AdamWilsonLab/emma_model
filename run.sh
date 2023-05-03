@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "starting run.sh"
+
 # Submit the pipeline as a background process with ./run.sh
 # module load R # Uncomment if R is an environment module.
 nohup nice -4 R CMD BATCH run.R &
@@ -9,3 +11,5 @@ nohup nice -4 R CMD BATCH run.R &
 
 # Removing .RData is recommended.
  rm -f .RData
+
+echo "ending run.sh"
