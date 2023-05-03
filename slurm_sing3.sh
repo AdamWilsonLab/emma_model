@@ -12,6 +12,7 @@
 #SBATCH --mail-user=bmaitner@gmail.com
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
+#SBATCH -o singularity_test3.out
 
 
   export PROJECT_FOLDER="/panasas/scratch/grp-adamw/"

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 #SBATCH --cluster=faculty
 #SBATCH --qos=adamw
@@ -12,7 +12,7 @@
 #SBATCH --mail-user=bmaitner@gmail.com
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
-
+#SBATCH -o singularity_test2.out
 
   export PROJECT_FOLDER="/panasas/scratch/grp-adamw/"
   export APPTAINER_CACHEDIR="/panasas/scratch/grp-adamw/"$USER"/singularity"
@@ -28,4 +28,4 @@
   --bind $PROJECT_FOLDER:$PROJECT_FOLDER \
   --bind $APPTAINER_CACHEDIR/tmp:/tmp \
   --bind $APPTAINER_CACHEDIR/run:/run \
-  $SIF_PATH/$SIF_FILE ./run.sh
+  $SIF_PATH/$SIF_FILE
