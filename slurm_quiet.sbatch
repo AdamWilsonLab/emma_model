@@ -28,7 +28,7 @@
   --bind $PROJECT_FOLDER:$PROJECT_FOLDER \
   --bind $APPTAINER_CACHEDIR/tmp:/tmp \
   --bind $APPTAINER_CACHEDIR/run:/run \
-  $SIF_PATH/$SIF_FILE ./run2.sh
+  $SIF_PATH/$SIF_FILE ./run_quiet.sh
 
 
   echo "v2"
