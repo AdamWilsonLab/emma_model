@@ -8,7 +8,7 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=200G
 #SBATCH  -C INTEL
-#SBATCH --time=10-0
+#SBATCH --time=240:00:00
 #SBATCH --mail-user=bmaitner@gmail.com
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
