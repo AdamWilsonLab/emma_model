@@ -6,9 +6,9 @@
 #SBATCH --job-name "EMMA model slurm_sing3.sh"
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mem=240G
+#SBATCH --mem=200G
 #SBATCH  -C INTEL
-#SBATCH --time=15-0
+#SBATCH --time=10-0
 #SBATCH --mail-user=bmaitner@gmail.com
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
