@@ -3,7 +3,7 @@
 #SBATCH --cluster=faculty
 #SBATCH --qos=adamw
 #SBATCH --partition=adamw
-#SBATCH --job-name "EMMA model slurm_sing3.sh"
+#SBATCH --job-name "EMMA model slurm_verbose.sbatch"
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mem=120G
@@ -12,7 +12,7 @@
 #SBATCH --mail-user=bmaitner@gmail.com
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
-#SBATCH -o singularity_test3.out
+#SBATCH -o emma_model_verbose.out
 
 
   export PROJECT_FOLDER="/panasas/scratch/grp-adamw/"
