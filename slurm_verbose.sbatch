@@ -6,7 +6,7 @@
 #SBATCH --job-name "EMMA model slurm_verbose.sbatch"
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mem=120G
+#SBATCH --mem=160G
 #SBATCH  -C INTEL
 #SBATCH --time=240:00:00
 #SBATCH --mail-user=bmaitner@gmail.com
