@@ -181,7 +181,7 @@ list(
     batches = 1,
     quiet=T,
     reps = 1,
-    variables = c("alpha","gamma","lambda"),
+    variables = c("alpha","gamma","lambda","alpha_beta","gamma_beta","lambda_beta"),
     combine=T, #I THINK setting this to false changes the model output, breaking downsteam code
     pedantic=T,
     force_recompile=F,
