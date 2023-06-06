@@ -77,10 +77,10 @@ list(
              tidy_static_data(
                envdata_files,
                remnant_distance=2, #drop pixels within this distance of remnant edge (km)
-               region=c(xmin = 16, xmax = 28, ymin = -35, ymax = -28), #whole region
-               #region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
+               #region=c(xmin = 16, xmax = 28, ymin = -35, ymax = -28), #whole region
+               region=c(xmin = 18, xmax = 19.5, ymin = -35, ymax = -33), #core
                #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
-               sample_proportion= .5)),
+               sample_proportion= .25)),
 
   tar_target(
     data_training,
@@ -181,6 +181,7 @@ list(
     batches = 1,
     quiet=T,
     reps = 1,
+    variables = c("alpha","gamma","lambda"),
     combine=T, #I THINK setting this to false changes the model output, breaking downsteam code
     pedantic=T,
     force_recompile=F,
@@ -193,7 +194,7 @@ list(
     garbage_collection=T,
     init=1,
     tol_rel_obj = 0.001,
-    output_samples = 100
+    output_samples = 10
   )
   ,
 
