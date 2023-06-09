@@ -15,24 +15,27 @@
 #SBATCH -o emma_model_verbose.out
 
 
+  # Specify directories needed and sif file
+
   export PROJECT_FOLDER="/panasas/scratch/grp-adamw/"
   export APPTAINER_CACHEDIR="/panasas/scratch/grp-adamw/"$USER"/singularity"
   export SIF_PATH=$PROJECT_FOLDER"/"$USER"/singularity"
   export SIF_FILE="AdamWilsonLab-emma_docker-latest.sif"
 
+  # make sure the sif file is in the correct location
+
   cp -r "/projects/academic/adamw/users/"$USER"/singularity/"$SIF_FILE $SIF_PATH/$SIF_FILE
+
+  # make needed directories
 
   mkdir -p "$APPTAINER_CACHEDIR/tmp"
   mkdir -p "$APPTAINER_CACHEDIR/run"
 
-#this code works fine when executed interactively or by running this file, but fails when run with sbatch
+  # execute the function run_verbose.sh (which in turn runs the function run.R, which in turn calls tar_make())
 
   singularity exec \
   --bind $PROJECT_FOLDER:$PROJECT_FOLDER \
   --bind $APPTAINER_CACHEDIR/tmp:/tmp \
   --bind $APPTAINER_CACHEDIR/run:/run \
   $SIF_PATH/$SIF_FILE ./run_verbose.sh
-
-
-  echo "v3"
 
