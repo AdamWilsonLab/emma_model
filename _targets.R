@@ -44,15 +44,20 @@ tar_option_set(packages = c("piggyback","cmdstanr", "posterior", "bayesplot", "t
 
 print("Setting env")
 Sys.setenv(HOME="/home/rstudio")
+
+print("Setting cmdstan path")
 cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
 #cmdstanr::check_cmdstan_toolchain()
 #cmdstanr::install_cmdstan()
 
 # tar_destroy(ask = F)
 
+
+
 # Testing and training time windows
-training_window=c("2000-01-01","2014-07-01")
-testing_window=c("2014-07-01","2022-01-01")
+  print("setting time windows")
+  training_window=c("2000-01-01","2014-07-01")
+  testing_window=c("2014-07-01","2022-01-01")
 
 # decide sampling proportion
 total_fynbos_pixels=348911
