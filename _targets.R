@@ -1,3 +1,6 @@
+print("Loading libraries")
+
+library(stantargets)
 library(targets)
 library(tarchetypes)
 library(tidyverse)
@@ -11,22 +14,26 @@ library(piggyback)
 #   devtools::install_github('Chrisjb/basemapR')
 # }
 
+print("Attempting to install needed packages")
 
-if(!"plotly" %in% rownames(installed.packages())){
+  if(!"plotly" %in% rownames(installed.packages())){
 
-  # create local user library path (not present by default)
-  dir.create(path = Sys.getenv("R_LIBS_USER"), showWarnings = FALSE, recursive = TRUE)
-  # install to local user library path
-  install.packages("plotly", lib = Sys.getenv("R_LIBS_USER"))
+    # create local user library path (not present by default)
+    dir.create(path = Sys.getenv("R_LIBS_USER"), showWarnings = FALSE, recursive = TRUE)
+    # install to local user library path
+    install.packages("plotly", lib = Sys.getenv("R_LIBS_USER"))
 
-}
+  }
 
-library(stantargets)
+
+print("Sourcing files")
 source("scratch_code/report_generator.R") #this should be moved
 source("https://raw.githubusercontent.com/AdamWilsonLab/emma_envdata/main/R/robust_pb_download.R")
 # source all files in R folder
 lapply(list.files("R",pattern="[.]R",full.names = T), source)
 
+
+print("Setting options")
 options(tidyverse.quiet = TRUE)
 options(clustermq.scheduler = "multicore")
 
