@@ -46,7 +46,7 @@ print("Setting env")
 Sys.setenv(HOME="/home/rstudio")
 
 print("Setting cmdstan path")
-cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
+#cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1") #this is causing errors
 #cmdstanr::check_cmdstan_toolchain()
 #cmdstanr::install_cmdstan()
 
