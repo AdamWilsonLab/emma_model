@@ -42,6 +42,7 @@ tar_option_set(packages = c("piggyback","cmdstanr", "posterior", "bayesplot", "t
                             "doParallel","raster"),
                deployment="main")
 
+print("Setting env")
 Sys.setenv(HOME="/home/rstudio")
 cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1")
 #cmdstanr::check_cmdstan_toolchain()
