@@ -3,13 +3,18 @@ library(tarchetypes)
 library(tidyverse)
 library(arrow)
 library(piggyback)
-library(plotly)
+#library(plotly)
 # library(leaflet)
 #library(rnoaa)
 #remotes::install_github("ropensci/stantargets")
 # if(!"basemapR" %in% rownames(installed.packages())){
 #   devtools::install_github('Chrisjb/basemapR')
 # }
+
+if(!"plotly" %in% rownames(installed.packages())){
+  install.packages("plotly")
+}
+
 library(stantargets)
 source("scratch_code/report_generator.R") #this should be moved
 source("https://raw.githubusercontent.com/AdamWilsonLab/emma_envdata/main/R/robust_pb_download.R")
