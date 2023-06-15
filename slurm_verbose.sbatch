@@ -46,4 +46,3 @@
   --bind $APPTAINER_CACHEDIR/tmp:/tmp \
   --bind $APPTAINER_CACHEDIR/run:/run \
   $SIF_PATH/$SIF_FILE ./run_verbose.sh
-

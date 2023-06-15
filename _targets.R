@@ -11,8 +11,14 @@ library(piggyback)
 #   devtools::install_github('Chrisjb/basemapR')
 # }
 
+
 if(!"plotly" %in% rownames(installed.packages())){
-  install.packages("plotly")
+
+  # create local user library path (not present by default)
+  dir.create(path = Sys.getenv("R_LIBS_USER"), showWarnings = FALSE, recursive = TRUE)
+  # install to local user library path
+  install.packages(p, lib = Sys.getenv("R_LIBS_USER"), repos = "https://cran.rstudio.com/")
+
 }
 
 library(stantargets)
