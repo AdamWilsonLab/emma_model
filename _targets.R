@@ -3,7 +3,7 @@ library(tarchetypes)
 library(tidyverse)
 library(arrow)
 library(piggyback)
-# library(plotly)
+library(plotly)
 # library(leaflet)
 #library(rnoaa)
 #remotes::install_github("ropensci/stantargets")
@@ -37,8 +37,9 @@ testing_window=c("2014-07-01","2022-01-01")
 
 # decide sampling proportion
 total_fynbos_pixels=348911
-#sample_proportion=round(18000/total_fynbos_pixels,2);sample_proportion # ~5% works on github actions
-sample_proportion=round(34891/total_fynbos_pixels,2);sample_proportion # ~10% sample
+sample_proportion=round(18000/total_fynbos_pixels,2);sample_proportion # ~5% works on github actions
+#sample_proportion=round(34891/total_fynbos_pixels,2);sample_proportion # ~10% sample
+
 #tar_option_set(debug = "spatial_outputs")
 
 ## Download the most recent data release
@@ -112,7 +113,8 @@ list(
     garbage_collection=T,
     init = 0.5, #list(list(phi = 0.5, tau_sq = 0.1, gamma_tau_sq = 0.1, lambda_tau_sq = 0.1, alpha_tau_sq = 0.1, A_tau_sq = 0.1)),
     tol_rel_obj = 0.001,
-    output_samples = 500,
+    #output_samples = 500,
+    output_samples = 10, #using this to test locally (as I'm getting a crash using 500)
     #error = "continue", # Used it when getting the error - Chain 1 Exception: normal_rng: Location parameter[975276] is -inf, but must be finite! (in '/tmp/Rtmp8DI5YZ/model-2ad6dc5ec5b.stan', line 91, column 4 to column 33)
     format_df="parquet"
     #format="parquet"
