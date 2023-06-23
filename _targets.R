@@ -135,7 +135,7 @@ list(
     pedantic=F,
     adapt_engaged=F,
     eta=0.11,
-    iter = 40000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
+    iter = 100000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
     garbage_collection=T,
     init = 0.5, #list(list(phi = 0.5, tau_sq = 0.1, gamma_tau_sq = 0.1, lambda_tau_sq = 0.1, alpha_tau_sq = 0.1, A_tau_sq = 0.1)),
     tol_rel_obj = 0.001,
