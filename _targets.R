@@ -63,7 +63,7 @@ print("Setting cmdstan path")
 total_fynbos_pixels=348911
 #sample_proportion=round(18000/total_fynbos_pixels,2);sample_proportion # ~5% works on github actions
 #sample_proportion=round(34891/total_fynbos_pixels,2);sample_proportion # ~10% sample
-sample_proportion=0.2;sample_proportion # ~10% sample
+sample_proportion=0.3;sample_proportion # ~10% sample
 
 
 #tar_option_set(debug = "spatial_outputs")
@@ -88,7 +88,7 @@ list(
                envdata_files,
                remnant_distance=2, #drop pixels within this distance of remnant edge (km)
                #region=c(xmin = 18.3, xmax = 19.3, ymin = -34.3, ymax = -33.3), #core
-               region=c(xmin = 0, xmax = 30, ymin = -36, ymax = -20), #core
+               region=c(xmin = 0, xmax = 30, ymin = -36, ymax = -20), #continent
                #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
                sample_proportion= sample_proportion, long_pixels=long_pixels)),
   tar_target(envvars,c( #select and possibly rename envvars to be included in model
@@ -135,7 +135,7 @@ list(
     pedantic=F,
     adapt_engaged=F,
     eta=0.11,
-    iter = 100000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
+    iter = 1000000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
     garbage_collection=T,
     init = 0.5, #list(list(phi = 0.5, tau_sq = 0.1, gamma_tau_sq = 0.1, lambda_tau_sq = 0.1, alpha_tau_sq = 0.1, A_tau_sq = 0.1)),
     tol_rel_obj = 0.001,
