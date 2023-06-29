@@ -144,7 +144,7 @@ list(
     init = 0.5, #list(list(phi = 0.5, tau_sq = 0.1, gamma_tau_sq = 0.1, lambda_tau_sq = 0.1, alpha_tau_sq = 0.1, A_tau_sq = 0.1)),
     tol_rel_obj = 0.001,
     #output_samples = 500,
-    output_samples = 10, #using this to test locally (as I'm getting a crash using 500)
+    output_samples = 100, #using this to test locally (as I'm getting a crash using 500)
     #error = "continue", # Used it when getting the error - Chain 1 Exception: normal_rng: Location parameter[975276] is -inf, but must be finite! (in '/tmp/Rtmp8DI5YZ/model-2ad6dc5ec5b.stan', line 91, column 4 to column 33)
     format_df="parquet"
     #format="parquet"
