@@ -43,7 +43,7 @@ tar_option_set(packages = c("piggyback","cmdstanr", "posterior", "bayesplot", "t
                deployment="main")
 
 print("Setting env")
-Sys.setenv(HOME="/home/rstudio")
+#Sys.setenv(HOME="/home/rstudio")
 
 print("Setting cmdstan path")
 #cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1") #this is causing errors
