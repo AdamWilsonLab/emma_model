@@ -1,18 +1,18 @@
 print("Loading libraries")
 
-library(stantargets)
-library(targets)
-library(tarchetypes)
-library(tidyverse)
-library(arrow)
-library(piggyback)
-#library(plotly)
-# library(leaflet)
-#library(rnoaa)
-#remotes::install_github("ropensci/stantargets")
-# if(!"basemapR" %in% rownames(installed.packages())){
-#   devtools::install_github('Chrisjb/basemapR')
-# }
+  library(stantargets)
+  library(targets)
+  library(tarchetypes)
+  library(tidyverse)
+  library(arrow)
+  library(piggyback)
+  #library(plotly)
+  # library(leaflet)
+  #library(rnoaa)
+  #remotes::install_github("ropensci/stantargets")
+  # if(!"basemapR" %in% rownames(installed.packages())){
+  #   devtools::install_github('Chrisjb/basemapR')
+  # }
 
 print("Attempting to install needed packages")
 
@@ -27,31 +27,43 @@ print("Attempting to install needed packages")
 
 
 print("Sourcing files")
-source("scratch_code/report_generator.R") #this should be moved
-source("https://raw.githubusercontent.com/AdamWilsonLab/emma_envdata/main/R/robust_pb_download.R")
-# source all files in R folder
-lapply(list.files("R",pattern="[.]R",full.names = T), source)
+  source("scratch_code/report_generator.R") #this should be moved
+  source("https://raw.githubusercontent.com/AdamWilsonLab/emma_envdata/main/R/robust_pb_download.R")
+  # source all files in R folder
+  lapply(list.files("R",pattern="[.]R",full.names = T), source)
 
 
 print("Setting options")
-options(tidyverse.quiet = TRUE)
-options(clustermq.scheduler = "multicore")
+  options(tidyverse.quiet = TRUE)
+  options(clustermq.scheduler = "multicore")
 
-tar_option_set(packages = c("piggyback","cmdstanr", "posterior", "bayesplot", "tidyverse",
-                            "stringr","knitr","sf","stars","units","arrow","lubridate","stantargets",
-                            "doParallel","raster"),
-               deployment="main")
+  tar_option_set(packages = c("piggyback","cmdstanr", "posterior", "bayesplot", "tidyverse",
+                              "stringr","knitr","sf","stars","units","arrow","lubridate","stantargets",
+                              "doParallel","raster"),
+                 deployment="main")
 
-print("Setting env")
+#print("Setting env")
 #Sys.setenv(HOME="/home/rstudio")
 
-print("Setting cmdstan path")
+#print("Setting cmdstan path")
 #cmdstanr::set_cmdstan_path()#"/home/rstudio/.cmdstanr/cmdstan-2.28.1") #this is causing errors
 #cmdstanr::check_cmdstan_toolchain()
-cmdstanr::install_cmdstan()
 
-# tar_destroy(ask = F)
+# Install cmdstan if needed
 
+    if(!dir.exists(file.path(system(command = "echo $HOME", intern = TRUE),".cmdstan"))){
+
+      message("cmdstan installation not found, installing cmdstan")
+      cmdstanr::install_cmdstan()
+
+    }else{
+
+      message("cmdstan installation found, skipping installation")
+
+    }
+
+
+# tar_destroy(ask = F) #Uncomment this to destroy the targets objects
 
 
 # Testing and training time windows
@@ -60,10 +72,10 @@ cmdstanr::install_cmdstan()
   testing_window=c("2014-07-01","2022-01-01")
 
 # decide sampling proportion
-total_fynbos_pixels=348911
-#sample_proportion=round(18000/total_fynbos_pixels,2);sample_proportion # ~5% works on github actions
-#sample_proportion=round(34891/total_fynbos_pixels,2);sample_proportion # ~10% sample
-sample_proportion=.8;sample_proportion # ~10% sample
+  total_fynbos_pixels=348911
+  #sample_proportion=round(18000/total_fynbos_pixels,2);sample_proportion # ~5% works on github actions
+  #sample_proportion=round(34891/total_fynbos_pixels,2);sample_proportion # ~10% sample
+  sample_proportion=.8;sample_proportion # ~10% sample
 
 
 #tar_option_set(debug = "spatial_outputs")
