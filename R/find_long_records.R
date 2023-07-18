@@ -11,8 +11,8 @@ find_long_records <- function(env_files,
                               # age_range = c(2,10),
                               ndvi_prob = 0.8){
 
-  age_files <- open_dataset(sources = list.files("data/envdata","dynamic_parquet-time_since_fire",full=T))
-  ndvi_files <- open_dataset(sources = list.files("data/envdata","dynamic_parquet-ndvi",full=T))
+  age_files <- open_dataset(sources = list.files(env_files, "dynamic_parquet-time_since_fire",full=T))
+  ndvi_files <- open_dataset(sources = list.files(env_files, "dynamic_parquet-ndvi",full=T))
 
   # long_aged_pixels <-
   #   age_files  %>%

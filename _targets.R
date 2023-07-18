@@ -82,8 +82,11 @@ print("Setting options")
   total_fynbos_pixels=348911
   #sample_proportion=round(18000/total_fynbos_pixels,2);sample_proportion # ~5% works on github actions
   #sample_proportion=round(34891/total_fynbos_pixels,2);sample_proportion # ~10% sample
-  sample_proportion=.01;sample_proportion # ~10% sample
+  sample_proportion=.3;sample_proportion # ~10% sample
+  sample_proportion_prediction =.5
   output_samples = 10 #number of output samples to characterize the posterior
+
+
 
 #tar_option_set(debug = "spatial_outputs")
 
@@ -105,6 +108,7 @@ list(
                                max_years_to_first_fire = 2,
                                min_years_without_fire = 10,
                                ndvi_prob = 0.8)),
+
   tar_target(envdata,
              tidy_static_data(
                envdata_files,
@@ -114,6 +118,7 @@ list(
                #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
                sample_proportion= sample_proportion,
                long_pixels=long_pixels)),
+
   tar_target(envvars,c( #select and possibly rename envvars to be included in model
 #    "Mean_January_Precipitation" = "CHELSA_prec_01_V1.2_land.tif",
     "Mean_July_Precipitation" =  "CHELSA_prec_07_V1.2_land.tif",
@@ -151,7 +156,7 @@ list(
       predict=1)
   ),
 
-  # tried mcmc - 500 samples in ~12 hours
+  #tried mcmc - 500 samples in ~12 hours
   tar_stan_vb(
     model,
     stan_files = "postfire_season.stan",
@@ -170,7 +175,7 @@ list(
     format_df="parquet"
     #format="parquet"
   ),
-
+  #
   #Crashes locally, presumably due to memory.  Also may contain errors
     # tar_stan_mcmc(name = model_mcmc,
     #               stan_files = "postfire_season.stan",
@@ -218,7 +223,7 @@ list(
                #region=c(xmin = 18.3, xmax = 19.3, ymin = -34.3, ymax = -33.3), #core
                region=c(xmin = 0, xmax = 30, ymin = -36, ymax = -20), #whole region
                #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
-               sample_proportion= .2,
+               sample_proportion= sample_proportion_prediction,
                long_pixels=long_pixels_predict)),
   tar_target(
     data_predicting,
@@ -253,7 +258,7 @@ tar_stan_vb(
   pedantic=F,
   adapt_engaged=F,
   eta=0.11,
-  iter = 1000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
+  iter = 100000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
   garbage_collection=T,
   init = 0.5, #list(list(phi = 0.5, tau_sq = 0.1, gamma_tau_sq = 0.1, lambda_tau_sq = 0.1, alpha_tau_sq = 0.1, A_tau_sq = 0.1)),
   tol_rel_obj = 0.001,
