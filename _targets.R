@@ -270,20 +270,28 @@ tar_stan_vb(
 ),
 
 
+# Release model output
+
+  tar_target(
+    release_stan_outputs,
+    release_stan_objects(object_names = c("model_summary_postfire_season",
+                                          "model_w_pred_summary_postfire_season_predict")),
+    model_w_pred,
+    model
+  ),
+
+  tar_target(
+    release_html,
+    release_html_objects(file_names = "index.html",
+                         model_w_pred,
+                         model,
+                         report
+    )
+    ),
+
+
+
 # render report ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    tar_render(report, "index.Rmd")
-
-
-
- # tar_target(name = reports,
- #            command = generate_reports(output_directory = "reports/",
- #                                       temp_directory = "data/temp/",
- #                                       report_location = "report_prototype.rmd",
- #                                       model_results = model_results,
- #                                       model_prediction = model_prediction,
- #                                       spatial_outputs = spatial_outputs))
-
-
-
 
 )
