@@ -9,27 +9,27 @@ release_html_objects <- function(file_names = c("index.html"),
 ){
 
   # check/create release
-  
+
   assets <- pb_list(repo = "AdamWilsonLab/emma_model")
-  
-  if(!release %in% assets$tag){
-    
+
+  if(!tag %in% assets$tag){
+
     pb_new_release(repo = "AdamWilsonLab/emma_model",
                    tag = tag)
   }
 
   #iterative uploads
-  
+
   for(i in 1:length(file_names)){
-    
+
 
     pb_upload(file = file_names[i],
               repo = "AdamWilsonLab/emma_model",
               tag = tag)
-    
-  }  
-  
+
+  }
+
   return(Sys.Date())
-   
-  
+
+
 }
