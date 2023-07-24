@@ -2,6 +2,7 @@
 #' @author Brian S Maitner
 #' @note Most targets objects can be loaded just fine as RDS files.  For some reason, the stan files are having issues.
 #' So, I'm trying a work-around here.
+#' @note: this issue is because stantargets uses other options than rds for saving.
 #' @note Also, this is designed for targets objects that are tables/dataframes
 
 release_stan_objects <- function(object_names = c("model_summary_postfire_season",
@@ -37,7 +38,7 @@ release_stan_objects <- function(object_names = c("model_summary_postfire_season
                                      paste(object_names[i],".gz.parquet", sep = "")),
                     compression = "gzip")
 
-      rm(list = objects[i])
+      rm(list = object_names[i])
 
       pb_upload(file = file.path(temp_directory,
                                  paste(object_names[i],".gz.parquet", sep = "")),
