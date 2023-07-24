@@ -7,7 +7,6 @@
 
 release_stan_objects <- function(object_names = c("model_summary_postfire_season",
                                                   "model_w_pred_summary_postfire_season_predict"),
-                                 temp_directory = "temp/objects",
                                  tag = "model_output",
                                  max_attempts = 10,
                                  sleep_time = 10,
