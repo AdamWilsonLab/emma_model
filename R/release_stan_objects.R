@@ -9,10 +9,14 @@ release_stan_objects <- function(object_names = c("model_summary_postfire_season
                                                   "model_w_pred_summary_postfire_season_predict"),
                                  temp_directory = "temp/objects",
                                  tag = "model_output",
+                                 max_attempts = 10,
+                                 sleep_time = 10,
+                                 temp_directory="data/temp/pb_upload"
                                  ...
                                  ){
 
   # create temp dir if needed
+
     if(!dir.exists(temp_directory)){
       dir.create(temp_directory,recursive = TRUE)
     }
@@ -31,28 +35,35 @@ release_stan_objects <- function(object_names = c("model_summary_postfire_season
 
     for(i in 1:length(object_names)){
 
-      tar_load(object_names[i])
-
-      write_parquet(x = get(object_names[i]),
-                    sink = file.path(temp_directory,
-                                     paste(object_names[i],".gz.parquet", sep = "")),
-                    compression = "gzip")
-
-      rm(list = object_names[i])
-
-      pb_upload(file = file.path(temp_directory,
-                                 paste(object_names[i],".gz.parquet", sep = "")),
-                repo = "AdamWilsonLab/emma_model",
-                tag = tag)
-
-      file.remove(file.path(temp_directory,
-                            paste(object_names[i],".gz.parquet", sep = "")))
+      # tar_load(object_names[i])
+      #
+      # write_parquet(x = get(object_names[i]),
+      #               sink = file.path(temp_directory,
+      #                                paste(object_names[i],".gz.parquet", sep = "")),
+      #               compression = "gzip")
+      #
+      # rm(list = object_names[i])
+      #
+      # robust_pb_upload(file = file.path(temp_directory,
+      #                                   paste(object_names[i],
+      #                                         ".gz.parquet", sep = "")),
+      #           repo = "AdamWilsonLab/emma_model",
+      #           tag = tag,
+      #           max_attempts = max_attempts,
+      #           sleep_time = sleep_time,
+      #           temp_directory = temp_directory)
+#
+#       file.remove(file.path(temp_directory,
+#                             paste(object_names[i],".gz.parquet", sep = "")))
 
 
       #Upload raw objects
-      pb_upload(file = file.path("_targets/objects/",object_names[i]),
-                repo = "AdamWilsonLab/emma_model",
-                tag = tag)
+      robust_pb_upload(file = file.path("_targets/objects/",object_names[i]),
+                       repo = "AdamWilsonLab/emma_model",
+                       tag = tag,
+                       max_attempts = max_attempts,
+                       sleep_time = sleep_time,
+                       temp_directory = temp_directory)
 
 
 

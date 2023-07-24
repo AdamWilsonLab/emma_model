@@ -283,12 +283,16 @@ tar_stan_vb(
 
   tar_target(
     release_html,
-    release_html_objects(file_names = "index.html",
-                         tag = "model_output",
-                         ... =  model_w_pred,
-                         ... =   model,
-                         ... =  report
-    )
+    robust_pb_upload(files = "index.html",
+                     repo = "AdamWilsonLab/emma_model",
+                     tag = "model_output",
+                     max_attempts = 10,
+                     sleep_time = 10,
+                     temp_directory = "data/temp/pb_upload",
+                     ... =  model_w_pred,
+                     ... =   model,
+                     ... =  report
+                     )
     ),
 
 
