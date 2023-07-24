@@ -20,7 +20,7 @@ release_stan_objects <- function(object_names = c("model_summary_postfire_season
 
     assets <- pb_list(repo = "AdamWilsonLab/emma_model")
 
-  if(!release %in% assets$tag){
+  if(!tag %in% assets$tag){
 
     pb_new_release(repo = "AdamWilsonLab/emma_model",
                    tag = tag)
