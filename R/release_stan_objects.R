@@ -10,7 +10,7 @@ release_stan_objects <- function(object_names = c("model_summary_postfire_season
                                  tag = "model_output",
                                  max_attempts = 10,
                                  sleep_time = 10,
-                                 temp_directory="data/temp/pb_upload"
+                                 temp_directory="data/temp/pb_upload",
                                  ...
                                  ){
 
