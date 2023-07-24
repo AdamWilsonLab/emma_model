@@ -275,9 +275,10 @@ tar_stan_vb(
   tar_target(
     release_stan_outputs,
     release_stan_objects(object_names = c("model_summary_postfire_season",
-                                          "model_w_pred_summary_postfire_season_predict")),
-    model_w_pred,
-    model
+                                          "model_w_pred_summary_postfire_season_predict"),
+                         ... = model_w_pred,
+                         ... = model
+    ),
   ),
 
   tar_target(
