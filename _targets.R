@@ -283,9 +283,10 @@ tar_stan_vb(
   tar_target(
     release_html,
     release_html_objects(file_names = "index.html",
-                         model_w_pred,
-                         model,
-                         report
+                         tag = "model_output",
+                         ... =  model_w_pred,
+                         ... =   model,
+                         ... =  report
     )
     ),
 
