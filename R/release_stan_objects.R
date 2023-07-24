@@ -26,8 +26,12 @@ release_stan_objects <- function(object_names = c("model_summary_postfire_season
 
   if(!tag %in% assets$tag){
 
-    pb_new_release(repo = "AdamWilsonLab/emma_model",
-                   tag = tag)
+    caught<-tryCatch(pb_new_release(repo = "AdamWilsonLab/emma_model",
+                   tag = tag),
+             error = function(e) e)
+
+    if(exists("caught")){rm(caught)}
+
   }
 
   #temporarily save objects
