@@ -82,8 +82,8 @@ print("Setting options")
   total_fynbos_pixels=348911
   #sample_proportion=round(18000/total_fynbos_pixels,2);sample_proportion # ~5% works on github actions
   #sample_proportion=round(34891/total_fynbos_pixels,2);sample_proportion # ~10% sample
-  sample_proportion=.3;sample_proportion # ~10% sample
-  sample_proportion_prediction =.5
+  sample_proportion=1;sample_proportion # ~10% sample
+  sample_proportion_prediction =1
   output_samples = 10 #number of output samples to characterize the posterior
 
 
