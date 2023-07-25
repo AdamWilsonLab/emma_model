@@ -16,23 +16,23 @@ release_stan_objects <- function(object_names = c("model_summary_postfire_season
 
   # create temp dir if needed
 
-    if(!dir.exists(temp_directory)){
-      dir.create(temp_directory,recursive = TRUE)
+    if(!dir.exists(file.path(temp_directory))){
+      dir.create(file.path(temp_directory),recursive = TRUE)
     }
 
   # check/create release
 
     assets <- pb_list(repo = "AdamWilsonLab/emma_model")
 
-  if(!tag %in% assets$tag){
+      if(!tag %in% assets$tag){
 
-    caught<-tryCatch(pb_new_release(repo = "AdamWilsonLab/emma_model",
-                   tag = tag),
-             error = function(e) e)
+        caught<-tryCatch(pb_new_release(repo = "AdamWilsonLab/emma_model",
+                       tag = tag),
+                 error = function(e) e)
 
-    if(exists("caught")){rm(caught)}
+        if(exists("caught")){rm(caught)}
 
-  }
+      }
 
   #temporarily save objects
 
@@ -68,6 +68,7 @@ release_stan_objects <- function(object_names = c("model_summary_postfire_season
       #Upload raw objects
 
       if(raw){
+
       robust_pb_upload(file = file.path("_targets/objects/",object_names[i]),
                        repo = "AdamWilsonLab/emma_model",
                        tag = tag,
@@ -81,7 +82,7 @@ release_stan_objects <- function(object_names = c("model_summary_postfire_season
 
     }
 
-  unlink(x = temp_directory,recursive = TRUE,force = TRUE)
+  unlink(x = file.path(temp_directory),recursive = TRUE,force = TRUE)
 
   return(Sys.Date())
 
