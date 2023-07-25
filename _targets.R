@@ -276,6 +276,10 @@ tar_stan_vb(
     release_stan_outputs,
     release_stan_objects(object_names = c("model_summary_postfire_season",
                                           "model_w_pred_summary_postfire_season_predict"),
+                         tag = "model_output",
+                         max_attempts = 10,
+                         sleep_time = 10,
+                         temp_directory="data/temp/pb_upload",
                          ... = model_w_pred,
                          ... = model
     ),
@@ -288,7 +292,7 @@ tar_stan_vb(
                      tag = "model_output",
                      max_attempts = 10,
                      sleep_time = 10,
-                     temp_directory = "data/temp/pb_upload",
+                     temp_directory = "data/temp/pb_upload/",
                      ... =  model_w_pred,
                      ... =   model,
                      ... =  report
