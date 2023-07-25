@@ -82,11 +82,11 @@ These parameters represent the relationship of the following environmental varia
 
 ```{r p1, echo=F, eval=T, warning=F, message=FALSE}
 
-betas=model_results %>% 
+betas <- model_results %>%
   filter(type=="beta")
 
 
-p1 <- ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
+p1 <- ggplot(betas, aes(y=xname, xmin=q5,x=median,xmax=q95))+
   geom_pointrange(fill="grey")+
   facet_wrap(~parameter,nrow=1)+
   geom_vline(xintercept=0,col="grey")+
@@ -195,13 +195,39 @@ Maps of spatial parameters in the model.
 
 rast=projectRaster(spatial_outputs,crs = "+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs")
 
-leaflet() %>% setView(lng = 18.577, lat = -33.998707, zoom = 10) %>% 
+library(leafem)
+
+leaflet() %>%
+  setView(lng = 18.577, lat = -33.998707, zoom = 10) %>% 
   addProviderTiles(providers$Esri.WorldImagery) %>% 
-  addRasterImage(rast[[1]],group=names(rast)[1]) %>% #, color = ~pal(values(rast)[,1]) 
-  addRasterImage(rast[[2]],group=names(rast)[2]) %>% 
-  addRasterImage(rast[[3]],group=names(rast)[3]) %>% 
-  addRasterImage(rast[[4]],group=names(rast)[4]) %>% 
-  addRasterImage(rast[[5]],group=names(rast)[5]) %>% 
+  
+  addRasterImage(rast[[1]],
+                 group=names(rast)[1],
+                 layerId = names(rast)[1]) %>% #, color = ~pal(values(rast)[,1]) 
+  addImageQuery(rast[[1]],
+                layerId = names(rast)[1]) %>% 
+  
+  addRasterImage(rast[[2]],
+                 group=names(rast)[2],
+                 layerId = names(rast)[2]) %>% 
+    addImageQuery(rast[[2]],
+                layerId = names(rast)[2]) %>% 
+
+  addRasterImage(rast[[3]],group=names(rast)[3],
+                 layerId = names(rast)[3]) %>%
+    addImageQuery(rast[[3]],
+                layerId = names(rast)[3]) %>% 
+
+  addRasterImage(rast[[4]],group=names(rast)[4],
+                 layerId = names(rast)[4]) %>%
+    addImageQuery(rast[[4]],
+                layerId = names(rast)[4]) %>% 
+
+  addRasterImage(rast[[5]],group=names(rast)[5],
+                 layerId = names(rast)[5]) %>%
+    addImageQuery(rast[[5]],
+                layerId = names(rast)[5]) %>% 
+
   addLayersControl(
     baseGroups = names(rast),
     options = layersControlOptions(collapsed = FALSE))  
