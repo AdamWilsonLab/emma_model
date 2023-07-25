@@ -8,11 +8,22 @@ release_stan_objects <- function(object_names = c("model_summary_postfire_season
                                  tag = "model_output",
                                  max_attempts = 10,
                                  sleep_time = 10,
-                                 temp_directory="data/temp/pb_upload",
+                                 temp_directory="data/temp/pb_upload/",
                                  parquet=TRUE,
                                  raw=TRUE,
                                  ...
                                  ){
+
+
+  #make sure directory ends in "/"
+    last_char <- substr(x = temp_directory,
+                        start = nchar(temp_directory),
+                        stop = nchar(temp_directory))
+
+    if(!last_char %in% c("/")){
+      message("directory does not end in /, which may cause problems")
+      }
+
 
   # create temp dir if needed
 
@@ -49,6 +60,7 @@ release_stan_objects <- function(object_names = c("model_summary_postfire_season
 
         rm(list = object_names[i])
 
+        #doesn't work
         robust_pb_upload(file = file.path(temp_directory,
                                           paste(object_names[i],
                                                 ".gz.parquet", sep = "")),
@@ -58,8 +70,18 @@ release_stan_objects <- function(object_names = c("model_summary_postfire_season
                   sleep_time = sleep_time,
                   temp_directory = temp_directory)
 
-              file.remove(file.path(temp_directory,
-                                    paste(object_names[i],".gz.parquet", sep = "")))
+
+        #delete the temp file if needed (may not be needed, depends on directory choices)
+
+          if(file.exists(file.path(temp_directory,
+                                   paste(object_names[i],".gz.parquet", sep = "")))){
+
+
+            file.remove(file.path(temp_directory,
+                                  paste(object_names[i],".gz.parquet", sep = "")))
+
+
+          }
 
       }#if parquet = TRUE
 

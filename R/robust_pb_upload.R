@@ -24,11 +24,6 @@ robust_pb_upload <- function(files,
     }
 
 
-  # ensure dir is empty if it exists
-    if(dir.exists(temp_directory)){
-      unlink(file.path(temp_directory),force = TRUE,recursive = TRUE)
-      }
-
   # create dir if needed
 
     if(!dir.exists(temp_directory)){dir.create(temp_directory,recursive = TRUE)}
@@ -41,7 +36,7 @@ robust_pb_upload <- function(files,
 
     message("attempting to upload file ", i, " of ",length(files),": ",files[i])
 
-    attempts <- 0
+    attempts <- 1
 
     while(attempts < max_attempts){
 
@@ -118,12 +113,16 @@ robust_pb_upload <- function(files,
     # and pause
       Sys.sleep(sleep_time)
 
+    #message if failed
+      if(attempts >= max_attempts){
+        message("Uploading file ",files[i] ," failed. Giving up.")
+
+      }
+
     }#while loop
   }# i files loop
 
 
-  # Clean up directory
-    unlink(file.path(temp_directory),recursive = TRUE,force = TRUE)
 
   return(as.character(Sys.Date()))
 
