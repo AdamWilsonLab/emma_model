@@ -279,7 +279,7 @@ tar_stan_vb(
                          tag = "model_output",
                          max_attempts = 10,
                          sleep_time = 10,
-                         temp_directory="data/temp/pb_upload",
+                         temp_directory="data/temp/pb_upload/",
                          ... = model_w_pred,
                          ... = model
     ),
