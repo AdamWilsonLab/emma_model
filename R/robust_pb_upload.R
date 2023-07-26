@@ -11,11 +11,11 @@ robust_pb_upload <- function(files,
 
   # check/create release
 
-    assets <- pb_list(repo = "AdamWilsonLab/emma_model")
+    assets <- pb_list(repo = repo)
 
     if(!tag %in% assets$tag){
 
-      caught<-tryCatch(pb_new_release(repo = "AdamWilsonLab/emma_model",
+      caught<-tryCatch(pb_new_release(repo = repo,
                                       tag = tag),
                        error = function(e) e)
 
