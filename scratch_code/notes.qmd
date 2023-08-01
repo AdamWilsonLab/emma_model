@@ -1,0 +1,38 @@
+---
+title: "notes"
+format: revealjs
+editor: visual
+---
+
+## Notes
+
+-   https://docs.google.com/document/d/1qcpiDIa1gkRcXAc-\_U00AyDwAp-l4M-TdvbOrg7lI5M/edit#heading=h.a071nddm0oal
+
+# Docker code for setup
+
+docker run -d -e DISABLE_AUTH=true -p 1984:8787 -v C:/Users/"Brian Maitner"/Desktop/current_projects/emma_model:/home/rstudio/emma_model adamwilsonlab/emma:latest
+
+```{r}
+
+system('docker run --name="emma_model" -d -e DISABLE_AUTH=true -p 1984:8787 -v C:/Users/"Brian Maitner"/Desktop/current_projects/emma_model:/home/rstudio/emma_model adamwilsonlab/emma:latest'
+)
+
+
+```
+
+# Setting up
+
+```{r,eval=FALSE}
+
+#setwd("emma_model/")
+#setwd("~/emma_model")
+#getwd()
+
+
+# gitcreds::gitcreds_set()
+targets::tar_make()
+
+
+```
+
+Note: When running in a cluster environment, make sure to update the permission for the .sh and .sbatch files

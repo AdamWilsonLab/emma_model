@@ -18,9 +18,12 @@ dyndata <- dynfiles  %>%
   filter(date>start_date & date<stop_date) %>%
   collect() %>%
   pivot_wider(names_from=variable,values_from=value,values_fn=first) %>% #not sure why ages are repeated twice in this
-  mutate(date=as_date(date),
-         ndvi=(ndvi/100)-1,
-         age=time_since_fire/365.23) %>% #convert age from days to years
+  mutate(
+        firemonth=ifelse(most_recent_burn_date==0,NA, #use median fire date
+                         month(as_date(most_recent_burn_date))),
+        date=as_date(date),
+        ndvi=(ndvi/100)-1,
+        age=time_since_fire/365.23) %>%  #convert age from days to years
   as_tibble()
 
 return(dyndata)
