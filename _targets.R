@@ -257,7 +257,7 @@ tar_stan_vb(
   data = stan_data_combined,
   quiet=T,
   pedantic=F,
-  adapt_engaged=F,
+  adapt_engaged=T,
   eta=0.11,
   iter = 100000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
   garbage_collection=T,
