@@ -260,7 +260,7 @@ tar_stan_vb(
   data = stan_data_combined,
   quiet=T,
   pedantic=F,
-  adapt_engaged=T,
+  adapt_engaged=F, #Chain 1 stan::variational::advi::adapt_eta: All proposed step-sizes failed. Your model may be either severely ill-conditioned or misspecified. Warning: Fitting finished unexpectedly! Use the $output() method for more information.
   eta=0.11,
   iter = 100000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
   garbage_collection=T,
