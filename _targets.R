@@ -82,9 +82,9 @@ print("Setting options")
   total_fynbos_pixels=348911
   #sample_proportion=round(18000/total_fynbos_pixels,2);sample_proportion # ~5% works on github actions
   #sample_proportion=round(34891/total_fynbos_pixels,2);sample_proportion # ~10% sample
-  sample_proportion=1;sample_proportion # ~10% sample
-  sample_proportion_prediction =1
-  output_samples = 10 #number of output samples to characterize the posterior
+  sample_proportion=.5;sample_proportion # ~10% sample
+  sample_proportion_prediction = .5
+  output_samples = 1000 #number of output samples to characterize the posterior
 
 
 
@@ -212,11 +212,11 @@ list(
 
 #set up prediction data
 
-  tar_target(long_pixels_predict,
-             find_long_records(env_files = envdata_files,
-                               max_years_to_first_fire = NULL,
-                               min_years_without_fire = NULL,
-                               ndvi_prob = 0)),
+  # tar_target(long_pixels_predict,
+  #            find_long_records(env_files = envdata_files,
+  #                              max_years_to_first_fire = NULL,
+  #                              min_years_without_fire = NULL,
+  #                              ndvi_prob = 0)),
   tar_target(envdata_predict,
              tidy_static_data(
                envdata_files,
@@ -225,16 +225,19 @@ list(
                region=c(xmin = 0, xmax = 30, ymin = -36, ymax = -20), #whole region
                #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
                sample_proportion= sample_proportion_prediction,
-               long_pixels=long_pixels_predict)),
+               long_pixels=long_pixels)),
+
   tar_target(
     data_predicting,
     filter_training_data(envdata_predict,envvars)
   ),
+
   tar_target(
     dyndata_predicting,
     tidy_dynamic_data(envdata_predict,
                       date_window=ymd(predicting_window))
   ),
+
   tar_target(
     stan_data_predict,
     create_stan_data(
@@ -243,13 +246,13 @@ list(
       fit=1,
       predict=1)
   ),
+
   tar_target(
     stan_data_combined,
     combine_stan_data(stan_data = stan_data,
                       stan_data_predict = stan_data_predict)
   ),
 
-# NOTE: for the prediction, alpha is just a random draw for now.  We need to either make this a function of the environment or else fit all pixels and use the fitted alphas.
 
 tar_stan_vb(
   model_w_pred,
@@ -300,7 +303,6 @@ tar_stan_vb(
   #                    ... =  report
   #                    )
   #   ),
-
 
 
 # render report ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
