@@ -35,6 +35,7 @@ print("Sourcing files")
     list.files("R",pattern="[.]R",full.names = T)%>%
     stringr::str_subset(c("R/detect_anomalies.R"), negate=TRUE)%>%
       stringr::str_subset(c("R/predict_the_future.R"), negate=TRUE)%>%
+      stringr::str_subset(c("R/predict_from_model.R"), negate=TRUE)%>%
     lapply( source)
 
 print("Setting options")
@@ -278,14 +279,16 @@ tar_stan_vb(
 
   tar_target(
     release_stan_outputs,
-    release_stan_objects(object_names = c(#"model_summary_postfire_season",
+    release_stan_objects(object_names = c("model_summary_postfire_season",
                                           "model_w_pred_summary_postfire_season_predict"),
                          tag = "model_output",
                          max_attempts = 10,
                          sleep_time = 10,
                          temp_directory="data/temp/pb_upload/",
                          ... = model_w_pred,
-                         ... = model
+                         ... = model,
+                         ... = model_summary_postfire_season,
+                         ...= model_w_pred_summary_postfire_season_predict
     ),
   )
 #,
