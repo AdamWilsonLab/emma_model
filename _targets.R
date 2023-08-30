@@ -159,44 +159,47 @@ list(
 
   #tried mcmc - 500 samples in ~12 hours
 #commenting this model out for now.  want to try the other version
-  # tar_stan_vb(
-  #   model,
-  #   stan_files = "postfire_season.stan",
-  #   data = stan_data,
-  #   quiet=T,
-  #   pedantic=F,
-  #   adapt_engaged=F,
-  #   eta=0.11,
-  #   iter = 1000000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
-  #   garbage_collection=T,
-  #   init = 0.5, #list(list(phi = 0.5, tau_sq = 0.1, gamma_tau_sq = 0.1, lambda_tau_sq = 0.1, alpha_tau_sq = 0.1, A_tau_sq = 0.1)),
-  #   tol_rel_obj = 0.001,
-  #   #output_samples = 500,
-  #   output_samples = output_samples, #use smaller numbers if running out of space.
-  #   #error = "continue", # Used it when getting the error - Chain 1 Exception: normal_rng: Location parameter[975276] is -inf, but must be finite! (in '/tmp/Rtmp8DI5YZ/model-2ad6dc5ec5b.stan', line 91, column 4 to column 33)
-  #   format_df="parquet"
-  #   #format="parquet"
-  # ),
-  #
+  tar_stan_vb(
+    model,
+    stan_files = "postfire_season.stan",
+    data = stan_data,
+    quiet=T,
+    pedantic=F,
+    adapt_engaged=F,
+    eta=0.11,
+    iter = 1000000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
+    garbage_collection=T,
+    init = 0.5, #list(list(phi = 0.5, tau_sq = 0.1, gamma_tau_sq = 0.1, lambda_tau_sq = 0.1, alpha_tau_sq = 0.1, A_tau_sq = 0.1)),
+    tol_rel_obj = 0.001,
+    #output_samples = 500,
+    output_samples = output_samples, #use smaller numbers if running out of space.
+    #error = "continue", # Used it when getting the error - Chain 1 Exception: normal_rng: Location parameter[975276] is -inf, but must be finite! (in '/tmp/Rtmp8DI5YZ/model-2ad6dc5ec5b.stan', line 91, column 4 to column 33)
+    format_df="parquet"
+    #format="parquet"
+  ),
+
   #Crashes locally, presumably due to memory.  Also may contain errors
-    tar_stan_mcmc(name = model_mcmc,
-                  stan_files = "postfire_season.stan",
-                  data = stan_data,
-                  quiet = FALSE,
-                  pedantic = FALSE,
-                  force_recompile = FALSE,
-                  init = 0.5,
-                  adapt_engaged = F,
-                  garbage_collection = T,
-                  format_df = "parquet",
-                  return_draws = FALSE,parallel_chains = 1),
+    # tar_stan_mcmc(name = model_mcmc,
+    #               stan_files = "postfire_season.stan",
+    #               data = stan_data,
+    #               quiet = FALSE,
+    #               pedantic = FALSE,
+    #               force_recompile = FALSE,
+    #               init = 0.5,
+    #               adapt_engaged = F,
+    #               garbage_collection = T,
+    #               format_df = "parquet",
+    #               return_draws = FALSE,parallel_chains = 1),
 
   tar_target(model_results,
              summarize_model_output(model_summary_postfire_season, stan_data, envdata)),
+
   tar_target(model_prediction,
             summarize_predictions(model_results,stan_data,envdata)),
+
  tar_target(spatial_outputs,
             create_spatial_outputs(envdata, envvars, model_results, data_training)),
+
  tar_target(name = release_outputs,
             command = release_model_outputs(model_results = model_results,
                                             spatial_outputs = spatial_outputs,
