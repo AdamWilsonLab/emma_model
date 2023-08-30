@@ -207,7 +207,8 @@ list(
               model_output,
               file="targets/objects/model_results",
               repo = "AdamWilsonLab/emma_model",
-              tag = "current")),
+              tag = "current",
+              ... = model_results)),
 
 # attempts to predict from fitted model ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
