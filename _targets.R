@@ -310,6 +310,7 @@ tar_target(
                        max_attempts = 10,
                        sleep_time = 10,
                        temp_directory="data/temp/pb_upload/",
+                       parquet=FALSE,
                        ... = model_w_pred,
                        ... = model,
                        ... = model_summary_postfire_season,
