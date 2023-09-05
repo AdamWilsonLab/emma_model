@@ -36,6 +36,7 @@ print("Sourcing files")
     stringr::str_subset(c("R/detect_anomalies.R"), negate=TRUE)%>%
       stringr::str_subset(c("R/predict_the_future.R"), negate=TRUE)%>%
       stringr::str_subset(c("R/predict_from_model.R"), negate=TRUE)%>%
+      stringr::str_subset(c("R/predict_from_model_draws.R"), negate=TRUE)%>%
     lapply( source)
 
 print("Setting options")
