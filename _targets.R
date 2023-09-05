@@ -281,10 +281,18 @@ tar_stan_vb(
 
 # Release model output
 
+# tar_load(model_results)
+# tar_load(model_draws_postfire_season)
+# tar_load(stan_data_predict)
+
+
   tar_target(
     release_stan_outputs,
     release_stan_objects(object_names = c("model_summary_postfire_season",
-                                          "model_w_pred_summary_postfire_season_predict"),
+                                          "model_w_pred_summary_postfire_season_predict",
+                                          "model_results",
+                                          "model_draws_postfire_season",
+                                          "stan_data_predict"),
                          tag = "model_output",
                          max_attempts = 10,
                          sleep_time = 10,
