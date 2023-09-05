@@ -317,20 +317,22 @@ tar_target(
   )
 
 ),
-tar_target(
-  release_model_draws,
-  release_stan_objects(object_names = c("model_draws_postfire_season"),
-                       tag = "model_output",
-                       max_attempts = 10,
-                       sleep_time = 10,
-                       temp_directory="data/temp/pb_upload/",
-                       ... = model_w_pred,
-                       ... = model,
-                       ... = model_summary_postfire_season,
-                       ...= model_w_pred_summary_postfire_season_predict
-  )
 
-),
+## the model draws are currently too large.  Need to make a smaller version (e.g., by only focusing on the needed parms)
+# tar_target(
+#   release_model_draws,
+#   release_stan_objects(object_names = c("model_draws_postfire_season"),
+#                        tag = "model_output",
+#                        max_attempts = 10,
+#                        sleep_time = 10,
+#                        temp_directory="data/temp/pb_upload/",
+#                        ... = model_w_pred,
+#                        ... = model,
+#                        ... = model_summary_postfire_season,
+#                        ...= model_w_pred_summary_postfire_season_predict
+#   )
+#
+# ),
 
 
 tar_target(
