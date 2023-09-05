@@ -292,7 +292,6 @@ tar_stan_vb(
     release_stan_outputs,
     release_stan_objects(object_names = c("model_summary_postfire_season",
                                           "model_w_pred_summary_postfire_season_predict",
-                                          "model_draws_postfire_season",
                                           "stan_data_predict"),
                          tag = "model_output",
                          max_attempts = 10,
@@ -305,6 +304,21 @@ tar_stan_vb(
     )
 
   ),
+tar_target(
+  release_model_draws,
+  release_stan_objects(object_names = c("model_draws_postfire_season"),
+                       tag = "model_output",
+                       max_attempts = 10,
+                       sleep_time = 10,
+                       temp_directory="data/temp/pb_upload/",
+                       ... = model_w_pred,
+                       ... = model,
+                       ... = model_summary_postfire_season,
+                       ...= model_w_pred_summary_postfire_season_predict
+  )
+
+),
+
 
 tar_target(
   release_model_results,
