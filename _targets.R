@@ -206,6 +206,7 @@ list(
                                             spatial_outputs = spatial_outputs,
                                             model_prediction = model_prediction,
                                             temp_directory = "data/temp/release/")),
+
  tar_target(release,
             release_posteriors(
               model_output,
@@ -291,7 +292,6 @@ tar_stan_vb(
     release_stan_outputs,
     release_stan_objects(object_names = c("model_summary_postfire_season",
                                           "model_w_pred_summary_postfire_season_predict",
-                                          "model_results",
                                           "model_draws_postfire_season",
                                           "stan_data_predict"),
                          tag = "model_output",
@@ -302,8 +302,24 @@ tar_stan_vb(
                          ... = model,
                          ... = model_summary_postfire_season,
                          ...= model_w_pred_summary_postfire_season_predict
-    ),
+    )
+
+  ),
+
+tar_target(
+  release_model_results,
+  release_stan_objects(object_names = c("model_results"),
+                       tag = "model_output",
+                       max_attempts = 10,
+                       sleep_time = 10,
+                       temp_directory="data/temp/pb_upload/",
+                       ... = model_w_pred,
+                       ... = model,
+                       ... = model_summary_postfire_season,
+                       ...= model_w_pred_summary_postfire_season_predict
   )
+
+)
 #,
 
   # tar_target(
