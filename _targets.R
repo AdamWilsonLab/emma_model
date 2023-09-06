@@ -380,7 +380,7 @@ tar_target(
 ),
 
 tar_target(
-  release_envdata,
+  release_data_training,
   release_stan_objects(object_names = c("data_training"),
                        tag = "model_output",
                        max_attempts = 10,
