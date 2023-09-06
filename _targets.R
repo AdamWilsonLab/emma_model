@@ -363,6 +363,20 @@ tar_target(
                        ...= model_w_pred_summary_postfire_season_predict
   )
 
+),
+tar_target(
+  release_envdata,
+  release_stan_objects(object_names = c("envdata","envdata_predict"),
+                       tag = "model_output",
+                       max_attempts = 10,
+                       sleep_time = 10,
+                       temp_directory="data/temp/pb_upload/",
+                       ... = model_w_pred,
+                       ... = model,
+                       ... = model_summary_postfire_season,
+                       ...= model_w_pred_summary_postfire_season_predict
+  )
+
 )
 
 #,
