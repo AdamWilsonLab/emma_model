@@ -1,5 +1,5 @@
 # Summarize posteriors
-summarize_model_output <- function(model_summary,stan_data, data){
+summarize_model_output <- function(model_summary,stan_data, data, ...){
   #posterior predictive
 
   beta_names<-data.frame(

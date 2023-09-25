@@ -14,14 +14,15 @@
   # SD NDVI
 
 
-tar_load(model_results)
-tar_load(stan_data_predict)
+#tar_load(model_results)
+#tar_load(stan_data_predict)
 
 
 predict_from_model <- function(model_results,
                                data_predicting,
                                n_hyperparameter_draws = 10,
-                               n_parameter_draws = 10){
+                               n_parameter_draws = 10,
+                               return_parms = TRUE){
 
   #First, get the needed parameters and uncertainty
 
@@ -81,11 +82,13 @@ predict_from_model <- function(model_results,
 
   alpha_mu <-
     model_results %>%
-    filter(grepl(pattern = "alpha_mu",x = variable,fixed = TRUE))
+    filter(grepl(pattern = "alpha_mu",
+                 x = variable,fixed = TRUE))
 
   alpha_tau <-
     model_results %>%
-    filter(grepl(pattern = "alpha_tau$",x = variable,fixed = FALSE))
+    filter(grepl(pattern = "alpha_tau$",
+                 x = variable,fixed = FALSE))
 
 
   # Calculating A
@@ -110,6 +113,13 @@ predict_from_model <- function(model_results,
 
   # create output data.frame
     out_df <- matrix(nrow = length(stan_data_predict$y_cellID),ncol = n_hyperparameter_draws * n_parameter_draws)
+
+  if(return_parms){
+    parms_df <- NULL
+    betas_df <- NULL
+    taus_df <- NULL
+    mus_df <- NULL
+  }
 
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -173,6 +183,35 @@ predict_from_model <- function(model_results,
       mutate(draw = rnorm(n=1,mean=mean,sd=sd)) %>% pull(draw) -> alpha_tau_h
 
 
+    if(return_parms){
+
+      hp_df <- data.frame (A_beta = A_beta_h$draw,
+                           gamma_beta = gamma_beta_h$draw,
+                           lambda_beta = lambda_beta_h$draw)%>%
+        mutate(var=names(data_predicting$x))%>%
+        pivot_longer(c(A_beta,gamma_beta,lambda_beta))
+
+      t_df <- data.frame (A_tau = A_tau_h,
+                          gamma_tau = gamma_tau_h,
+                          lambda_tau = lambda_tau_h,
+                          alpha_tau=alpha_tau_h)%>%
+        mutate(h_rep = h)%>%
+        pivot_longer(c(A_tau,gamma_tau,lambda_tau,alpha_tau))
+
+      m_df <-
+      data.frame (cellID = stan_data_predict$x_cellID,
+                  gamma_mu = t(gamma_mu_h),
+                  lambda_mu = t(lambda_mu_h),
+                  A_mu = t(A_mu_h),
+                  alpha_mu = alpha_mu_h)
+
+
+      betas_df <- bind_rows(betas_df,hp_df)
+      taus_df <- bind_rows(taus_df,t_df)
+      mus_df <-bind_rows(mus_df,m_df)
+
+    }
+
     for(p in 1:n_parameter_draws){
 
       # alpha ~ lognormal(alpha_mu, alpha_tau);
@@ -182,9 +221,10 @@ predict_from_model <- function(model_results,
       # phi  ~ uniform(-3.141593,3.141593);
 
 
-      alpha_p <- rlnorm(n = 1,
+      alpha_p <- rlnorm(n = length(stan_data_predict$x_cellID),
                         meanlog = alpha_mu_h,
                         sdlog = alpha_tau_h)
+
 
       gamma_p <-
         data.frame(gamma_mu = t(gamma_mu_h),
@@ -265,13 +305,18 @@ predict_from_model <- function(model_results,
 
       out_df[,((h-1)*n_parameter_draws)+p] <- prediction_stuff$mu
 
+      if(return_parms){
+
+        parms_df <- bind_rows(parms_df,model_parms)
+      }
+
 
     } # end p loop
 
   } #end hyperparm loop
 
 
-  temp_means <- rowMeans(out_df)
+  #temp_means <- rowMeans(out_df)
 
     # hist(log10(temp_means)) #looks waaay wrong
 
@@ -284,16 +329,26 @@ predict_from_model <- function(model_results,
 
     # correlations with real data
 
-      stan_data_predict$y_obs
-      plot(x = stan_data_predict$y_obs,
-          y = log10(temp_means))
+      # stan_data_predict$y_obs
+      # plot(x = stan_data_predict$y_obs,
+      #     y = log10(temp_means))
+      #
+      # plot(x = stan_data_predict$y_obs,
+      #      y = temp_means#,ylim=c(0,1)
+      #      )
 
-      plot(x = stan_data_predict$y_obs,
-           y = temp_means,ylim=c(-100,100))
+    if(return_parms){
+
+      output <- list(out_df,parms_df,betas_df,taus_df,mus_df)
+      names(output) <- c("ndvi_mus","model_parms","betas","taus","mus")
+    }else{
+      output <- list(out_df)
+      names(output) <- c("ndvi_mus")
+    }
 
 
+    return(output)
 
-  return(out_df)
 
 }#end fx
 

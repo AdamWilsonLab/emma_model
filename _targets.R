@@ -84,9 +84,14 @@ print("Setting options")
   total_fynbos_pixels=348911
   #sample_proportion=round(18000/total_fynbos_pixels,2);sample_proportion # ~5% works on github actions
   #sample_proportion=round(34891/total_fynbos_pixels,2);sample_proportion # ~10% sample
+
+  # sample_proportion=.5;sample_proportion # ~10% sample
+  # sample_proportion_prediction = .5
+  # output_samples = 100 #number of output samples to characterize the posterior
   sample_proportion=.5;sample_proportion # ~10% sample
-  sample_proportion_prediction = .5
+  sample_proportion_prediction = .1
   output_samples = 100 #number of output samples to characterize the posterior
+
 
 
 
@@ -162,7 +167,7 @@ list(
 #commenting this model out for now.  want to try the other version
   tar_stan_vb(
     model,
-    stan_files = "postfire_season.stan",
+    stan_files = "postfire_season2.stan",
     data = stan_data,
     quiet=T,
     pedantic=F,
@@ -193,7 +198,7 @@ list(
     #               return_draws = FALSE,parallel_chains = 1),
 
   tar_target(model_results,
-             summarize_model_output(model_summary_postfire_season, stan_data, envdata)),
+             summarize_model_output(model_summary_postfire_season2, stan_data, envdata)),
 
   tar_target(model_prediction,
             summarize_predictions(model_results,stan_data,envdata)),
@@ -224,62 +229,63 @@ list(
   #                              max_years_to_first_fire = NULL,
   #                              min_years_without_fire = NULL,
   #                              ndvi_prob = 0)),
-  tar_target(envdata_predict,
-             tidy_static_data(
-               envdata_files,
-               remnant_distance=2, #drop pixels within this distance of remnant edge (km)
-               #region=c(xmin = 18.3, xmax = 19.3, ymin = -34.3, ymax = -33.3), #core
-               region=c(xmin = 0, xmax = 30, ymin = -36, ymax = -20), #whole region
-               #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
-               sample_proportion= sample_proportion_prediction,
-               long_pixels=long_pixels)),
+  # tar_target(envdata_predict,
+  #            tidy_static_data(
+  #              envdata_files,
+  #              remnant_distance=2, #drop pixels within this distance of remnant edge (km)
+  #              #region=c(xmin = 18.3, xmax = 19.3, ymin = -34.3, ymax = -33.3), #core
+  #              region=c(xmin = 0, xmax = 30, ymin = -36, ymax = -20), #whole region
+  #              #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
+  #              sample_proportion= sample_proportion_prediction,
+  #              long_pixels=long_pixels)),
+  #
+  # tar_target(
+  #   data_predicting,
+  #   filter_training_data(envdata_predict,envvars)
+  # ),
+  #
+  # tar_target(
+  #   dyndata_predicting,
+  #   tidy_dynamic_data(envdata_predict,
+  #                     date_window=ymd(predicting_window))
+  # ),
 
-  tar_target(
-    data_predicting,
-    filter_training_data(envdata_predict,envvars)
-  ),
+  # tar_target(
+  #   stan_data_predict,
+  #   create_stan_data(
+  #     data=data_predicting,
+  #     dyndata=dyndata_predicting,
+  #     fit=1,
+  #     predict=1)
+  # ),
 
-  tar_target(
-    dyndata_predicting,
-    tidy_dynamic_data(envdata_predict,
-                      date_window=ymd(predicting_window))
-  ),
-
-  tar_target(
-    stan_data_predict,
-    create_stan_data(
-      data=data_predicting,
-      dyndata=dyndata_predicting,
-      fit=1,
-      predict=1)
-  ),
-
-  tar_target(
-    stan_data_combined,
-    combine_stan_data(stan_data = stan_data,
-                      stan_data_predict = stan_data_predict)
-  ),
+  # tar_target(
+  #   stan_data_combined,
+  #   combine_stan_data(stan_data = stan_data,
+  #                     stan_data_predict = stan_data_predict)
+  # ),
 
 
-tar_stan_vb(
-  model_w_pred,
-  stan_files = "postfire_season_predict.stan",
-  data = stan_data_combined,
-  quiet=T,
-  pedantic=F,
-  adapt_engaged=F, #Chain 1 stan::variational::advi::adapt_eta: All proposed step-sizes failed. Your model may be either severely ill-conditioned or misspecified. Warning: Fitting finished unexpectedly! Use the $output() method for more information.
-  eta=0.11,
-  iter = 100000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
-  garbage_collection=T,
-  init = 0.5, #list(list(phi = 0.5, tau_sq = 0.1, gamma_tau_sq = 0.1, lambda_tau_sq = 0.1, alpha_tau_sq = 0.1, A_tau_sq = 0.1)),
-  tol_rel_obj = 0.001,
-  #output_samples = 500,
-  output_samples = output_samples, #use smaller numbers if running out of space.
-  #error = "continue", # Used it when getting the error - Chain 1 Exception: normal_rng: Location parameter[975276] is -inf, but must be finite! (in '/tmp/Rtmp8DI5YZ/model-2ad6dc5ec5b.stan', line 91, column 4 to column 33)
-  format_df="parquet"
-  #format="parquet"
-),
-
+# tar_stan_vb(
+#   model_w_pred,
+#   #stan_files = "postfire_season_predict.stan",
+#   stan_files = "postfire_season_predict2.stan",
+#   data = stan_data_combined,
+#   quiet=T,
+#   pedantic=F,
+#   adapt_engaged=F, #Chain 1 stan::variational::advi::adapt_eta: All proposed step-sizes failed. Your model may be either severely ill-conditioned or misspecified. Warning: Fitting finished unexpectedly! Use the $output() method for more information.
+#   eta=0.11,
+#   iter = 100000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
+#   garbage_collection=T,
+#   init = 0.5, #list(list(phi = 0.5, tau_sq = 0.1, gamma_tau_sq = 0.1, lambda_tau_sq = 0.1, alpha_tau_sq = 0.1, A_tau_sq = 0.1)),
+#   tol_rel_obj = 0.001,
+#   #output_samples = 500,
+#   output_samples = output_samples, #use smaller numbers if running out of space.
+#   #error = "continue", # Used it when getting the error - Chain 1 Exception: normal_rng: Location parameter[975276] is -inf, but must be finite! (in '/tmp/Rtmp8DI5YZ/model-2ad6dc5ec5b.stan', line 91, column 4 to column 33)
+#   format_df="parquet"
+#   #format="parquet"
+# ),
+#
 
 # Release model output
 
@@ -290,34 +296,37 @@ tar_stan_vb(
 
   tar_target(
     release_stan_outputs,
-    release_stan_objects(object_names = c("model_summary_postfire_season",
-                                          "model_w_pred_summary_postfire_season_predict"),
+    release_stan_objects(object_names = c("model_summary_postfire_season2"),
                          tag = "model_output",
                          max_attempts = 10,
                          sleep_time = 10,
                          temp_directory="data/temp/pb_upload/",
-                         ... = model_w_pred,
                          ... = model,
-                         ... = model_summary_postfire_season,
-                         ...= model_w_pred_summary_postfire_season_predict
+                         ... = model_summary_postfire_season2
     )
 
   ),
-tar_target(
-  release_stan_data_predict,
-  release_stan_objects(object_names = c("stan_data_predict"),
-                       tag = "model_output",
-                       max_attempts = 10,
-                       sleep_time = 10,
-                       temp_directory="data/temp/pb_upload/",
-                       parquet=FALSE,
-                       ... = model_w_pred,
-                       ... = model,
-                       ... = model_summary_postfire_season,
-                       ...= model_w_pred_summary_postfire_season_predict
-  )
 
-),
+# tar_target(model_results_predict,
+#            summarize_model_output(model_w_pred_summary_postfire_season_predict2,
+#                                   stan_data_combined,
+#                                   envdata_predict)),
+
+# tar_target(
+#   release_stan_data_predict,
+#   release_stan_objects(object_names = c("stan_data_predict"),
+#                        tag = "model_output",
+#                        max_attempts = 10,
+#                        sleep_time = 10,
+#                        temp_directory="data/temp/pb_upload/",
+#                        parquet=FALSE,
+#                        ... = model_w_pred,
+#                        ... = model,
+#                        ... = model_summary_postfire_season,
+#                        ...= model_w_pred_summary_postfire_season_predict2
+#   )
+#
+# ),
 
 ## the model draws are currently too large.  Need to make a smaller version (e.g., by only focusing on the needed parms)
 # tar_target(
@@ -343,10 +352,9 @@ tar_target(
                        max_attempts = 10,
                        sleep_time = 10,
                        temp_directory="data/temp/pb_upload/",
-                       ... = model_w_pred,
                        ... = model,
                        ... = model_summary_postfire_season,
-                       ...= model_w_pred_summary_postfire_season_predict
+                       ... = model_results
   )
 
 ),
@@ -357,24 +365,22 @@ tar_target(
                        max_attempts = 10,
                        sleep_time = 10,
                        temp_directory="data/temp/pb_upload/",
-                       ... = model_w_pred,
                        ... = model,
                        ... = model_summary_postfire_season,
-                       ...= model_w_pred_summary_postfire_season_predict
+                       ... = model_prediction
   )
 
 ),
 tar_target(
   release_envdata,
-  release_stan_objects(object_names = c("envdata","envdata_predict"),
+  release_stan_objects(object_names = c("envdata"),
                        tag = "model_output",
                        max_attempts = 10,
                        sleep_time = 10,
                        temp_directory="data/temp/pb_upload/",
-                       ... = model_w_pred,
                        ... = model,
                        ... = model_summary_postfire_season,
-                       ...= model_w_pred_summary_postfire_season_predict
+                       ... = envdata
   )
 
 ),
@@ -386,10 +392,9 @@ tar_target(
                        max_attempts = 10,
                        sleep_time = 10,
                        temp_directory="data/temp/pb_upload/",
-                       ... = model_w_pred,
                        ... = model,
                        ... = model_summary_postfire_season,
-                       ...= model_w_pred_summary_postfire_season_predict
+                       ... = data_training
   )
 
 )
