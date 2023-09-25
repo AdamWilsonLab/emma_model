@@ -1,6 +1,6 @@
 # Spatial Predictions
 
-create_spatial_outputs <- function(envdata, envvars, model_results,data_training) {
+create_spatial_outputs <- function(envdata, envvars, model_results, data_training) {
 
   td <- envdata %>%
     left_join(dplyr::select(data_training, cellID, pid))
@@ -19,9 +19,8 @@ create_spatial_outputs <- function(envdata, envvars, model_results,data_training
 
   # get the template raster to align the predictions
   template="data/template.tif"
-  if(!file.exists(template))
-    download.file("https://github.com/AdamWilsonLab/emma_envdata/releases/download/processed_static/template.tif",destfile=template)
-  domain=raster(template)
+  if(!file.exists(template)){download.file("https://github.com/AdamWilsonLab/emma_envdata/releases/download/processed_static/template.tif",destfile=template)}
+  domain=raster::raster(template)
 
   vmat=left_join(data.frame(cellID=values(domain)),
                  dplyr::select(td,cellID, gamma, lambda, A,RT)) %>%
