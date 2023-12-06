@@ -12,6 +12,11 @@ create_spatial_outputs <- function(envdata, envvars, model_results, data_trainin
     mutate(term=sub("_.*$","",parameter)) %>%
     dplyr::select(term,median,xname)
 
+  if(nrow(betas)==0){
+    message("beta parameters not found")
+    return(invisible(NULL))
+    }
+
   td$gamma = as.vector(xmat%*%filter(betas,term=="gamma")$median)
   td$lambda = as.vector(xmat%*%filter(betas,term=="lambda")$median)
   td$A = as.vector(xmat%*%filter(betas,term=="A")$median)
