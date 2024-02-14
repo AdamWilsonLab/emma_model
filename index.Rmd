@@ -29,22 +29,49 @@ We estimate the age of a site by calculating the years since the last fire. We t
 
 ## Input data
 
+```{r, echo=FALSE}
+
+#get useful stats
+
+tar_load(envdata_predict)
+tar_load(stan_data_predict)
+
+fitting_domain_pixels <- length(which(envdata$model_domain))
+
+fitting_domain_long_pixels <- length(which(!is.na(envdata$long)& 
+                                          envdata$model_domain))
+
+predicting_domain_pixels <- length(which(envdata_predict$model_domain))
+
+predicting_domain_long_pixels <- length(which(!is.na(envdata_predict$long)& 
+                                          envdata_predict$model_domain))
+
+rm(envdata_predict)
+
+```
+
+
+
 The model was last fit on `r now()`.
 
-This version of the model was fit with `r filter(envdata,training) %>% nrow()` pixels including data from `r as_date(range(stan_data$y_date))[1]` to `r as_date(range(stan_data$y_date))[2]`.
+This version of the model was fit with `r filter(envdata,training) %>% nrow()` pixels including data from `r as_date(range(stan_data$y_date))[1]` to `r as_date(range(stan_data$y_date))[2]`. `r stan_data$J` out of `r predicting_domain_pixels` predicting domain pixels were used in model fitting (`r round(stan_data$J/predicting_domain_pixels,digits = 2)*100`%). Predictions were made for `r stan_data_predict$J` out of `r predicting_domain_pixels` prediction domain pixels (`r round(stan_data_predict$J/predicting_domain_pixels,digits = 2)*100`%).
 
 ## Workflow
 
 This repository was developed using the Targets framework.
 
-```{r, echo=F, eval=T, message=F, include=T, results="asis"}
+```{r, echo=F, eval=T, message=F, include=F, results="asis"}
 #tfile=paste0(tempfile(),".html")
-targets::tar_visnetwork() #%>% 
+test<-targets::tar_visnetwork() #%>% 
 #  htmlwidgets::saveWidget(file = tfile)
 #webshot::install_phantomjs()
 #webshot::webshot(tfile, "network.png")
 #![targets_network](network.png)
 
+```
+
+```{r, echo=FALSE}
+test
 ```
 
 ## Results
@@ -54,16 +81,18 @@ targets::tar_visnetwork() #%>%
 These parameters represent the relationship of the following environmental variables to the recovery trajectory.
 
 ```{r p1, echo=F, eval=T, warning=F, message=FALSE}
-betas=model_results %>% 
+
+betas <- model_results %>%
   filter(type=="beta")
 
 
-p1<-ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
+p1 <- ggplot(betas, aes(y=xname, xmin=q5,x=median,xmax=q95))+
   geom_pointrange(fill="grey")+
   facet_wrap(~parameter,nrow=1)+
   geom_vline(xintercept=0,col="grey")+
   xlab("Beta (regression coefficient +/- 95% CI)")+
   ylab("Environmental Variable") 
+
 ggplotly(p1)
 
 ```
@@ -73,6 +102,7 @@ ggplotly(p1)
 The plot below illustrates some example recovery trajectories. It currently just shows the top 20 cells with the most observations.
 
 ```{r plot, echo=F, eval=T, message=FALSE,fig.height=12}
+
 cells_with_long_records<-
   model_prediction %>% 
   group_by(cellID) %>% 
@@ -89,6 +119,7 @@ model_prediction %>%
   facet_wrap(~cellID) +
   labs(x="time since fire (years)",y="NDVI") +
   theme_bw()
+
 ```
 
 ```{r, echo=F, eval=F}
@@ -111,6 +142,7 @@ model_prediction %>%
   facet_wrap(~cellID) +
   labs(x="time since fire (years)",y="NDVI") +
   theme_bw()
+
 ```
 
 ## Model Performance
@@ -118,6 +150,7 @@ model_prediction %>%
 Compare estimated vs observed values for all pixels. This is not true validation - these pixels were included in the model fitting.
 
 ```{r, message=F, echo=F}
+
 model_prediction %>% 
   ggplot(aes(x=median,y=y_obs)) +
   geom_hex(bins=30)+
@@ -131,6 +164,27 @@ model_prediction %>%
       ) +
   theme_bw()+
   coord_equal()
+
+```
+
+
+```{r, echo=FALSE}
+
+tar_load(model_w_pred_summary_postfire_season_predict)
+
+# Generating a plot of the alphas
+model_w_pred_summary_postfire_season_predict %>%
+  filter(grepl(pattern = "alpha[",fixed = TRUE,x=variable))-> alphas
+
+
+alpha_rast <- spatial_outputs[[1]]
+alpha_rast[1:ncell(alpha_rast)] <- NA
+alpha_rast[stan_data$x_cellID] <- alphas$mean 
+names(alpha_rast) <- "alpha" 
+
+spatial_outputs <- stack(spatial_outputs,alpha_rast)
+
+rm(model_w_pred_summary_postfire_season_predict)
 ```
 
 ## Spatial Predictions
@@ -141,12 +195,39 @@ Maps of spatial parameters in the model.
 
 rast=projectRaster(spatial_outputs,crs = "+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs")
 
-leaflet() %>% setView(lng = 18.577, lat = -33.998707, zoom = 10) %>% 
+library(leafem)
+
+leaflet() %>%
+  setView(lng = 18.577, lat = -33.998707, zoom = 10) %>% 
   addProviderTiles(providers$Esri.WorldImagery) %>% 
-  addRasterImage(rast[[1]],group=names(rast)[1]) %>% #, color = ~pal(values(rast)[,1]) 
-  addRasterImage(rast[[2]],group=names(rast)[2]) %>% 
-  addRasterImage(rast[[3]],group=names(rast)[3]) %>% 
-  addRasterImage(rast[[4]],group=names(rast)[4]) %>% 
+  
+  addRasterImage(rast[[1]],
+                 group=names(rast)[1],
+                 layerId = names(rast)[1]) %>% #, color = ~pal(values(rast)[,1]) 
+  addImageQuery(rast[[1]],
+                layerId = names(rast)[1]) %>% 
+  
+  addRasterImage(rast[[2]],
+                 group=names(rast)[2],
+                 layerId = names(rast)[2]) %>% 
+    addImageQuery(rast[[2]],
+                layerId = names(rast)[2]) %>% 
+
+  addRasterImage(rast[[3]],group=names(rast)[3],
+                 layerId = names(rast)[3]) %>%
+    addImageQuery(rast[[3]],
+                layerId = names(rast)[3]) %>% 
+
+  addRasterImage(rast[[4]],group=names(rast)[4],
+                 layerId = names(rast)[4]) %>%
+    addImageQuery(rast[[4]],
+                layerId = names(rast)[4]) %>% 
+
+  addRasterImage(rast[[5]],group=names(rast)[5],
+                 layerId = names(rast)[5]) %>%
+    addImageQuery(rast[[5]],
+                layerId = names(rast)[5]) %>% 
+
   addLayersControl(
     baseGroups = names(rast),
     options = layersControlOptions(collapsed = FALSE))  

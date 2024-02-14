@@ -21,6 +21,7 @@ library(doParallel)
 library(raster)
 library(lubridate)
 library(sf)
+library(rnoaa)
 
 # load data saved in the pipeline
   tar_load(c(envdata, stan_data, model_results, spatial_outputs,model_prediction)) 
@@ -74,16 +75,18 @@ This repository was developed using the Targets framework as follows.
 These parameters represent the relationship of the following environmental variables to the recovery trajectory.
 
 ```{r p1, echo=F, eval=T, warning=F, message=FALSE}
-betas=model_results %>% 
+
+betas <- model_results %>% 
   filter(type=="beta")
 
 
-p1<-ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
+p1 <- ggplot(betas,aes(y=xname, xmin=q5,x=median,xmax=q95))+
   geom_pointrange(fill="grey")+
   facet_wrap(~parameter,nrow=1)+
   geom_vline(xintercept=0,col="grey")+
   xlab("Beta (regression coefficient +/- 95% CI)")+
-  ylab("Environmental Variable") 
+  ylab("Environmental Variable")
+
 ggplotly(p1)
 
 ```
@@ -94,6 +97,7 @@ ggplotly(p1)
 The plot below illustrates some example recovery trajectories. It currently just shows the top 20 cells with the most observations.
 
 ```{r plot, echo = F, eval = TRUE, message = FALSE, fig.height = 12}
+
 cells_with_long_records<-
   model_prediction %>% 
   group_by(cellID) %>% 
@@ -110,6 +114,7 @@ model_prediction %>%
   facet_wrap(~cellID) +
   labs(x="time since fire (years)",y="NDVI") +
   theme_bw()
+
 ```
 
 
@@ -118,7 +123,8 @@ model_prediction %>%
 Maps of spatial parameters in the model.  
 
 ```{r compare_data2, echo = F, eval = TRUE, warning = F, message = FALSE}
-rast=projectRaster(spatial_outputs,crs = "+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs")
+
+rast <- projectRaster(spatial_outputs,crs = "+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs")
 
 leaflet() %>% setView(lng = 18.577, lat = -33.998707, zoom = 10) %>% 
   addProviderTiles(providers$Esri.WorldImagery) %>% 
@@ -287,7 +293,6 @@ bbox <- st_bbox(focal_wgs) %>%
 
 ```{r ndvi_and_burns, fig.width = 10, fig.height = 7, echo = FALSE, warning = FALSE, message = FALSE}
 
-
   leaflet(data = focal_wgs) %>%
   addProviderTiles("Esri.NatGeoWorldMap", group = "NatGeo") %>%
     #addProviderTiles("NASAGIBS.ModisTerraTrueColorCR", group = "True Colors") %>%
@@ -326,9 +331,6 @@ bbox <- st_bbox(focal_wgs) %>%
     overlayGroups = c("NDVI", "Fire Outlines","Fires", "Park"),
     options = layersControlOptions(collapsed = FALSE),position = "topright") %>%
   fitBounds(bbox[1], bbox[2], bbox[3], bbox[4])
-
-
-
 
 ```
 
@@ -388,5 +390,122 @@ Figure X. Leaflet map showing NDVI and the number of years since the most recent
   
   
 ```
+
+
+### Climate Data
+
+```{r precip, fig.width = 10, echo = FALSE, warning = FALSE, message = FALSE}
+
+#construct needed bounding box
+  bb1 <- focal_wgs %>%st_bbox()
+  class(bb1) <- "numeric"
+
+# get climate data.  Currently set to grab climate data starting from one day before, using 2 days if that fails.
+  #If we fun into errors in the future, this could be turned into a "while" loop.
+  
+  
+focal_arc <- 
+  tryCatch(expr = arc2(date = seq(Sys.Date() - (time_window_days+1), Sys.Date() - 1, "days"),
+                    box = bb1) %>%
+                bind_rows(), error = function(e){
+                  
+                  arc2(date = seq(Sys.Date() - (time_window_days+2), Sys.Date() - 2, "days"),
+                    box = bb1) %>%
+                bind_rows()
+
+                })
+
+
+#in case the park is too small to show up, enlarge the bounding box until some data shows up  
+
+  if(nrow(focal_arc) == 0){
+    
+    while(nrow(focal_arc)==0){
+      
+      bb1[1] <- bb1[1] - 0.5
+      bb1[2] <- bb1[2] - 0.5
+      bb1[3] <- bb1[3] + 0.5
+      bb1[4] <- bb1[4] + 0.5
+      
+      
+      focal_arc <- 
+  tryCatch(expr = arc2(date = seq(Sys.Date() - (time_window_days+1), Sys.Date() - 1, "days"),
+                    box = bb1) %>%
+                bind_rows(), error = function(e){
+                  
+                  arc2(date = seq(Sys.Date() - (time_window_days+2), Sys.Date() - 2, "days"),
+                    box = bb1) %>%
+                bind_rows()
+
+                })
+      
+    }
+    
+    
+    
+  }#if no data retereived
+
+
+
+
+
+  
+#toss values outside of the park (unless there aren't any)  
+
+  
+  focal_arc %>%
+    st_as_sf(coords = c("lon","lat"),
+             crs = st_crs(focal_wgs)) -> focal_arc
+
+st_intersection(x = focal_arc,
+                y = focal_wgs) -> park_arc
+
+
+#make a plot
+  if(nrow(park_arc) == 0){
+    
+    
+    
+    focal_arc %>%
+      group_by(date)%>%
+      summarize(mean_precip = mean(precip)) %>%
+      st_drop_geometry()%>% mutate(date = as.Date(date))%>%
+      ggplot(mapping = aes(x = date, y = mean_precip))+
+      geom_line()+
+      xlab("Date")+
+      ylab("Mean Precipitation (mm)")+
+             ylim(c(0, max(focal_arc$precip)%>% {if(.==0){100}else .}) )
+      
+
+  }else{
+    
+    park_arc %>%
+      group_by(date)%>%
+      summarize(mean_precip = mean(precip)) %>%
+      st_drop_geometry()%>% mutate(date = as.Date(date))%>%
+      ggplot(mapping = aes(x = date, y = mean_precip))+
+      geom_line()+
+      xlab("Date")+
+      ylab("Mean Precipitation (mm)")+
+             ylim(c(0, max(focal_arc$precip)%>% {if(.==0){100}else .}) )
+  
+  }
+
+
+
+  #clean up
+    rm(focal_arc, park_arc)
+
+  #clear out arc data
+    arc2_cache$delete_all()
+
+```
+
+
+
+
+
+
+
 
 

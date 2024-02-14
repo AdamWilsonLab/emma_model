@@ -13,15 +13,15 @@ data {
   int<lower = 0, upper = 1> predict; // predict NDVI for all pixels?
 }
 parameters {
-  vector[J] alpha;
-  vector[J] gamma;
-  vector[J] lambda;
-  vector[J] A;
-  real alpha_mu;
+  vector<lower=0, upper = 1>[J] alpha;
+  vector<lower=0, upper = 1>[J] gamma;
+  vector<lower=0>[J] lambda;
+  vector<lower=0, upper = 1>[J] A;
+  real<lower=0,upper=1> alpha_mu;
   vector[P] gamma_beta;
   vector[P] lambda_beta;
   vector[P] A_beta;
-  real<lower=0> phi;
+  real phi;
   real<lower=0> tau_sq;
   real<lower=0> gamma_tau_sq;
   real<lower=0> lambda_tau_sq;
@@ -47,7 +47,7 @@ transformed parameters {
 
   if(fit==1){ // only run if fitting is desired
   for (i in 1:N){
-    mu[i] = exp(alpha[pid[i]])+exp(gamma[pid[i]])-exp(gamma[pid[i]])*exp(-(age[i]/exp(lambda[pid[i]])))+
+    mu[i] = alpha[pid[i]]+gamma[pid[i]]-gamma[pid[i]]*exp(-(age[i]/lambda[pid[i]]))+
     sin((phi+((firemonth[i]-1)*3.141593/6))+6.283185*age[i])*A[pid[i]];
 //    mu = exp(alpha[pid])+exp(gamma[pid])-exp(gamma[pid])*exp(-(age/exp(lambda[pid])));
   }
@@ -71,11 +71,11 @@ model {
   // month effects
   phi  ~ uniform(-3.141593,3.141593);
 
-  // recovery curve
-  alpha ~ normal(alpha_mu, alpha_tau);
-  gamma ~ normal(gamma_mu,gamma_tau);
-  lambda ~ normal(lambda_mu,lambda_tau);
-  A ~ normal(A_mu, A_tau);
+  // recovery curve - @Glenn - why the switch to normal from lognormal?
+  alpha ~ lognormal(alpha_mu, alpha_tau);
+  gamma ~ lognormal(gamma_mu,gamma_tau);
+  lambda ~ lognormal(lambda_mu,lambda_tau);
+  A ~ lognormal(A_mu, A_tau);
 
   // likelihood
 //  if(fit==1){ // only run if fitting is desired

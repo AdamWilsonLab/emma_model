@@ -1,6 +1,6 @@
 # Spatial Predictions
 
-create_spatial_outputs <- function(envdata, envvars, model_results,data_training) {
+create_spatial_outputs <- function(envdata, envvars, model_results, data_training) {
 
   td <- envdata %>%
     left_join(dplyr::select(data_training, cellID, pid))
@@ -12,6 +12,11 @@ create_spatial_outputs <- function(envdata, envvars, model_results,data_training
     mutate(term=sub("_.*$","",parameter)) %>%
     dplyr::select(term,median,xname)
 
+  if(nrow(betas)==0){
+    message("beta parameters not found")
+    return(invisible(NULL))
+    }
+
   td$gamma = as.vector(xmat%*%filter(betas,term=="gamma")$median)
   td$lambda = as.vector(xmat%*%filter(betas,term=="lambda")$median)
   td$A = as.vector(xmat%*%filter(betas,term=="A")$median)
@@ -19,9 +24,8 @@ create_spatial_outputs <- function(envdata, envvars, model_results,data_training
 
   # get the template raster to align the predictions
   template="data/template.tif"
-  if(!file.exists(template))
-    download.file("https://github.com/AdamWilsonLab/emma_envdata/releases/download/processed_static/template.tif",destfile=template)
-  domain=raster(template)
+  if(!file.exists(template)){download.file("https://github.com/AdamWilsonLab/emma_envdata/releases/download/processed_static/template.tif",destfile=template)}
+  domain=raster::raster(template)
 
   vmat=left_join(data.frame(cellID=values(domain)),
                  dplyr::select(td,cellID, gamma, lambda, A,RT)) %>%

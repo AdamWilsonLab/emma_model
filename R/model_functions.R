@@ -1,14 +1,14 @@
 # Summarize posteriors
-summarize_model_output <- function(model_summary,stan_data, data){
+summarize_model_output <- function(model_summary,stan_data, data, ...){
   #posterior predictive
 
   beta_names<-data.frame(
-    pid=as.character(1:ncol(stan_data$x)), #call it pid for easy joining with beta index below
+    uid=as.character(1:ncol(stan_data$x)), #call it pid for easy joining with beta index below
     type="beta",
     xname=as.factor(colnames(stan_data$x)))
 
   tdata<- model_summary %>%
-            mutate(pid=gsub("[]]","",gsub(".*[[]","",variable)),
+            mutate(uid=gsub("[]]","",gsub(".*[[]","",variable)),
                parameter=gsub("[[].*","",variable),
                type=case_when(
                  grepl("beta",parameter) ~ "beta",
@@ -20,7 +20,41 @@ summarize_model_output <- function(model_summary,stan_data, data){
                )) %>%  #extract pid from parameter names
   left_join(beta_names)
 
-  if(F)  tdata %>% group_by(parameter,type) %>% summarize(n())
+  #append pid from model. this is tricky because some of the model parameters use uid, other pid
+
+    unique(tdata$parameter)
+
+    tdata%>%
+      group_by(parameter)%>%
+      summarize(n=n())%>%
+      ungroup()->t_summary
+
+    #probably a smarter way to do this in tidyverse, but meh
+    tdata$pid <- NA
+    for(i in 1:nrow(t_summary)){
+
+      var_i <-t_summary$parameter[i]
+
+      if(t_summary$n[i] == stan_data$J){
+
+        tdata$pid[which(tdata$parameter== t_summary$parameter[i])] <- stan_data$x_pid
+
+      }
+
+
+      if(t_summary$n[i] == stan_data$N){
+
+        tdata$pid[which(tdata$parameter== t_summary$parameter[i])] <- stan_data$pid
+
+
+
+      }
+
+
+    }
+
+
+  if(F){  tdata %>% group_by(parameter,type) %>% summarize(n())}
 
     return(tdata)
 }

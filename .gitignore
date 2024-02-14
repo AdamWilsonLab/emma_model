@@ -39,6 +39,8 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
+#html files
+*.html
 
 # Targets files
 data/envdata*
