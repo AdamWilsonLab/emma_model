@@ -1,0 +1,985 @@
+---
+title: "Model evaluation"
+author: "Brian Maitner"
+output:
+  html_document:
+    code_folding: hide
+
+---
+
+
+In this first attempt, I'm going to use the summarized model output, since the draws need to be pruned before uploading to avoid size restrictions on uploads.
+
+```{R load stuff}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+
+  # model_results
+  # data_predicting
+
+library(piggyback)
+library(tidyverse)
+library(plotly)
+library(ggpubr)
+source("https://raw.githubusercontent.com/AdamWilsonLab/emma_envdata/main/R/robust_pb_download.R")
+source("R/robust_tar_load.R")
+
+if(!dir.exists("temp/model_eval")){dir.create("temp/model_eval",recursive = TRUE)}
+
+#cluster <- TRUE
+cluster <- FALSE
+mcmc <- TRUE
+
+if(cluster){
+t1 <- robust_pb_download(file = "model_results",
+                   dest = "temp/model_eval",
+                   repo = "AdamWilsonLab/emma_model",
+                   tag = "model_output")
+
+t2 <- robust_pb_download(file = "stan_data_predict",
+                   dest = "temp/model_eval",
+                   repo = "AdamWilsonLab/emma_model",
+                   tag = "model_output")
+
+t3 <- robust_pb_download(file = "data_training",
+                   dest = "temp/model_eval",
+                   repo = "AdamWilsonLab/emma_model",
+                   tag = "model_output")
+
+rm(t1,t2,t3)
+stan_data_predict <- robust_tar_load(object_name= "stan_data_predict",
+                                     location = "temp/model_eval/")
+
+model_results <- robust_tar_load(object_name= "model_results",
+                                     location = "temp/model_eval/")
+
+data_training <- robust_tar_load(object_name= "data_training",
+                           location = "temp/model_eval/")
+}
+
+
+if(!cluster){
+  
+
+  # stan_data_predict <- robust_tar_load(object_name= "stan_data_predict",
+  #                                      location = "_targets/objects")
+  
+  # model_results <- robust_tar_load(object_name= "model_results",
+  #                                      location = "_targets/objects/model_results")
+  
+      list.files("R",pattern="[.]R",full.names = T)%>%
+    stringr::str_subset(c("R/detect_anomalies.R"), negate=TRUE)%>%
+      stringr::str_subset(c("R/predict_the_future.R"), negate=TRUE)%>%
+      stringr::str_subset(c("R/predict_from_model.R"), negate=TRUE)%>%
+      stringr::str_subset(c("R/predict_from_model_draws.R"), negate=TRUE)%>%
+    lapply( source)
+
+  
+  tar_load(model_w_pred_summary_postfire_season_predict2)
+  tar_load(model_results)
+  tar_load(data_training)
+  tar_load(stan_data_predict)
+  
+}
+
+#sanity check
+
+
+
+```
+
+
+## How does the HB model fit look?
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: FALSE
+#| code-fold: TRUE
+#| code-summary: "Show the code"
+
+betas <- model_results %>%
+  filter(type=="beta")
+
+
+p1 <- ggplot(betas, aes(y=xname, xmin=q5,x=median,xmax=q95))+
+  geom_pointrange(fill="grey")+
+  facet_wrap(~parameter,nrow=1)+
+  geom_vline(xintercept=0,col="grey")+
+  xlab("Beta (regression coefficient +/- 95% CI)")+
+  ylab("Environmental Variable") 
+
+ggplotly(p1)
+
+
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+
+
+if(cluster){
+  
+robust_pb_download(file = "model_prediction",
+                   dest = "temp/model_eval",
+                   repo = "AdamWilsonLab/emma_model",
+                   tag = "model_output")
+
+model_prediction <- robust_tar_load(object_name= "model_prediction",
+                                     location = "temp/model_eval/")
+}
+
+if(!cluster){
+  
+tar_load(model_prediction)
+  
+}
+
+
+cells_with_long_records<-
+  model_prediction %>% 
+  group_by(cellID) %>% 
+  summarize(n=n()) %>% 
+  arrange(desc(n)) %>% 
+  slice(1:20) # top 20 cells with the most observations
+
+model_prediction %>% 
+  filter(cellID%in%cells_with_long_records$cellID) %>% 
+  ggplot(aes(x=age)) +
+  geom_ribbon(aes(ymin=q5,ymax=q95),alpha=0.5)+
+  geom_line(aes(y=y_obs),colour="darkred",lwd=0.5) +
+  geom_line(aes(y=median),colour="blue") +
+  facet_wrap(~cellID) +
+  labs(x="time since fire (years)",y="NDVI") +
+  ylim(c(-1,1))+
+  theme_bw()
+
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+model_prediction %>% 
+  ggplot(aes(x=median,y=y_obs)) +
+  geom_hex(bins=30)+
+  geom_smooth(method = "lm",col="red")+
+  geom_abline(color="blue")+
+#  facet_wrap(~cellID) +
+  scale_fill_viridis_c()+
+  labs(x="Estimated NDVI",y="Observed NDVI",
+       caption = "Blue line is 1:1, Red line is least squares regression. Count is the number of pixels in that location",
+       title = "Estimated vs. Observed NDVI"
+      ) +
+  theme_bw()+
+  coord_equal()
+
+```
+The HB model seems to fit the data quite well.
+
+## Are we getting the model parameters and hyperparameters correct?
+
+```{r}
+#| echo: FALSE
+#| message: FALSE
+#| warning: FALSE
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: TRUE
+#| code-fold: TRUE
+#| code-summary: "Show the code"
+
+source("R/predict_from_model.R")
+
+predictions_from_model <- predict_from_model(model_results = model_results,
+                   data_predicting = stan_data_predict,
+                   n_hyperparameter_draws = 10,
+                   n_parameter_draws = 10,
+                   return_parms = TRUE)
+
+
+
+library(ggplot2)
+
+# mus <- predictions_from_model$ndvi_mus
+# 
+# mus <- as.data.frame(mus)
+# 
+# colnames(mus) <- 1:100
+# mus$cell <- stan_data_predict$y_cellID
+# 
+# mus_long <- pivot_longer(data = mus,cols = 1:100,names_to = "replicate",values_to = "mu")
+# 
+# 
+# #do anova to look at contribution of cell vs parms
+# aov_sum <-aov(data = mus_long %>%
+#   filter(cell %in% sample(x = unique(mus$cell),
+#                           size = 1000,replace = F)),
+#      formula = mu ~ cell + replicate)
+# 
+# summary(aov_sum)
+
+
+```
+
+Plotting the parameters we inferred from the model outputs
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+
+
+betas_drawn <- predictions_from_model$betas
+
+betas_drawn <- 
+betas_drawn %>%
+  group_by(var,name)%>%
+  summarise(q5 = quantile(x=value,probs=0.05),
+            q95 = quantile(x=value,probs=0.95),
+            median = median(value))%>%
+  rename(parameter=name,xname=var)
+
+
+
+betas$source <- "hb"
+betas_drawn$source <- "drawn"
+
+all_betas <- bind_rows(betas,betas_drawn)
+
+p2 <- ggplot(all_betas, aes(y=xname, xmin=q5,x=median,xmax=q95,color=source))+
+  geom_pointrange(fill="grey")+
+  facet_wrap(~parameter,nrow=1)+
+  geom_vline(xintercept=0,col="grey")+
+  xlab("Beta (regression coefficient +/- 95% CI)")+
+  ylab("Environmental Variable") 
+
+p2
+#ggplotly(p2)
+
+
+```
+Betas seem to be reasonable. Lets check some of the other parameters
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+
+drawn_model_parms <- predictions_from_model$model_parms %>%
+  pivot_longer(cols = c(alpha,gamma,lambda,A,phi))
+
+drawn_model_parms %>%
+  group_by(cellID,name) %>%
+    summarise(q5 = quantile(x=value,probs=0.05),
+            q95 = quantile(x=value,probs=0.95),
+            median = median(value))%>%
+  rename(parameter=name)%>%
+  mutate(source = "drawn") -> drawn_model_parms
+
+
+model_parms <- model_results %>%
+  filter(parameter %in% c("alpha","gamma","lambda","A","phi"))%>%
+  mutate(source = "hb")
+
+# pid 
+
+data_training %>%
+  select(cellID,pid)%>%
+  mutate(pid = as.character(pid))%>%
+  full_join(model_parms,by = "pid",multiple="all") -> model_parms
+
+combined_model_parms <- bind_rows(model_parms,drawn_model_parms)
+
+p3 <- ggplot(combined_model_parms, aes(y=source, xmin=q5,x=median,xmax=q95,
+                                       color=source))+
+  geom_pointrange(fill="grey")+
+  facet_wrap(~parameter,nrow=1,scales = "free")+
+  geom_vline(xintercept=0,col="grey")+
+  xlab("Regression coefficient +/- 90% CI")+
+  ylab("Environmental Variable") 
+
+p3
+#ggplotly(p3)
+
+
+```
+The parameters that are used to predict mu (NDVI) are very different from what the HB model has fit.
+
+Are the erroneous values from locations outside the training dataset?  These might just have weird environmental values that break things?
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+#need to flag pixels that were in training dataset
+
+combined_model_parms %>%
+  filter(!is.na(pid))%>%
+  pull(cellID)%>%
+  unique()-> training_cellIDS
+
+combined_model_parms %>%
+  mutate(in_training = case_when(cellID %in% training_cellIDS ~ 1,
+                                 !cellID %in% training_cellIDS ~ 0))->combined_model_parms
+
+
+p4<-
+ggplot(combined_model_parms%>%
+         filter(source=="drawn")%>%
+         mutate(in_training = as.logical(in_training)),
+       aes(y=in_training, xmin=q5,x=median,xmax=q95,
+           color=in_training))+
+  geom_pointrange(fill="grey")+
+  facet_wrap(~parameter,nrow=1,scales = "free")+
+  geom_vline(xintercept=0,col="grey")+
+  xlab("Regression coefficient +/- 90% CI")+
+  ylab("Environmental Variable") 
+
+p4
+
+
+
+```
+So, it doesn't appear to be a simple issue of cells outside the training data giving bad results.
+
+Let's check how correlated the fitted and drawn parms are
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+
+combined_model_parms %>%
+  select(cellID,source,mean,median,parameter) %>%
+  filter(source=="hb") -> hb_parms
+
+
+combined_model_parms %>%
+  select(cellID,source,mean,median,parameter) %>%
+  filter(source=="drawn")%>%
+  rename(drawn_median = median) -> drawn_parms
+
+
+hb_parms %>%
+  inner_join(drawn_parms,
+             by = c("cellID","parameter"))%>%
+  filter(!is.na(drawn_median))%>%
+  ggplot(mapping = aes(x=median,y=drawn_median))+
+  geom_point()+
+  facet_wrap(~parameter,scales = "free")+
+  xlab("hb median")
+
+
+```
+Weak relationships between the values I'm getting vs. those returned by the hb model, despite the nearly identical betas.  Let's dig in to the "A" parameter to see where things go wrong. First, let's see if the A mu parameters seem alright.
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+#Why is A so high?
+
+#in the hb, it ranges from 0 to 0.1 or so in the drawn from 0 to 2.
+
+  #A_mu = x*A_beta
+  #A ~ lognormal(A_mu, A_tau)
+  #A goes into model
+
+
+#hb A_mu
+#hb A_tau
+
+A_mus <- model_results %>%
+  filter(parameter %in% c("A_mu"))
+
+data_training %>%
+  select(cellID,pid)%>%
+  mutate(pid = as.character(pid))%>%
+  full_join(A_mus,by = "pid",multiple="all") -> A_mus
+
+#Do the A_mus match?
+
+#drawn A mu and A tau
+
+predictions_from_model$mus %>%
+  select(cellID,A_mu) -> drawn_A_mus
+
+predictions_from_model$taus %>%
+  filter(name=="A_tau") -> drawn_A_taus
+
+
+drawn_A_mus %>%
+  group_by(cellID)%>%
+  summarise(q5 = quantile(x=A_mu, probs=0.05),
+            q95 = quantile(x=A_mu, probs=0.95),
+            median = median(A_mu),
+            parameter = "A_mu",
+            source = "drawn") -> drawn_A_mus
+
+
+A_mus %>%
+  select(parameter,cellID,q5,q95,median)%>%
+  mutate(source = "hb") %>%
+  bind_rows(drawn_A_mus)%>%
+ggplot( aes(y=source, xmin=q5,x=median,xmax=q95,
+           color=source))+
+  geom_pointrange(fill="grey")+
+  facet_wrap(~parameter,nrow=1,scales = "free")+
+  geom_vline(xintercept=0,col="grey")+
+  xlab("Regression coefficient +/- 90% CI")+
+  ylab("Environmental Variable") 
+
+
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+A_mus %>%
+  select(parameter,cellID,q5,q95,median)%>%
+  mutate(source = "hb") %>%
+  right_join(drawn_A_mus %>%
+              rename(drawn_q5=q5,
+                     drawn_q95=q95,
+                     drawn_median=median),by = "cellID")%>%
+  ggplot(aes(x=median,y=drawn_median))+
+  geom_point()+
+  geom_errorbar(aes(ymin = drawn_q5,
+                    ymax = drawn_q95)) + 
+  geom_errorbarh(aes(xmin = q5,
+                     xmax = q95))+
+  ylab("drawn A_mu (median +/- 90% CI)")+
+  xlab("hb A_mu (median +/- 90% CI)")+
+  geom_abline(slope = 1,intercept = 0,color="red")
+
+```
+
+A_mus look spot on, how about the A taus?
+
+```{r, echo=FALSE}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+
+predictions_from_model$taus %>%
+  filter(name=="A_tau") -> drawn_A_taus
+
+
+drawn_A_taus %>%
+  summarise(drawn_q5 = quantile(x=value, probs=0.05),
+            drawn_q95 = quantile(x=value, probs=0.95),
+            drawn_median = median(value),
+            parameter = "A_tau"
+            #,source = "drawn"
+            ) -> drawn_A_taus
+
+
+model_results %>%
+  filter(parameter %in% c("A_tau")) %>%
+  mutate(source = "hb")%>%
+  inner_join(drawn_A_taus)%>%
+  ggplot(aes(x=median,y=drawn_median))+
+  geom_point()+
+  geom_errorbar(aes(ymin = drawn_q5,
+                    ymax = drawn_q95)) + 
+  geom_errorbarh(aes(xmin = q5,
+                     xmax = q95))+
+  ylab("drawn A_tau (median +/- 90% CI)")+
+  xlab("hb A_tau (median +/- 90% CI)")+
+  geom_abline(slope = 1,intercept = 0,color="red")
+
+
+
+```
+A_taus are likewise spot on.
+
+
+Do the observed A median (or mean) values correlate with the drawn mus?
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+
+model_parms %>%
+  filter(parameter=="A")%>%
+right_join(drawn_A_mus %>%
+              rename(drawn_q5=q5,
+                     drawn_q95=q95,
+                     drawn_median=median)%>%
+             mutate(e_drawn_median = exp(drawn_median)),
+           by = "cellID")%>%
+  ggplot(aes(y=log(median),x=drawn_median))+
+  geom_point()+ylab("ln(hb A)")+xlab("drawn A_mu")+
+  geom_abline(slope = 1,intercept = 0,color="red")
+
+
+
+```
+Not really (red line is 1:1).
+
+
+Do the hb A and hb A mu correlate?
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+hb_A <- model_parms %>%
+  filter(parameter=="A")
+
+hb_A_tau <- model_results %>%
+  filter(parameter=="A_tau")
+
+hb_A_mu <- model_results %>%
+  filter(parameter=="A_mu")
+
+
+
+hb_A %>%
+  select(pid,cellID,median)%>%
+  rename(A_median = median)%>%
+  left_join(y = hb_A_mu %>%
+  select(pid,median) %>%
+    rename(A_mu_median = median),
+  by = "pid")%>%
+  ggplot(mapping = aes(y=log(A_median),x=A_mu_median))+
+  geom_point(alpha=0.1)+
+  geom_abline(slope=1,intercept = 0,col="red")+
+  ylab("ln(hb A)")+
+  xlab("hb A_mu")
+  
+
+
+
+
+```
+Red line is 1:1.
+
+So, even in the HB model itself, "A" is not strongly related to "A mu". Is this driven by tau?  Let's try setting tau = 0.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+#take the hb taus and mus and generate a set of As, compare to drawn As and A mus
+
+
+#A ~ lognormal(A_mu, A_tau)
+
+
+hb_A_mu %>%
+  select(pid,mean,sd)%>%
+  rename(A_mu_mean = mean,
+         A_mu_sd = sd) %>%
+  mutate(A_tau_mean = hb_A_tau$mean,
+         A_tau_sd = hb_A_tau$sd) %>%
+  rowwise()%>%
+  mutate(A = rlnorm(meanlog = rnorm(mean = A_mu_mean, sd = A_mu_sd,n = 1),
+                    sdlog = rnorm(mean = A_tau_mean, sd = A_tau_sd,n = 1),n=1),
+         A_tau_zero = rlnorm(meanlog = rnorm(mean = A_mu_mean, sd = A_mu_sd,n = 1),
+                    sdlog = 0,n=1)
+         )->expected_A
+
+
+  expected_A %>%
+    ggplot(mapping = aes(y=log(A_tau_zero),x=A_mu_mean))+
+    geom_point()+
+    geom_abline(slope=1,intercept = 0,color="red")+
+    ylab("log(A) (calculated with tau = 0)")+
+    xlab("A mu (mean)")
+
+
+  # expected_A %>%
+  #   ggplot(mapping = aes(x=A_tau_zero,y=exp(A_mu_mean)))+
+  #   geom_point()+
+  #   xlim(c(0,2.5))
+
+
+
+```
+Red line is 1:1.
+
+This is more along the lines of what I would expect, a reasonable correlation between A and A mu.
+
+Is tau simply so high that it overwhelms the influence of mu? Let's take a look at my predicted (using drawn parameters) A mu vs A:
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+  expected_A %>%
+    ggplot(mapping = aes(y=log(A),x=A_mu_mean))+
+    geom_point()+
+    geom_abline(slope=1,intercept = 0,color="red")+
+    ylab("ln(A) (drawn, calculated with fitted tau)")+
+    xlab("A mu (mean, drawn)")+
+    geom_smooth(method = "lm")+
+     stat_cor(
+   aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))
+)
+    
+
+
+```
+Blue line is a linear regression, red line is 1:1. A mu is a relatively poor predictor of A.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+ #comparing model parms with mus
+
+model_parms %>%
+  filter(parameter=="lambda") %>%
+  select(pid,cellID,median)%>%
+  rename(lambda_median = median)%>%
+  left_join(y = model_results %>%
+  filter(parameter=="lambda_mu") %>%
+  select(pid,median) %>%
+    rename(lambda_mu_median = median),
+  by = "pid")%>%
+  ggplot(mapping = aes(y=log(lambda_median),x=lambda_mu_median))+
+  geom_point(alpha=0.1)+
+  geom_abline(slope=1,intercept = 0,col="red")+
+  ylab("ln(hb lambda mu)")+
+  xlab("hb lambda")+
+  geom_smooth(method = "lm")+
+     stat_cor(
+   aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))
+)
+  
+
+
+```
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+
+ #comparing model parms with mus
+
+model_parms %>%
+  filter(parameter=="gamma") %>%
+  select(pid,cellID,median)%>%
+  rename(gamma_median = median)%>%
+  left_join(y = model_results %>%
+  filter(parameter=="gamma_mu") %>%
+  select(pid,median) %>%
+    rename(gamma_mu_median = median),
+  by = "pid")%>%
+  ggplot(mapping = aes(y=log(gamma_median),x=gamma_mu_median))+
+  geom_point(alpha=0.1)+
+  geom_abline(slope=1,intercept = 0,col="red")+
+  ylab("ln(hb gamma mu)")+
+  xlab("hb gamma")+
+  geom_smooth(method = "lm")+
+     stat_cor(
+   aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))
+)
+  
+
+
+```
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+
+ #comparing model alpha with alpha mu
+
+expected_alphas <-
+  model_results %>%
+  filter(parameter %in% c("alpha_mu","alpha_tau")) %>%
+  select(parameter, median) %>%
+  pivot_wider(names_from = "parameter",values_from = "median")%>%
+  bind_cols(cellID = model_prediction$cellID) %>%
+  rowwise()%>%
+  mutate(alpha_drawn = rlnorm(meanlog = alpha_mu,sdlog = alpha_tau,n=1))%>%
+  ggplot(mapping = aes(x=log(alpha_drawn)))+
+  geom_histogram()+
+  geom_vline(mapping = aes(xintercept=alpha_mu))+
+  xlab("ln(drawn alpha)")+
+  ggtitle("Expected from\n alpha_mu and alpha_tau")
+
+actual_alphas <-
+model_parms %>%
+  filter(parameter=="alpha") %>%
+  select(pid,cellID,median)%>%
+  rename(alpha_median = median)%>%
+  bind_cols(y = model_results %>%
+  filter(parameter=="alpha_mu") %>%
+  select(median) %>%
+    rename(alpha_mu_median = median)) %>%
+  ggplot(mapping = aes(x=log(alpha_median)))+
+  geom_histogram()+
+  geom_vline(mapping = aes(xintercept=alpha_mu_median))+
+  xlab("ln(hb alpha)")+
+  ggtitle("Alphas from\n hb model")
+
+ggarrange(expected_alphas,
+          actual_alphas)
+
+```
+Black line is alpha mu.
+
+The alpha values of the hb make more sense (since I'd expect them to be between 0 and 1).  However, the alpha_mu and alpha_tau don't track
+
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+# yobs vs mu
+
+
+model_results  %>%
+  filter(parameter=="mu")%>%
+  select(pid,median)%>%
+  rename(mu_median = median)%>%
+  bind_cols(y_obs = model_prediction$y_obs)%>%
+  ggplot(mapping = aes(y=,mu_median,x=y_obs))+
+  geom_point(alpha=0.1)+
+  geom_abline(slope=1,intercept = 0,col="red")+
+  geom_smooth(method = "lm")+
+     stat_cor(
+   aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))
+)
+  
+
+
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| out.width: 100%
+#| strip.white: TRUE
+#| include: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+#what is phi?
+
+model_results %>%
+  filter(parameter == "phi") %>%
+  pull(median) %>%
+  as.numeric()->phi_hb
+
+
+```
+
+
+
+The model is:
+
+    mu[i] = alpha[pid[i]] + gamma[pid[i]] - gamma[pid[i]]*exp(-(age[i]/lambda[pid[i]]))+
+    sin((phi+((firemonth[i]-1)*3.141593/6)) + 6.283185*age[i])*A[pid[i]]
+
+* alpha isn't well predicted by alpha mu
+* gamma isn't well-predicted by gamma mu
+* lambda isn't well-predicted by lambda mu
+* A isn't well-predicted by A mu
+* phi is a constant (`r phi_hb`)
+
+Even though the overall mu and observation match well, the terms going into the calculation of the overall mu cannot be predicted because they don't correlated well with their individual predicted mus (e.g., alpha mu, gamma mu, etc.).
+
+
+Next steps: 
+Look into what this bit of code is doing:
+
+  // recovery curve - @Glenn - why the switch to normal from lognormal?
+  alpha ~ lognormal(alpha_mu, alpha_tau);
+  gamma ~ lognormal(gamma_mu, gamma_tau);
+  lambda ~ lognormal(lambda_mu, lambda_tau);
+  A ~ lognormal(A_mu, A_tau);
+
+Is this being treated as a prior? Should it be part of the regression or something?4
+
+Per https://mc-stan.org/docs/stan-users-guide/hierarchical-logistic-regression.html maybe we need to add some indexing?
+
+
+## Comparing A parameter drawn in R, drawn in the hb model, and returned by the hb model
+
+```{r}
+
+
+model_results %>%
+  filter(parameter == "A_mu") %>%
+  select(mu_mean = mean) %>%
+  mutate(tau_mean = model_results %>%
+           filter(parameter == "A_tau")%>%
+           pull(mean))%>%
+  rowwise()%>%
+  mutate(A_drawn = rlnorm(n=1,meanlog = mu_mean,sdlog=tau_mean))-> drawn_As
+
+
+different_As <-
+data.frame(A = model_results %>%
+             filter(parameter == "A")%>%
+             pull(mean)%>%as.numeric(),
+           A_hb_est = model_results %>%
+             filter(parameter == "A_est")%>%
+             pull(mean) %>% as.numeric(),
+           A_R_est = drawn_As %>% pull(A_drawn)
+           )
+
+
+different_As %>%
+  ggplot(aes(x=A,y=A_hb_est))+
+  geom_point()+
+  geom_abline(slope = 1,intercept = 0,color="red")+
+  geom_smooth(method = "lm")+
+  stat_cor(
+    aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))
+  )
+
+
+```
+
+
+```{r}
+
+
+
+different_As %>%
+  ggplot(aes(x = A, y = A_R_est))+
+  geom_point()+
+  geom_abline(slope = 1,intercept = 0,color="red")+
+  geom_smooth(method = "lm")+
+  stat_cor(
+    aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))
+  )
+
+
+```
+
+
+```{r}
+
+
+different_As %>%
+  ggplot(aes(x = A_hb_est, y = A_R_est))+
+  geom_point()+
+  geom_abline(slope = 1,intercept = 0,color="red")+
+  geom_smooth(method = "lm")+
+  stat_cor(
+    aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))
+  )
+
+
+
+```
