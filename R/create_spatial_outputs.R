@@ -17,10 +17,21 @@ create_spatial_outputs <- function(envdata, envvars, model_results, data_trainin
     return(invisible(NULL))
     }
 
-  td$gamma = as.vector(xmat%*%filter(betas,term=="gamma")$median)
-  td$lambda = as.vector(xmat%*%filter(betas,term=="lambda")$median)
-  td$A = as.vector(xmat%*%filter(betas,term=="A")$median)
+  ## add exp() to unexponentiate due to lognormals
+  td$gamma = as.vector(xmat%*%filter(betas,term=="gamma")$median) %>% exp()
+  td$lambda = as.vector(xmat%*%filter(betas,term=="lambda")$median)%>% exp()
+  td$A = as.vector(xmat%*%filter(betas,term=="A")$median)%>% exp()
   td$RT=td$lambda*log(200*td$gamma) #calculate recovery time
+
+  if(F){ #amw exploring why regressions don't match 20240214
+    fitted_gamma=model_results %>%
+      filter(type=="spatial",parameter=="gamma") %>%
+      mutate(pid=as.numeric(pid)) %>%
+      left_join(
+        dplyr::select(td,pid,gamma),by=c("pid"="pid"))
+    ggplot(fitted_gamma,aes(x=exp(gamma),y=median))+geom_point()+geom_abline()
+  }
+
 
   # get the template raster to align the predictions
   template="data/template.tif"

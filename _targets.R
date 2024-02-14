@@ -6,6 +6,7 @@ print("Loading libraries")
   library(tidyverse)
   library(arrow)
   library(piggyback)
+library(bayesplot)
   #library(plotly)
   # library(leaflet)
   #library(rnoaa)
@@ -78,7 +79,7 @@ print("Setting options")
   testing_window=c("2014-07-01","2022-01-01")
   #predicting_window=c("2000-01-01",as.character(Sys.Date()))
   #predicting_window=c("2022-01-01",as.character(Sys.Date()))
-  predicting_window=c("2021-01-01","2022-01-01")
+  predicting_window=c("2021-01-01","2024-01-01")
 
 # decide sampling proportion
   total_fynbos_pixels=348911
@@ -88,9 +89,9 @@ print("Setting options")
   # sample_proportion=.5;sample_proportion # ~10% sample
   # sample_proportion_prediction = .5
   # output_samples = 100 #number of output samples to characterize the posterior
-  sample_proportion=.03;sample_proportion # ~10% sample
+  sample_proportion=.1;sample_proportion # ~10% sample
   sample_proportion_prediction = .1
-  output_samples = 100 #number of output samples to characterize the posterior
+  output_samples = 200 #number of output samples to characterize the posterior
   #thin = NULL #default
   thin = 100 #trying to get model to run locally
 
@@ -165,49 +166,49 @@ list(
 
   #tried mcmc - 500 samples in ~12 hours
 #commenting this model out for now.  want to try the other version
-  # tar_stan_vb(
-  #   model,
-  #   stan_files = "postfire_season2.stan",
-  #   data = stan_data,
-  #   quiet=T,
-  #   pedantic=F,
-  #   adapt_engaged=F,
-  #   eta=0.11,
-  #   iter = 1000000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
-  #   garbage_collection=T,
-  #   init = 0.5, #list(list(phi = 0.5, tau_sq = 0.1, gamma_tau_sq = 0.1, lambda_tau_sq = 0.1, alpha_tau_sq = 0.1, A_tau_sq = 0.1)),
-  #   tol_rel_obj = 0.001,
-  #   #output_samples = 500,
-  #   output_samples = output_samples, #use smaller numbers if running out of space.
-  #   #error = "continue", # Used it when getting the error - Chain 1 Exception: normal_rng: Location parameter[975276] is -inf, but must be finite! (in '/tmp/Rtmp8DI5YZ/model-2ad6dc5ec5b.stan', line 91, column 4 to column 33)
-  #   format_df="parquet"
-  #   #format="parquet"
-  # ),
-
-    tar_stan_mcmc(name = model_mcmc,
-                  stan_files = "postfire_season2.stan",
-                  data = stan_data,
-                  quiet = FALSE,
-                  pedantic = TRUE,
-                  force_recompile = FALSE,
-                  init = .5, #was .5
-                  adapt_engaged = TRUE,
-                  garbage_collection = TRUE,
-                  format_df = "parquet",
-                  return_draws = FALSE,
-                  parallel_chains = 1,
-                  memory = "transient",
-                  thin = thin),
+  tar_stan_vb(
+    model,
+    stan_files = "postfire_season2.stan",
+    data = stan_data,
+    quiet=T,
+    pedantic=F,
+    adapt_engaged=F,
+    eta=0.11,
+    iter = 10000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
+    garbage_collection=T,
+    init = 0.5, #list(list(phi = 0.5, tau_sq = 0.1, gamma_tau_sq = 0.1, lambda_tau_sq = 0.1, alpha_tau_sq = 0.1, A_tau_sq = 0.1)),
+    tol_rel_obj = 0.001,
+    #output_samples = 500,
+    output_samples = output_samples, #use smaller numbers if running out of space.
+    #error = "continue", # Used it when getting the error - Chain 1 Exception: normal_rng: Location parameter[975276] is -inf, but must be finite! (in '/tmp/Rtmp8DI5YZ/model-2ad6dc5ec5b.stan', line 91, column 4 to column 33)
+    format_df="parquet"
+    #format="parquet"
+  ),
+#
+#     tar_stan_mcmc(name = model_mcmc,
+#                   stan_files = "postfire_season2.stan",
+#                   data = stan_data,
+#                   quiet = FALSE,
+#                   pedantic = TRUE,
+#                   force_recompile = FALSE,
+#                   init = .5, #was .5
+#                   adapt_engaged = TRUE,
+#                   garbage_collection = TRUE,
+#                   format_df = "parquet",
+#                   return_draws = FALSE,
+#                   parallel_chains = 1,
+#                   memory = "transient",
+#                   thin = thin),
 
     ##vb version
-    # tar_target(model_results,
-    #            summarize_model_output(model_summary_postfire_season2, stan_data, envdata)),
+    tar_target(model_results,
+               summarize_model_output(model_summary_postfire_season2, stan_data, envdata)),
 
     ##mcmc version
-    tar_target(model_results,
-               summarize_model_output(model_summary = model_mcmc_summary_postfire_season2,
-                                      stan_data =  stan_data,
-                                      data=envdata)),
+    # tar_target(model_results,
+    #            summarize_model_output(model_summary = model_mcmc_summary_postfire_season2,
+    #                                   stan_data =  stan_data,
+    #                                   data=envdata)),
 
     tar_target(model_prediction,
               summarize_predictions(model_results,stan_data,envdata)),

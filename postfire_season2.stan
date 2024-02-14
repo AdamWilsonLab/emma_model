@@ -71,7 +71,7 @@ model {
   // month effects
   phi  ~ uniform(-3.141593,3.141593);
 
-  // recovery curve - @Glenn - why the switch to normal from lognormal?
+  // recovery curve
   alpha ~ lognormal(alpha_mu, alpha_tau);
   gamma ~ lognormal(gamma_mu,gamma_tau);
   lambda ~ lognormal(lambda_mu,lambda_tau);
