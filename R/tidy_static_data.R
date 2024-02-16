@@ -15,6 +15,7 @@ td=data %>%
   as_tibble() %>%
   left_join(bind_cols(long_pixels,long=1),by="cellID") %>% # add column for pixels with long records
   mutate(
+    Intercept = 1,  # add a column of ones for the intercept
     fynbos = case_when( #all remnants
       remnant_distance.tif>0 ~ TRUE,
       TRUE ~ FALSE),
@@ -31,8 +32,8 @@ td=data %>%
   ungroup()
 
 #Jasper's inelegant hack to scale the spatial env vars...
-hmm1 <- td %>% dplyr::select(!where(is.numeric) | c(x, y, cellID, long))
-hmm2 <- td %>% dplyr::select(where(is.numeric) & !c(x, y, cellID, long)) %>% scale()
+hmm1 <- td %>% dplyr::select(!where(is.numeric) | c(x, y, cellID, long,Intercept))
+hmm2 <- td %>% dplyr::select(where(is.numeric) & !c(x, y, cellID, long, Intercept)) %>% scale()
 td <- cbind(hmm1, hmm2)
 
 if(F) {
