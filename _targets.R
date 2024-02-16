@@ -110,6 +110,12 @@ list(
                        sleep_time=3),
     format="file"),
 
+  tar_target(
+    stable_data_parquet,
+    make_stable_data_parquet(envdata_files,
+                             filename = "stable_data.gz.parquet")
+    ),
+
   tar_target(long_pixels,
              find_long_records(env_files = envdata_files,
                                max_years_to_first_fire = 2,
@@ -124,7 +130,8 @@ list(
                region=c(xmin = 0, xmax = 30, ymin = -36, ymax = -20), #whole region
                #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
                sample_proportion= sample_proportion,
-               long_pixels=long_pixels)),
+               long_pixels=long_pixels,
+               ... = stable_data_parquet)),
 
   tar_target(envvars,c( #select and possibly rename envvars to be included in model
 #    "Mean_January_Precipitation" = "CHELSA_prec_01_V1.2_land.tif",
@@ -140,10 +147,12 @@ list(
     "Topographic_Diversity"="alos_topodiversity.tif")),
 #    "ALOS_CHILI"="alos_chili.tif",
 #    "ALOS_MTPI"="alos_mtpi.tif")),
+
   tar_target(
     data_training,
     filter_training_data(envdata,envvars)
   ),
+
   tar_target(
     dyndata_training,
     tidy_dynamic_data(envdata,
