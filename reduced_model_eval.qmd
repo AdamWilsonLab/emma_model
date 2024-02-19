@@ -1,0 +1,372 @@
+---
+title: "Reduced model output"
+format: html
+editor: visual
+---
+
+## Examining reduced model output
+
+```{r}
+
+
+
+      list.files("R",pattern="[.]R",full.names = T)%>%
+    stringr::str_subset(c("R/detect_anomalies.R"), negate=TRUE)%>%
+      stringr::str_subset(c("R/predict_the_future.R"), negate=TRUE)%>%
+      stringr::str_subset(c("R/predict_from_model.R"), negate=TRUE)%>%
+      stringr::str_subset(c("R/predict_from_model_draws.R"), negate=TRUE)%>%
+    lapply( source)
+
+  tar_load(model_results)
+  tar_load(data_training)
+  tar_load(stan_data)
+
+  
+    
+```
+
+# Run some basic sanity checks
+
+```{r sanity checks}
+
+#load the summary
+  tar_load(model_mcmc_summary_postfire_season2)
+
+
+#Sanity checks
+
+  model_mcmc_summary_postfire_season2 %>%
+    filter(grepl(pattern="alpha[",fixed = TRUE,x=variable)) -> alpha_estimates
+  
+  model_mcmc_summary_postfire_season2 %>%
+    filter(grepl(pattern="gamma[",fixed = TRUE,x=variable)) -> gamma_estimates
+
+  model_mcmc_summary_postfire_season2 %>%
+    filter(grepl(pattern="lambda[",fixed = TRUE,x=variable)) -> lambda_estimates
+
+  
+    model_mcmc_summary_postfire_season2 %>%
+    filter(grepl(pattern="^mu\\[",perl = TRUE,x=variable)) -> mu_estimates
+
+    model_mcmc_summary_postfire_season2 %>%
+    filter(grepl(pattern="^gamma_beta\\[",perl = TRUE,x=variable)) -> gamma_beta_estimates
+  
+    model_mcmc_summary_postfire_season2 %>%
+    filter(grepl(pattern="^lambda_beta\\[",perl = TRUE,x=variable)) -> lambda_beta_estimates
+    
+  
+# alpha estimates should be of length J
+  
+  if(nrow(alpha_estimates) != stan_data$J){stop("incorrect number of alpha estimates")}
+    
+# gamma estimates should be of length J
+  
+  if(nrow(gamma_estimates) != stan_data$J){stop("incorrect number of gamma estimates")}
+
+# lambda estimates should be of length J
+  
+  if(nrow(lambda_estimates) != stan_data$J){stop("incorrect number of lambda estimates")}
+    
+# lambda beta should be of length
+    if(nrow(lambda_beta_estimates) != ncol(stan_data$x)){stop("incorrect number of lambda beta estimates")}
+
+# gamma beta should be of length
+    if(nrow(gamma_beta_estimates) != ncol(stan_data$x)){stop("incorrect number of gamma beta estimates")}
+
+# mu should be the same length as pid 
+    
+  if(length(stan_data$pid) != nrow(mu_estimates)){stop("incorrect number of mu estimates")}
+    
+# mu should be of length N
+    
+  if(stan_data$N  != nrow(mu_estimates)){stop("incorrect number of mu estimates")}
+
+
+```
+
+# List model parameters
+
+```{r}
+
+library(tidyverse)
+
+model_results %>%
+  select(parameter)%>%
+  unique()-> parms_in_model
+
+parms_in_model
+
+
+
+
+
+```
+
+# Model checking
+
+The goal here is to start at the lowest level of the model and work our way up to make sure we can reproduce things from R
+
+## alpha
+
+### alpha mu
+
+```{r alpha mu}
+
+  #alpha ~ normal(alpha_mu, alpha_tau)
+
+model_results%>%
+  filter(parameter %in% c("alpha_mu", "alpha_tau")) -> alpha_mu_and_tau
+
+# we'll generate a set of 100 estimates for each alpha parameter. These should all be approximately the same
+
+alpha_mu_pred_r <- replicate(n = 100,
+          expr = rnorm(n = nrow(alpha_estimates),
+                       mean = alpha_mu_and_tau %>%
+                         filter(parameter=="alpha_mu") %>%
+                         pull(mean),sd = alpha_mu_and_tau %>%
+                         filter(parameter=="alpha_mu") %>%
+                         pull(sd)))
+
+#alpha_seq <-seq(-1,1,length.out=100000)
+alpha_seq <-unique(as.vector(alpha_mu_pred_r))
+
+data.frame(alpha_mu_pred_r = alpha_mu_pred_r %>%
+  as.vector())%>%
+  ggplot(mapping = aes(x=alpha_mu_pred_r))+
+  geom_density(fill="blue",alpha=0.5)+
+  geom_line(data = data.frame(alpha = alpha_seq,
+                               density = dnorm(x = alpha_seq,
+      mean = alpha_mu_and_tau %>%
+        filter(variable=="alpha_mu")%>%
+        pull(mean),
+      sd = alpha_mu_and_tau %>%
+        filter(variable=="alpha_mu")%>%
+        pull(sd))),
+      mapping = aes(x=alpha,y=density),color="red")+
+  ggtitle("Red = density given the mean and sd; blue = density from estimates in R ")
+  
+  
+
+```
+
+### alpha tau
+
+```{r alpha tau}
+
+  #alpha ~ normal(alpha_mu, alpha_tau)
+
+# we'll generate a set of 100 estimates for each alpha parameter. These should all be approximately the same
+
+alpha_tau_pred_r <- replicate(n = 100,
+          expr = rnorm(n = nrow(alpha_estimates),
+                       mean = alpha_mu_and_tau %>%
+                         filter(parameter=="alpha_tau") %>%
+                         pull(mean),sd = alpha_mu_and_tau %>%
+                         filter(parameter=="alpha_tau") %>%
+                         pull(sd)))
+
+#alpha_seq <-seq(-1,1,length.out=100000)
+alpha_seq <-unique(as.vector(alpha_tau_pred_r))
+
+data.frame(alpha_tau_pred_r = alpha_tau_pred_r %>%
+  as.vector())%>%
+  ggplot(mapping = aes(x=alpha_tau_pred_r))+
+  geom_density(fill="blue",alpha=0.5)+
+  geom_line(data = data.frame(alpha = alpha_seq,
+                               density = dnorm(x = alpha_seq,
+      mean = alpha_mu_and_tau %>%
+        filter(variable=="alpha_tau")%>%
+        pull(mean),
+      sd = alpha_mu_and_tau %>%
+        filter(variable=="alpha_tau")%>%
+        pull(sd))),
+      mapping = aes(x=alpha,y=density),color="red")+
+  ggtitle("Red = density given the mean and sd; blue = density from estimates in R ")
+  
+  
+
+```
+
+### Can we get alpha right from R?
+
+```{r pred from r}
+
+
+alpha_pred_r <-apply(X = array(c(alpha_mu_pred_r,alpha_tau_pred_r),
+                               dim=c(dim(alpha_mu_pred_r),2)),
+                     MARGIN = c(1,2),
+                     FUN = function(x){rnorm(n=1,mean=x[1],sd = x[2])})
+
+
+alpha_pred_r_summary <- apply(alpha_pred_r, MARGIN = 1,
+                              FUN = function(x){c(mean=mean(x),sd=sd(x))}) %>%
+  t() %>% as.data.frame()
+
+if( min(alpha_pred_r)< -1 | max(alpha_pred_r) > 1){message("Impossible alpha pred values found")}
+
+model_results %>%
+  filter(parameter == "alpha")%>%
+  ggplot(mapping = aes(x=mean))+
+  geom_density(fill="red",alpha=0.5)+
+  
+  geom_density(data = data.frame(pred_alpha = alpha_pred_r_summary$mean),
+               mapping = aes(x=pred_alpha),fill="blue",alpha=0.5)+
+  
+  ggtitle("red = alpha from fit, blue = alpha predicted in R")
+  
+  
+
+```
+
+OK, estimates of alpha seem fine from R
+
+### Alpha predicted from generated quantities block
+
+```{r alpha estimates from stan}
+
+# 
+# model_results %>%
+#   filter(parameter == "alpha")%>%
+#   ggplot(mapping = aes(x=mean))+
+#   geom_density(fill="red",alpha=0.5)+
+#   
+#   geom_density(data = model_results%>%
+#   filter(parameter=="alpha_pred"),
+#                mapping = aes(x=mean),fill="blue",alpha=0.5)+
+#   
+#   ggtitle("red = alpha from fit, blue = alpha predicted in generated quantities")
+
+
+model_results%>%
+  filter(parameter=="alpha_pred")
+
+
+```
+
+Alpha predictions run into NaN problems.
+
+## Is y_obs \~ normal(mu,tau)?
+
+```{r}
+
+
+#current model is 
+  # y_obs ~ normal(mu, tau)  
+  # mu[i] = alpha[pid[i]];
+
+  model_results %>%
+  filter(parameter=="mu") -> mus
+
+  model_results %>%
+  filter(parameter=="alpha") -> alphas
+
+  mus %>%
+    select(mean,pid)%>%
+    rename(mu_mean=mean)%>%
+    left_join(y =   alphas %>%
+    select(mean,pid)%>%
+    rename(alpha_mean=mean))->alphas_and_mus
+  
+  alphas_and_mus %>%
+    ggplot(mapping = aes(y=alpha_mean,x=mu_mean))+
+    geom_point()
+
+  
+```
+
+```{r}
+
+    #y_obs ~ normal(mu, tau);
+
+    alphas_and_mus$y_obs <- stan_data$y_obs      
+  
+    alphas_and_mus %>%
+      ggplot(mapping = aes(x=mu_mean,
+                           y=y_obs))+
+      geom_point()+
+      geom_abline(slope = 1,intercept = 0,color="light blue")+
+      geom_smooth(formula = y~x)
+
+
+```
+
+Looks spot on for y \~ normal(mu,tau)
+
+# Do predictions look ok?
+
+## model preds
+
+```{r}
+
+
+  model_results %>%
+  filter(parameter=="y_pred_from_parms")%>%
+  select(mean_y_pred_from_parms = mean,pid)-> y_pred_from_parms
+
+y_pred_from_parms$y_obs <- stan_data$y_obs
+
+    
+  y_pred_from_parms %>%
+    ggplot(mapping = aes(x=y_obs,y=mean_y_pred_from_parms))+
+    geom_point()
+
+
+
+```
+
+Unsurprisingly bad, given that the prediction is entirely independent of the environment at this point
+
+#Can we get alpha right?
+
+```{r pred from r}
+
+#   mu_pred[i] = alpha_pred[pid[i]];
+#  alpha_pred[k] = normal_rng(alpha_mu, alpha_tau);
+
+model_results%>%
+  filter(parameter %in% c("alpha_mu","alpha_tau")) -> alpha_mu_and_tau
+
+alpha_pred_r <- rnorm(n = nrow(alpha_estimates),
+                      mean = alpha_mu_and_tau%>%
+                        filter(parameter=="alpha_mu")%>%
+                        pull(mean),
+                      sd = alpha_mu_and_tau%>%
+                        filter(parameter=="alpha_tau")%>%
+                        pull(mean))
+
+message("update R code above to incorporate uncertainty in mu and tau")
+
+
+model_results %>%
+  filter(parameter == "alpha")%>%
+  ggplot(mapping = aes(x=mean))+
+  geom_density(fill="red",alpha=0.5)+
+  
+  geom_density(data = data.frame(pred_alpha = alpha_pred_r),
+               mapping = aes(x=pred_alpha),fill="blue",alpha=0.5)+
+  
+  ggtitle("red = alpha from fit, blue = alpha predicted in R")
+  
+
+
+```
+
+OK, estimates of alpha seem fine from R
+
+```{r alpha estimates from stan}
+
+
+model_results %>%
+  filter(parameter == "alpha")%>%
+  ggplot(mapping = aes(x=mean))+
+  geom_density(fill="red",alpha=0.5)+
+  
+  geom_density(data = model_results%>%
+  filter(parameter=="alpha_pred"),
+               mapping = aes(x=mean),fill="blue",alpha=0.5)+
+  
+  ggtitle("red = alpha from fit, blue = alpha predicted in generated quantities")
+
+
+
+```

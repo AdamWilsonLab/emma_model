@@ -1,4 +1,9 @@
-tidy_static_data <- function(envdata_files,region,remnant_distance,sample_proportion,long_pixels){
+tidy_static_data <- function(envdata_files,
+                             region,
+                             remnant_distance,
+                             sample_proportion,
+                             long_pixels,
+                             ...){
 
 # Load static parquet file
 data <- open_dataset(sources = file.path(envdata_files,"stable_data.gz.parquet"))
