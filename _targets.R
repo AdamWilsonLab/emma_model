@@ -89,9 +89,9 @@ print("Setting options")
   # sample_proportion=.5;sample_proportion # ~10% sample
   # sample_proportion_prediction = .5
   # output_samples = 100 #number of output samples to characterize the posterior
-  sample_proportion=.1;sample_proportion # ~10% sample
-  sample_proportion_prediction = .1
-  output_samples = 200 #number of output samples to characterize the posterior
+  sample_proportion=.2;sample_proportion # ~10% sample
+  sample_proportion_prediction = .2
+  output_samples = 100 #number of output samples to characterize the posterior
   #thin = NULL #default
   thin = 100 #trying to get model to run locally
 
@@ -128,17 +128,18 @@ list(
                long_pixels=long_pixels)),
 
   tar_target(envvars,c( #select and possibly rename envvars to be included in model
-#    "Mean_January_Precipitation" = "CHELSA_prec_01_V1.2_land.tif",
+  "Intercept" = "Intercept",
     "Mean_July_Precipitation" =  "CHELSA_prec_07_V1.2_land.tif",
-#    "Soil_pH" = "soil_pH.tif",
     "Max_Air_Temperature_Warmest" = "CHELSA_bio10_05_V1.2.tif",
     "Min_Air_Temperature_Coldest" =  "CHELSA_bio10_06_V1.2.tif",
+    "Cloud_Seasonal_Concentration"="MODCF_seasonality_concentration.tif",
+    "Topographic_Diversity"="alos_topodiversity.tif")),
+#    "Mean_January_Precipitation" = "CHELSA_prec_01_V1.2_land.tif",
+#    "Soil_pH" = "soil_pH.tif",
 #    "Mean_Annual_Air_Temperature"="CHELSA_bio10_01_V1.2.tif", #select env vars to use in model
 #    "Mean_Annual_Precipitation"="CHELSA_bio10_12_V1.2.tif",
 #    "Mean_Monthly_Precipitation_In_Driest_Quarter"="CHELSA_bio10_17_V1.2.tif",
 #    "Mean_Annual_Cloud_Frequency"="MODCF_meanannual.tif",
-    "Cloud_Seasonal_Concentration"="MODCF_seasonality_concentration.tif",
-    "Topographic_Diversity"="alos_topodiversity.tif")),
 #    "ALOS_CHILI"="alos_chili.tif",
 #    "ALOS_MTPI"="alos_mtpi.tif")),
   tar_target(
@@ -165,7 +166,6 @@ list(
   ),
 
   #tried mcmc - 500 samples in ~12 hours
-#commenting this model out for now.  want to try the other version
   tar_stan_vb(
     model,
     stan_files = "postfire_season2.stan",
@@ -174,7 +174,7 @@ list(
     pedantic=F,
     adapt_engaged=F,
     eta=0.11,
-    iter = 10000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
+    iter = 7000, #should be 1000 or more - 100 is just to run quickly - CP converged after 6400
     garbage_collection=T,
     init = 0.5, #list(list(phi = 0.5, tau_sq = 0.1, gamma_tau_sq = 0.1, lambda_tau_sq = 0.1, alpha_tau_sq = 0.1, A_tau_sq = 0.1)),
     tol_rel_obj = 0.001,
@@ -217,7 +217,7 @@ list(
               create_spatial_outputs(envdata = envdata,
                                      envvars = envvars,
                                      model_results = model_results,
-                                     data_training =  data_training))
+                                     data_training =  data_training)),
   #,
 
    # tar_target(name = release_outputs,
@@ -243,41 +243,41 @@ list(
 #                                max_years_to_first_fire = NULL,
 #                                min_years_without_fire = NULL,
 #                                ndvi_prob = 0)),
-  # tar_target(envdata_predict,
-  #            tidy_static_data(
-  #              envdata_files,
-  #              remnant_distance=2, #drop pixels within this distance of remnant edge (km)
-  #              #region=c(xmin = 18.3, xmax = 19.3, ymin = -34.3, ymax = -33.3), #core
-  #              region=c(xmin = 0, xmax = 30, ymin = -36, ymax = -20), #whole region
-  #              #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
-  #              sample_proportion= sample_proportion_prediction,
-  #              long_pixels=long_pixels)),
+  tar_target(envdata_predict,
+             tidy_static_data(
+               envdata_files,
+               remnant_distance=2, #drop pixels within this distance of remnant edge (km)
+               #region=c(xmin = 18.3, xmax = 19.3, ymin = -34.3, ymax = -33.3), #core
+               region=c(xmin = 0, xmax = 30, ymin = -36, ymax = -20), #whole region
+               #region=c(xmin = 18.301425, xmax = 18.524242, ymin = -34.565951, ymax = -34.055531), #peninsula
+               sample_proportion= sample_proportion_prediction,
+               long_pixels=long_pixels)),
 
-  # tar_target(
-  #   data_predicting,
-  #   filter_training_data(envdata_predict,envvars)
-  # ),
-  #
-  # tar_target(
-  #   dyndata_predicting,
-  #   tidy_dynamic_data(envdata_predict,
-  #                     date_window=ymd(predicting_window))
-  # ),
+  tar_target(
+    data_predicting,
+    filter_training_data(envdata_predict,envvars)
+  ),
 
-  # tar_target(
-  #   stan_data_predict,
-  #   create_stan_data(
-  #     data=data_predicting,
-  #     dyndata=dyndata_predicting,
-  #     fit=1,
-  #     predict=1)
-  # ),
-  #
-  # tar_target(
-  #   stan_data_combined,
-  #   combine_stan_data(stan_data = stan_data,
-  #                     stan_data_predict = stan_data_predict)
-  # ),
+  tar_target(
+    dyndata_predicting,
+    tidy_dynamic_data(envdata_predict,
+                      date_window=ymd(predicting_window))
+  ),
+
+  tar_target(
+    stan_data_predict,
+    create_stan_data(
+      data=data_predicting,
+      dyndata=dyndata_predicting,
+      fit=1,
+      predict=1)
+  ),
+
+  tar_target(
+    stan_data_combined,
+    combine_stan_data(stan_data = stan_data,
+                      stan_data_predict = stan_data_predict)
+  )#,
 
 
 # tar_stan_vb(
@@ -299,7 +299,7 @@ list(
 #   format_df="parquet"
 #   #format="parquet"
 # ),
-#
+# #
 
 # Release model output
 

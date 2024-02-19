@@ -24,12 +24,15 @@ create_spatial_outputs <- function(envdata, envvars, model_results, data_trainin
   td$RT=td$lambda*log(200*td$gamma) #calculate recovery time
 
   if(F){ #amw exploring why regressions don't match 20240214
-    fitted_gamma=model_results %>%
+
+    filter(model_results,type=="spatial",parameter=="alpha") %>% ggplot(aes(x=mean))+geom_density()
+
+      fitted_gamma=model_results %>%
       filter(type=="spatial",parameter=="gamma") %>%
       mutate(pid=as.numeric(pid)) %>%
       left_join(
         dplyr::select(td,pid,gamma),by=c("pid"="pid"))
-    ggplot(fitted_gamma,aes(x=exp(gamma),y=median))+geom_point()+geom_abline()
+    ggplot(fitted_gamma,aes(x=gamma,y=median))+geom_point()+geom_abline()
   }
 
 

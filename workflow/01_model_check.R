@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 library(prioritizr)
 library(cmdstanr)

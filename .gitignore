@@ -51,3 +51,8 @@ index.md
 index_files
 network.html
 img/
+.Rbuildignore
+data/template.tif
+postfire_constrained
+postfire_season2
+postfire_season2
