@@ -1,6 +1,8 @@
 tidy_static_data <- function(envdata_files,
                              region,
                              remnant_distance,
+                             protected_areas=F,
+                             protected_area_distance=5,
                              sample_proportion,
                              long_pixels,
                              ...){
@@ -18,16 +20,17 @@ region_bbox = st_bbox(region,crs = st_crs(4326)) %>%
 td=data %>%
   collect() %>%
   as_tibble() %>%
-  left_join(bind_cols(long_pixels,long=1),by="cellID") %>% # add column for pixels with long records
+  left_join(bind_cols(long_pixels,long=1),by="cellID") %>%  # add column for pixels with long records
   mutate(
     Intercept = 1,  # add a column of ones for the intercept
     fynbos = case_when( #all remnants
       remnant_distance.tif>0 ~ TRUE,
       TRUE ~ FALSE),
-    model_domain = case_when( #core remnants within bbox domain
+    model_domain = case_when( #core remnants within protected areas within the bbox domain
       remnant_distance.tif>=remnant_distance &
         long==1 & #flag the long records
-      x>region_bbox$xmin & x<region_bbox$xmax &
+        ifelse(protected_areas, protected_area_distance.tif<=protected_area_distance,T) & # limit to remnants in protected areas?
+        x>region_bbox$xmin & x<region_bbox$xmax &
       y>region_bbox$ymin & y<region_bbox$ymax ~ TRUE,
       TRUE ~ FALSE)) %>%
   group_by(model_domain) %>%
