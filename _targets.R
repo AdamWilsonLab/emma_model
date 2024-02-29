@@ -75,22 +75,22 @@ print("Setting options")
 
 # Testing and training time windows
   print("setting time windows")
-  training_window=c("2000-01-01","2014-07-01")
-  testing_window=c("2014-07-01","2022-01-01")
+  training_window=c("2000-01-01","2023-12-31")
   #predicting_window=c("2000-01-01",as.character(Sys.Date()))
   #predicting_window=c("2022-01-01",as.character(Sys.Date()))
-  predicting_window=c("2021-01-01","2024-01-01")
+  predicting_window=c("2020-01-01",as.character(Sys.Date()))
 
 # decide sampling proportion
-  total_fynbos_pixels=348911
+  #nrow(envdata)
+  #total_fynbos_pixels=348911
   #sample_proportion=round(18000/total_fynbos_pixels,2);sample_proportion # ~5% works on github actions
   #sample_proportion=round(34891/total_fynbos_pixels,2);sample_proportion # ~10% sample
 
   # sample_proportion=.5;sample_proportion # ~10% sample
   # sample_proportion_prediction = .5
   # output_samples = 100 #number of output samples to characterize the posterior
-  sample_proportion=.2;sample_proportion # ~10% sample
-  sample_proportion_prediction = .2
+  sample_proportion=1;sample_proportion # proportion of pixels to include in model fitting
+  sample_proportion_prediction = 1. # proportion of pixels to predict full time series
   output_samples = 100 #number of output samples to characterize the posterior
   #thin = NULL #default
   thin = 100 #trying to get model to run locally

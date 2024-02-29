@@ -24,12 +24,13 @@ td=data %>%
   mutate(
     Intercept = 1,  # add a column of ones for the intercept
     fynbos = case_when( #all remnants
-      remnant_distance.tif>0 ~ TRUE,
+      remnants.tif==1 ~ TRUE,
       TRUE ~ FALSE),
     model_domain = case_when( #core remnants within protected areas within the bbox domain
-      remnant_distance.tif>=remnant_distance &
+#      remnant_distance.tif>=remnant_distance &
+        remnants.tif==1 &
         long==1 & #flag the long records
-        ifelse(protected_areas, protected_area_distance.tif<=protected_area_distance,T) & # limit to remnants in protected areas?
+#        ifelse(protected_area_distance.tif<=protected_area_distance,T,F) & # limit to remnants in protected areas?
         x>region_bbox$xmin & x<region_bbox$xmax &
       y>region_bbox$ymin & y<region_bbox$ymax ~ TRUE,
       TRUE ~ FALSE)) %>%
@@ -40,13 +41,13 @@ td=data %>%
   ungroup()
 
 #Jasper's inelegant hack to scale the spatial env vars...
-hmm1 <- td %>% dplyr::select(!where(is.numeric) | c(x, y, cellID, long,Intercept))
-hmm2 <- td %>% dplyr::select(where(is.numeric) & !c(x, y, cellID, long, Intercept)) %>% scale()
+hmm1 <- td %>% dplyr::select(!where(is.numeric) | c(x, y, cellID, long,Intercept, remnants.tif, remnant_distance.tif, protected_area_distance.tif))
+hmm2 <- td %>% dplyr::select(where(is.numeric) & !c(x, y, cellID, long, Intercept, remnants.tif, remnant_distance.tif, protected_area_distance.tif)) %>% scale()
 td <- cbind(hmm1, hmm2)
 
 if(F) {
   # map domain for debugging
-  ggplot(td,aes(x=x,y=y,fill=sample))+geom_tile()+coord_equal()
+ td %>% ggplot(mapping = aes(x=x,y=y,fill=model_domain))+geom_tile()+coord_equal()
 }
 
 return(td)

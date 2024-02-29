@@ -94,15 +94,15 @@ model {
 generated quantities {
 
 array[N] real y_pred;
-vector[N] mu_pred;
+//vector[N] mu_pred;
 
 //if(predict==1){ // only run if prediction is desired
     y_pred = normal_rng(mu, tau);
 
-  for (i in 1:N){
-    mu_pred[i] = alpha[pid[i]]+gamma_mu[pid[i]]-gamma_mu[pid[i]]*exp(-(age[i]/lambda_mu[pid[i]]))+
-      sin((phi+((firemonth[i]-1)*3.141593/6))+6.283185*age[i])*A_mu[pid[i]];
-}
+//  for (i in 1:N){
+//    mu_pred[i] = alpha[pid[i]]+gamma_mu[pid[i]]-gamma_mu[pid[i]]*exp(-(age[i]/lambda_mu[pid[i]]))+
+//      sin((phi+((firemonth[i]-1)*3.141593/6))+6.283185*age[i])*A_mu[pid[i]];
+//}
 
 
   }
